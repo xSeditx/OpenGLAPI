@@ -1,0 +1,50 @@
+DEVLOG
+OPENGL 2.0 Abstraction API
+
+
+                                                           January 24 2018
+                                                          -----------------
+
+Created a Window class and populated it using Callback functions with various data such as keyboard input, mouse buttons, error handlers and
+things of that nature. The Global Active Window is stored in GLFWWindow *SCREEN variable which is contained in a global state and points to the 
+Current target of the API functions. A window is contructed with the Window Constructor Window(x,y, width, height, "Title") at which point 
+the constructor creates the window and then assigns the newly constructed object to SCREEN so that it becomes the target of all the 
+Window API seen here.
+
+______________________________________________________________________________________________________________________________________________________
+
+       Current Data Handled and Functions created these are contained under Private in the Window class and used to 
+	   populate the class with useful data about the current state of the window.
+______________________________________________________________________________________________________________________________________________________
+ 
+                     CallBacks
+				  --------------
+voidError_callback         (int error, const char* description)
+void Resize_Callback       (GLFWwindow *HAND,int w,int h)
+void Window_close_callback (GLFWwindow* window)
+void KeyBoard_Callback     (GLFWwindow *window, int key, int scancode, int action, int mods);
+void Mouse_Callback        (GLFWwindow *window, int button, int action, int mod);
+
+
+                     Methods
+                -------------------
+          void SYNC      (unsigned short rate)
+unsigned short SYNC_RATE 
+          void DESTROY  
+______________________________________________________________________________________________________________________________________________________
+
+                         EXTERNAL API FOR WINDOW, GRAPHICS, and APPLICATION MANAGEMENT
+______________________________________________________________________________________________________________________________________________________
+
+bool Set_Window_Focus  (Window *);
+void SYNC
+void CLS       
+bool GAME_LOOP
+
+
+
+
+
+
+
+Something is wrong with the Mouse.SHOW command and I have to click both buttons to trigger the RIGHT button to show true.

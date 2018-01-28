@@ -46,5 +46,20 @@ bool GAME_LOOP
 
 
 
-
+**FIXED** Enumerated Mousebutton was done away with and a state Array created instead. Works perfectly so now Keyboard and Mouse input is perfectly managed
 Something is wrong with the Mouse.SHOW command and I have to click both buttons to trigger the RIGHT button to show true.
+
+======================================================================================================================================================
+______________________________________________________________________________________________________________________________________________________
+1/27:        Getting a MISSING GL VERSION ERROR FROM GLEW
+______________________________________________________________________________________________________________________________________________________
+Solution seems to be at: https://www.opengl.org/discussion_boards/showthread.php/163694-glew-Missing-GL-Version-error
+Re: glew Missing GL Version error
+I managed to find the reason for the problem. A wxGLContext doesn't automatically create an OpenGL context when it is created itself. 
+First when the wxGLCanvas it is supposed to work with have been displayed and selected as the current canvas using SetCurrent(), the OpenGL 
+context is created and then glewInit() can be called.
+______________________________________________________________________________________________________________________________________________________
+
+
+
+

@@ -8,7 +8,7 @@
 #include <iostream>
 #include <Windows.h>
 
-#include "vector.h"
+#include "vertex.h"
 
 const bool _DEBUG_TRACE = true;
 
@@ -100,7 +100,7 @@ public:
              Modifications;
         int  X,
              Y;
-// Need to change this	    inline bool IsButtonPressed (int button){   return Button[keycode];}
+        inline bool IsButtonPressed (int button){return Button[button];}
         inline void HIDE(){glfwSetInputMode(SCREEN->glCONTEXT, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);}
         inline void SHOW(){glfwSetInputMode(SCREEN->glCONTEXT, GLFW_CURSOR, GLFW_CURSOR_NORMAL);} 
     }MOUSE;
@@ -112,7 +112,7 @@ public:
              Action, 
              Modifications;
          int KEY_STATES[350];
-      inline bool IsKeyPressed        (int keycode)                              {   return KEY_STATES[keycode];}		
+      inline bool IsKeyPressed        (int keycode)                              { return KEY_STATES[keycode];}		
     }KEY_BOARD;
 
 private:

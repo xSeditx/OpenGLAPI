@@ -1,3 +1,4 @@
+#include "Vertex.h"
 
 struct iPoint2D{
     

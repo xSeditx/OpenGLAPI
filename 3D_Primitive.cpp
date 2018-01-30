@@ -70,12 +70,12 @@ void Primitive::display(void)
 }                                                                                 
 
 
-void Primitive::init(void)
+void Primitive::Init(void)
 {
    Mesh = glGenLists (1);
    glNewList(Mesh, GL_COMPILE);
        //Vec3 POS ={0,0,0};
-       CUBE(Vec3(0,0,0), 1);
+   CUBE(Vec3(0,0,0), 1);
    glEndList();
 
    glShadeModel(GL_FLAT);
@@ -140,3 +140,22 @@ GLuint Make_Triangle(float size)
                 glEnd();
 return displayList;
 }
+
+void Draw_Mesh(std::vector<Mesh> meshes){
+      for(Mesh &mesh : meshes){   
+
+      // glVertexAttribPointer (  posAttrLoc,  3, GL_FLOAT, false, sizeof(Vec3), mesh.OFFSET + offsetof(Vertex, pos));
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
+       //  glVertexAttribPointer (normalAttrLoc, 3, GL_FLOAT, false, sizeof(Vec3), mesh.OFFSET + offsetof(Vertex, normal));
+        //...                                ^numverts ^data type
+//        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.ebo);
+
+    //    glDrawElements(GL_TRIANGLES, mesh.vertexCount, GL_UNSIGNED_INT, mesh.indexOffset);
+    }
+}                                                                                                                                                                                                                                                                             
+
+
+
+
+
+

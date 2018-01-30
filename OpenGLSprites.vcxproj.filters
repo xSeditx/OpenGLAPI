@@ -30,7 +30,7 @@
     <ClCompile Include="Vertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FileUtils.cpp">
+    <ClCompile Include="Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -64,5 +64,13 @@
     <Text Include="OpenGL Resource information.txt">
       <Filter>Resource Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="basic.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="basic.vert">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

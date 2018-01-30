@@ -24,10 +24,10 @@ Window *SCREEN;  // Target window for my API
 
 Window::Window(int x,int y,int w,int h,char* title):X(x), Y(y), WIDTH(w), HEIGHT(h), TITLE(title)
 {
-	
+	   f_TRACE(Print("CREATED A WINDOW"));
 //------------------------------------------------------- GLFW Window Hints	--------------------------------------------------------------------------------------------  
         glfwWindowHint(GLFW_SAMPLES              ,    4); // 4x antialiasing
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,    2); // Min and Max supported OpenGL versions
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,    2.1); // Min and Max supported OpenGL versions
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,    0);
         glfwWindowHint(GLFW_RESIZABLE            , true);
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------	    
@@ -52,7 +52,7 @@ Window::Window(int x,int y,int w,int h,char* title):X(x), Y(y), WIDTH(w), HEIGHT
         glfwSetWindowSizeCallback  (glCONTEXT, Resize_Callback);                   // Callback when Window is Resized
         glfwSetWindowCloseCallback (glCONTEXT, Window_close_callback);             // Callback when Closed
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------	    
-
+        glViewport(0,0, WIDTH,HEIGHT);
 
 //DONT FORGET TO HANDLE GENERATING THE FUCKING FRAME BUFFER CORRECTLY
 //        _GL(glGenFramebuffers(10,FRAME_BUFFER.NAME));
@@ -65,17 +65,20 @@ Window::Window(int x,int y,int w,int h,char* title):X(x), Y(y), WIDTH(w), HEIGHT
 }
 
 //______________________________________________________________________________________________________________________________________________________________________
-//                                                          CALLBACK FUNCTIONS
+//*Best view in collapsed mode*           CALLBACK FUNCTIONS
 //______________________________________________________________________________________________________________________________________________________________________
 void Window::Error_callback        (int error, const char* description)
 {
+
         std::cout << "WINDOW ERROR CALLBACK: " << glewGetErrorString(error); // << std::end;
         fprintf(stderr, "Error: %s\n", description);
 }
 void Window::Resize_Callback       (GLFWwindow *HAND,int w,int h){
+f_TRACE(Print("Resize Callback"));
+
         SCREEN->HEIGHT = h;
         SCREEN->WIDTH  = w;
-        _GL(glViewport(0,0, w,h));
+    _GL(glViewport(0,0, w,h));
 }
 void Window::Window_close_callback (GLFWwindow* window)
 {
@@ -83,8 +86,7 @@ void Window::Window_close_callback (GLFWwindow* window)
             glfwSetWindowShouldClose(window, GL_TRUE);
 }
 void Window::KeyBoard_Callback     (GLFWwindow *window, int key, int scancode, int action, int mods){ //GLFW_PRESS, GLFW_RELEASE or GLFW_REPEAT.
-        
-        _TRACE(Print("SETUP THE KEYBOARD ROUTINE"));
+f_TRACE(Print("SETUP THE KEYBOARD ROUTINE"));
 
         SCREEN->KEY_BOARD.Key, 
         SCREEN->KEY_BOARD.Scancode,  
@@ -98,8 +100,7 @@ void Window::Mouse_Callback        (GLFWwindow *window, int button, int action, 
 }
 void Window::DropFile_callback     (GLFWwindow *window, int count, const char** paths)
 {
-        int i;
-        for (i = 0;  i < count;  i++){
+        for (int i = 0;  i < count;  i++){
                 Print("File the DropFILE callback to handle File:");  //handle_dropped_file(paths[i]);
                 Print(*paths);}                                        
 }
@@ -113,7 +114,7 @@ void Window::Window_Size_Callback  (GLFWwindow *window, int x, int y)
         SCREEN->Y = y;
 }
 	
-/*____________________________________________________________________________________________________________________________________________________________________*/
+//____________________________________________________________________________________________________________________________________________________________________*/
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -212,7 +213,6 @@ Vec2 Window::GET_WINDOW_POSITION(){
 //=================================================================================================================================================================== */
 //____________________________________________________ Error Logger for Printing OpenGL Errors _________________________________________________________________________
 
-
 bool GLLogCall(const char *function, const char *file, int line){
         GLenum error = glGetError();
         if(error != 0){
@@ -222,6 +222,7 @@ bool GLLogCall(const char *function, const char *file, int line){
             std::cout << "LINE NUMBER: " << line << std::endl;
             std::cout << "FUNCTION: " << function << std::endl;
             return false;
+            system("PAUSE");
         }
   return true;
 }

@@ -41,4 +41,60 @@ Arrange the scene to be photographed into the desired composition (modeling tran
 Choose a camera lens or adjust the zoom (projection transformation). 
 Determine how large you want the final photograph to be - for example, you might want it enlarged (viewport transformation).
 
+https://computergraphics.stackexchange.com/questions/5895/what-is-an-opengl-vao-in-a-nutshell
+you MUST bind the VBO's under a VAO to get rendering output, if you just bind the VAO you won't get outpt. That's not true.
+ You can bind dummy VAO without attached VBOs and still dispatch drawcall. – narthex Nov 20 '
 
+
+
+
+
+
+ GLenum glCheckFramebufferStatus(	GLenum target);
+ 
+ void glDrawArrays(	GLenum mode,
+ 	GLint first,
+ 	GLsizei count);
+
+
+	C Specification
+void glVertexAttribPointer(	GLuint index,
+ 	GLint size,
+ 	GLenum type,
+ 	GLboolean normalized,
+ 	GLsizei stride,
+ 	const GLvoid * pointer);
+ 
+
+ 
+
+//		glViewport(0,0,640,480);
+//GLuint Vert_Shader_Id = 0,
+//	   Frag_Shader_Id = 0,
+//	   Shader_Program_Id = 0;
+ //
+ //                 // GL_VERTEX_SHADER 0x8B31
+////		Load_Shader(0x8B31, VERTEX_SHADER  , &Vert_Shader_Id);
+//		          //GL_FRAGMENT_SHADER 0x8B30
+//		Load_Shader(0x8B30,FRAGMENT_SHADER  , &Frag_Shader_Id);
+//		Shader_Program_Id = glCreateProgram();
+//		glAttachShader(Shader_Program_Id, Vert_Shader_Id);
+//		glAttachShader(Shader_Program_Id, Frag_Shader_Id);
+//		Print(Vert_Shader_Id);
+//		Print(Frag_Shader_Id);
+ //
+
+//glClear(.0,.3,.8,1.0);
+
+
+//https://www.3dgep.com/rendering-primitives-with-opengl/
+
+
+
+
+
+
+
+// USE THIS TO MAKE A FPS Getter and Setters 
+//glfwSwapBuffers(window);
+//glfwSwapInterval(1);

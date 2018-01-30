@@ -10,11 +10,11 @@
 
 #include "vertex.h"
 
-const bool _DEBUG_TRACE = true;
+const bool TRACE = true;
 
 #define DEBUG
 //#define TRACE
-
+#define FUNCTION_TRACE
 //======================================================================================================================================================================
 //_____________________________________________________________  MACROS  _______________________________________________________________________________________________
 
@@ -26,23 +26,27 @@ const bool _DEBUG_TRACE = true;
 
 
 #ifdef TRACE
-      #define  _TRACE(x) if(_DEBUG_TRACE) x
+      #define  _TRACE(x)  std::cout << #x << std::endl
 #else
       #define _TRACE(x)
 #endif
 
- 
+#ifdef FUNCTION_TRACE
+      #define  f_TRACE(x)  std::cout << #x << std::endl
+#else
+      #define f_TRACE(x)
+#endif
+
 
 #ifdef DEBUG
-#define _GL(x)   GLClearError();\
-                   x;\
+#define _GL(x)           GLClearError();\
+                                      x;\
+                              _TRACE(x);\
                    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
 #else
       #define _GL(x)  x
 #endif
 
-
-//#define DEBUG
 #ifdef  DEBUG
     #define GLCall(x) GLClearError(); x; ASSERT(GLLogCall(...))
 #else
@@ -73,7 +77,6 @@ public:
     Window(){}
     ~Window(){ glfwTerminate();}
     Window(int,int,int,int,char*);
-
 	
     int     X,     Y,
         WIDTH,HEIGHT;

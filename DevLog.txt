@@ -42,10 +42,6 @@ void CLS
 bool GAME_LOOP
 
 
-
-
-
-
 **FIXED** Enumerated Mousebutton was done away with and a state Array created instead. Works perfectly so now Keyboard and Mouse input is perfectly managed
 Something is wrong with the Mouse.SHOW command and I have to click both buttons to trigger the RIGHT button to show true.
 
@@ -63,3 +59,46 @@ ________________________________________________________________________________
 
 
 
+======================================================================================================================================================
+______________________________________________________________________________________________________________________________________________________
+1/28:        Getting a MISSING GL VERSION ERROR FROM GLEW
+______________________________________________________________________________________________________________________________________________________
+
+For my old Vertex and Matrix classes and implimented them as well as the starts of the simplistic shader class.
+
+Window is crashing on exit due to issues with loading a framebuffer. Better reference and naming to the framebuffer is in order.
+
+ADDED METHODS AND CLASSES
+============================================================RENDERER.H===================================================================================
+_______________________________________BUFFER CLASS _______________________________________________________________________________________________
+
+Buffer(GLfloat *data,GLsizei count,GLint componentcount);
+Bind()
+Unbind()
+__________________________________ INDEX BUFFER CLASS __________________________________________________________________________________________________
+
+IndexBuffer(GLushort *data,GLsizei count): COUNT(count)
+Bind()
+Unbind()
+__________________________________ VERTEX BUFFER CLASS __________________________________________________________________________________________________
+
+Addbuffer (Buffer *buffer, GLuint index)
+Bind()
+Unbind()
+___________________________________ RENDERER CLASS __________________________________________________________________________________________________
+
+Renderer::Push(Matrix4 mat4)
+Renderer::Pop()
+
+
+
+======================================================================================================================================================
+______________________________________________________________________________________________________________________________________________________
+1/30:        Getting a MISSING GL VERSION ERROR FROM GLEW
+______________________________________________________________________________________________________________________________________________________
+
+Not Much of anything has been dont as I have hit a stagnent area in which everything I know about OpenGL is no longer applicable due to the fact that my 
+graphics card does not support modern opengl. I need to reconsider the entire structure of this framework now and decide exactly how I am going to proceed from here
+
+I will possibly mimic VAO however there use will not be as efficient since it will be cpu side indexing. I know of no current work around to effectively 
+simulate the VAO.

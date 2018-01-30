@@ -10,16 +10,16 @@
 //======================================================================================================================================================================================
 
 Shader::Shader(const char* vertpath,const char* fragpath)
-	: m_Vertpath(vertpath),m_Fragpath(fragpath)
+              : m_Vertpath(vertpath),m_Fragpath(fragpath)
 {
-        m_ShaderID = load();
+        m_ShaderID = Load();
 }
 
 Shader::~Shader(){
-	    glDeleteProgram(m_ShaderID);
+        glDeleteProgram(m_ShaderID);
 }
 
-GLuint Shader::load()
+GLuint Shader::Load()
 {
         GLuint program = glCreateProgram();
         GLuint vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -78,7 +78,6 @@ return program;
 }
 
 
-
 void Shader::Enable() const
 {
     glUseProgram(m_ShaderID);
@@ -90,8 +89,45 @@ void Shader::Disable() const
     glUseProgram(0);
 }
 
+
+
+GLint GetUniformLocation(GLchar *name){
+
+}
+
+void Shader::SetUniform1f(GLchar *name, float value){
+glUniform1f(GetUniformLocation(name), value);
+}
+
+
+void Shader::SetUniform1Int(GLchar *name, int value){
+glUniform1i(GetUniformLocation(name), value);
+}
+
+
+void Shader::SetUniform2f(GLchar *name,  Vec2 &vector){
+glUniform2f(GetUniformLocation(name), vector.x, vector.y);
+} 
+
+void Shader::SetUniform3f(GLchar *name,  Vec3 &vector) {
+glUniform3f(GetUniformLocation(name), vector.x, vector.y,vector.z);
+}
+ 
+
+void Shader::SetUniform4f(GLchar *name,  Vec4 &vector) {
+glUniform4f(GetUniformLocation(name), vector.x, vector.y,vector.z, vector.w);
+}
+
+void Shader::SetUniformMat4(GLchar *name,  Matrix4 &matrix) {
+glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, matrix.elements);
+}
+
+
+GLint Shader::GetUniformLocation(GLchar *name){
+return glGetUniformLocation(m_ShaderID, name);
+}
 //======================================================================================================================================================================================
-//                                                                                                                                                                                            
+//          TEST DATA FOR SHADERS PRIMATIVES ETC...........ETC                                                                                                                                                                   
 //======================================================================================================================================================================================
 
 

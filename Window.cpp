@@ -22,20 +22,34 @@ Window *SCREEN;  // Target window for my API
 //                                                      /* Construct Window */                                                                                        //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-Window::Window(int x,int y,int w,int h,char* title):X(x), Y(y), WIDTH(w), HEIGHT(h), TITLE(title)
+Window::Window(int x,int y,int w,int h,char* title)
+       :X(x),
+        Y(y),
+        WIDTH(w), 
+        HEIGHT(h), 
+        TITLE(title),
+        TIMER(0),
+        FRAME_COUNT(0),
+        FPS(0),
+        SyncRATE(0)
 {
-	   f_TRACE(Print("CREATED A WINDOW"));
+    f_TRACE(Print("CREATED A WINDOW"));
+
+        glewExperimental = GL_TRUE;
+        if (!glfwInit())exit(-1);
+
 //------------------------------------------------------- GLFW Window Hints	--------------------------------------------------------------------------------------------  
         glfwWindowHint(GLFW_SAMPLES              ,    4); // 4x antialiasing
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,    2.1); // Min and Max supported OpenGL versions
+       // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,    3.0); // Min and Max supported OpenGL versions
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,    0);
         glfwWindowHint(GLFW_RESIZABLE            , true);
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------	    
 	    
-        glCONTEXT  = glfwCreateWindow(w, h, title, NULL, NULL);  if  (!glCONTEXT){
+        glCONTEXT  = glfwCreateWindow(w, h, title,  NULL, NULL);  if  (!glCONTEXT){
                                                                  glfwTerminate   ();  // Kill if Creation Failed
                                                                  exit(EXIT_FAILURE);
                                                                  }
+
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------	    
         Set_Window_Focus       (this);
         Hwnd = GetActiveWindow ();
@@ -52,16 +66,37 @@ Window::Window(int x,int y,int w,int h,char* title):X(x), Y(y), WIDTH(w), HEIGHT
         glfwSetWindowSizeCallback  (glCONTEXT, Resize_Callback);                   // Callback when Window is Resized
         glfwSetWindowCloseCallback (glCONTEXT, Window_close_callback);             // Callback when Closed
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------	    
-        glViewport(0,0, WIDTH,HEIGHT);
+        glViewport(0,0, WIDTH, HEIGHT);
+        MOUSE.MouseMoveX = 0;
+        MOUSE.MouseMoveY = 0;
+        MOUSE.Action     = 0;
 
-//DONT FORGET TO HANDLE GENERATING THE FUCKING FRAME BUFFER CORRECTLY
-//        _GL(glGenFramebuffers(10,FRAME_BUFFER.NAME));
-//        glfwGetFramebufferSize(glCONTEXT, FRAME_BUFFER.WIDTH, FRAME_BUFFER.HEIGHT); // Retrieves the size of the frame buffer and places it into the class
-        FRAME_COUNT = 0;
-        FPS         = 0;
-
+       KEY_BOARD.Key = 0;
+       KEY_BOARD.Scancode = 0;  
+       KEY_BOARD.Action = 0;
+       KEY_BOARD.Modifications = 0;
         for(int count = 0; count < 350;count++)SCREEN->KEY_BOARD.KEY_STATES[count] = 0;	// NULLIFY the KEYBOARD ARRAY
+ 
+        Set_Window_Focus(this);
+  
+        if (glewInit())
+        {
+            printf("GLEW ERROR: %s\n", glewGetErrorString(glewInit()));
+            system("PAUSE");
+            exit(EXIT_FAILURE);
+        }
+// --------------- Initialize Matrices ----------------------------------------------------
+        glShadeModel(GL_SMOOTH);
+        glEnable(GL_DEPTH_TEST);
+       
+        _GL(glMatrixMode(GL_PROJECTION ));
+        _GL(glLoadIdentity()); 
+        gluPerspective(30,640.0/480.0, 1, 1000);
 
+        _GL(glMatrixMode( GL_MODELVIEW ));
+        _GL(glLoadIdentity());
+        _GL(glTranslatef(0, 0, 0));
+ //-------------------------------------------------------------------------------------------      
 }
 
 //______________________________________________________________________________________________________________________________________________________________________
@@ -87,15 +122,23 @@ void Window::Window_close_callback (GLFWwindow* window)
 }
 void Window::KeyBoard_Callback     (GLFWwindow *window, int key, int scancode, int action, int mods){ //GLFW_PRESS, GLFW_RELEASE or GLFW_REPEAT.
 f_TRACE(Print("SETUP THE KEYBOARD ROUTINE"));
+       
 
-        SCREEN->KEY_BOARD.Key, 
-        SCREEN->KEY_BOARD.Scancode,  
-        SCREEN->KEY_BOARD.Action, 
-        SCREEN->KEY_BOARD.Modifications;
+       switch (action){
+       case(GLFW_PRESS):
+               SCREEN->KEY_BOARD.Key = key; 
+           break;
+       case(GLFW_RELEASE):  
+               SCREEN->KEY_BOARD.Key = 0; 
+           break;
+       }
+
+        SCREEN->KEY_BOARD.Scancode = scancode;  
+        SCREEN->KEY_BOARD.Modifications = mods;
         SCREEN->KEY_BOARD.KEY_STATES[key] = glfwGetKey(SCREEN->glCONTEXT,key);	
-
 }
 void Window::Mouse_Callback        (GLFWwindow *window, int button, int action, int mod){
+    SCREEN->MOUSE.Action = action;
         SCREEN->MOUSE.Button[button] = action != GLFW_RELEASE;
 }
 void Window::DropFile_callback     (GLFWwindow *window, int count, const char** paths)
@@ -105,12 +148,19 @@ void Window::DropFile_callback     (GLFWwindow *window, int count, const char** 
                 Print(*paths);}                                        
 }
 void Window::MouseMove_Callback    (GLFWwindow *window, double xpos, double ypos){
+      
+
+  //    Print(     SCREEN->MOUSE.MouseMoveX);
+        SCREEN->MOUSE.MouseMoveX = SCREEN->MOUSE.X - xpos;
+        SCREEN->MOUSE.MouseMoveY = SCREEN->MOUSE.Y - ypos;
         SCREEN->MOUSE.X = xpos,
         SCREEN->MOUSE.Y = ypos;
+
 }
 void Window::Window_Size_Callback  (GLFWwindow *window, int x, int y)
 {
-        SCREEN->X = x; // Double check to ensure this is the height and width and not position
+f_TRACE("WINDOW SIZE CALLBACK"); // I AM CURRENTLY NOT SURE HOW EXACTLY THIS DIFFERS FROM THE RESIZE CALL BACK
+        SCREEN->X = x; // Double check to ensure this is the height and width and not position THIS SHOULD BE THE WINDOW MOVE CALLBACK WTF
         SCREEN->Y = y;
 }
 	
@@ -158,7 +208,7 @@ Vec2 Window::GET_WINDOW_POSITION(){
 //__________________________________________________________ Swap front and back buffers _______________________________________________________________________________
 	inline void SYNC(){
 /*~~~~~~~~~~~~~~~~~~Get Frames Per Second~~~~~~~~~~~~~~~~~~~~*/
-		
+   
         if((glfwGetTime() - SCREEN->TIMER) >= 1)
             {
                         SCREEN->FPS = SCREEN->FRAME_COUNT;
@@ -171,17 +221,36 @@ Vec2 Window::GET_WINDOW_POSITION(){
             int W,H;
             glfwGetFramebufferSize(SCREEN->glCONTEXT,&W,&H); //<---------- The pollevents here and in the GAME_LOOP function should be reviewed because even though its working I dont believe its being done correctly;
             glfwSwapBuffers(SCREEN->glCONTEXT);
+
     }
 
 //======================================================================================================================================================================
 //____________________________________________________________  Clear the back buffers  ________________________________________________________________________________
     inline void CLS(){
-            _GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+        _GL(glClearColor(0,0,GL_Color(255),1));
+        _GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
+    }
+ 
+    inline void CLS(unsigned long color){
+        int R =  color % 255,
+            G = (color / 256)   % 256,
+            B = (color / 65536) % 256;
+        _GL(glClearColor(R,G,B,1));
+        _GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
     }
 
 //======================================================================================================================================================================
 //______________________________________________________  EVENT HANDLER AND MESSAGE DISPATCHER  ________________________________________________________________________
-    bool GAME_LOOP(){                                       /*----- May be overloaded -----*/
+    bool GAME_LOOP(){          /*----- May be overloaded -----*/
+
+      SCREEN->MOUSE.MouseMoveX -= SCREEN->MOUSE.X;
+      SCREEN->MOUSE.MouseMoveY -= SCREEN->MOUSE.Y;
+               SCREEN->MOUSE.OldX = SCREEN->MOUSE.X;
+               SCREEN->MOUSE.Oldy = SCREEN->MOUSE.Y;
+            SCREEN->MOUSE.MouseMoveX += SCREEN->MOUSE.X;
+            SCREEN->MOUSE.MouseMoveY += SCREEN->MOUSE.Y;
+
             glfwPollEvents();
             if (glfwWindowShouldClose(SCREEN->glCONTEXT))return false;
     return true;
@@ -195,7 +264,6 @@ Vec2 Window::GET_WINDOW_POSITION(){
             if(text) return text; else 
         return NULL;
     } 
-                                    
     void  SET_CLIPBOARD  (char *text){  /*clipboard setter*/
 		Print("TEST SET CLIPBOARD FUNCTION");
 			glfwSetClipboardString(SCREEN->glCONTEXT,text);
@@ -203,7 +271,7 @@ Vec2 Window::GET_WINDOW_POSITION(){
 
 //======================================================================================================================================================================
 //__________________________________________________________ Get Buffer Offser Pointer _________________________________________________________________________________
-    inline GLvoid* BufferObjectPtr( unsigned int idx )
+inline GLvoid* BufferObjectPtr( unsigned int idx )
 {
     return (GLvoid*)( ((char*)NULL) + idx );
 }
@@ -226,8 +294,6 @@ bool GLLogCall(const char *function, const char *file, int line){
         }
   return true;
 }
-
-
 void GLCheckError(){
    GLenum err;
    while((err = glGetError()) != GL_NO_ERROR)
@@ -236,7 +302,6 @@ void GLCheckError(){
    }
 
 }
-
 void GLClearError(){
      while((glGetError()) != GL_NO_ERROR);
 }
@@ -246,14 +311,25 @@ void GLClearError(){
 
 
 
-
+float WrapAngle(float angle){
+    while(angle < 0)   angle += 360;
+    while(angle > 360) angle -= 360;
+    return angle;
+}
 
 //=================================================================================================================================================================== */
 //_____________________________________________________________________________________________________________________________________________________________________
-  
 
+void *GetAnyGLFuncAddress(const char *name)
+{
+  void *p = (void *)wglGetProcAddress(name);
+  if(p == 0 ||
+    (p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
+    (p == (void*)-1) )
+  {
+    HMODULE module = LoadLibraryA("opengl32.dll");
+    p = (void *)GetProcAddress(module, name);
+  }
 
-
-
-
-
+  return p;
+}

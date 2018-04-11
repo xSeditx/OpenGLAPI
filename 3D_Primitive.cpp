@@ -1,161 +1,331 @@
+
+#include"Renderer.h"
 #include"3D_Primitive.h"
+#include "window.h"
 
-GLuint Primitive::CUBE (Vec3 pos,float size){
-    // The distance from the center to the outside of the cube
-    // is half the size.
-    size = size / 2.0f;
- 
-    GLuint displayList = glGenLists(1);
-    if(!displayList) Print("Failed to make Object:CUBE");
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-    glNewList( displayList, GL_COMPILE );
-    {
-        glBegin( GL_QUADS );
-        // Top face
-        glColor3f(   0.0f, 1.0f,  0.0f );  // Green
-        glVertex3d(  size, size, -size );  // Top-right of top face
-        glVertex3f( -size, size, -size );  // Top-left of top face
-        glVertex3f( -size, size,  size );  // Bottom-left of top face
-        glVertex3f(  size, size,  size );  // Bottom-right of top face
- 
-        // Bottom face
-        glColor3f(   1.0f,  0.5f,  0.0f ); // Orange
-        glVertex3f(  size, -size, -size ); // Top-right of bottom face
-        glVertex3f( -size, -size, -size ); // Top-left of bottom face
-        glVertex3f( -size, -size,  size ); // Bottom-left of bottom face
-        glVertex3f(  size, -size,  size ); // Bottom-right of bottom face
- 
-        // Front face
-        glColor3f(   1.0f,  0.0f, 0.0f );  // Red
-        glVertex3f(  size,  size, size );  // Top-Right of front face
-        glVertex3f( -size,  size, size );  // Top-left of front face
-        glVertex3f( -size, -size, size );  // Bottom-left of front face
-        glVertex3f(  size, -size, size );  // Bottom-right of front face
- 
-        // Back face
-        glColor3f(   1.0f,  1.0f,  0.0f ); // Yellow
-        glVertex3f(  size, -size, -size ); // Bottom-Left of back face
-        glVertex3f( -size, -size, -size ); // Bottom-Right of back face
-        glVertex3f( -size,  size, -size ); // Top-Right of back face
-        glVertex3f(  size,  size, -size ); // Top-Left of back face
- 
-        // Left face
-        glColor3f(   0.0f,  0.0f,  1.0f);  // Blue
-        glVertex3f( -size,  size,  size);  // Top-Right of left face
-        glVertex3f( -size,  size, -size);  // Top-Left of left face
-        glVertex3f( -size, -size, -size);  // Bottom-Left of left face
-        glVertex3f( -size, -size,  size);  // Bottom-Right of left face
- 
-        // Right face
-        glColor3f(   1.0f,  0.0f,  1.0f);  // Magenta
-        glVertex3f(  size,  size,  size);  // Top-Right of left face
-        glVertex3f(  size,  size, -size);  // Top-Left of left face
-        glVertex3f(  size, -size, -size);  // Bottom-Left of left face
-        glVertex3f(  size, -size,  size);  // Bottom-Right of left face
-        glEnd();        
-    }
-    glEndList();
- 
-    return displayList;
-}
-
-
-
-void Primitive::display(void)
+ Torus::Torus(int numc, int numt, float X, float Y, float Z, float scale)
 {
+    Scale.x = scale;
+    Scale.y = scale;
+    Scale.z = scale; 
+    Position.x = X;
+    Position.y = Y;
+    Position.z = Z;
+        ObjectType = Torus_t;
+    List = glGenLists(1);
+   glNewList(List, GL_COMPILE);
 
-   glColor3f (1.0, 1.0, 1.0);
-//   glCallList(Mesh);
-  // glFlush();
-}                                                                                 
+   int i, j, k;
+   double s, t, x, y, z, twopi;
 
+   twopi = 2 * (double)M_PI;
 
-void Primitive::Init(void)
-{
-   Mesh = glGenLists (1);
-   glNewList(Mesh, GL_COMPILE);
-       //Vec3 POS ={0,0,0};
-   CUBE(Vec3(0,0,0), 1);
+   for (i = 0; i < numc; i++) {
+      glBegin(GL_QUAD_STRIP);
+      for (j = 0; j <= numt; j++) {
+         for (k = 1; k >= 0; k--) {
+            s = (i + k) % numc + 0.5;
+            t = j % numt;
+
+            x = (1+.1*cos(s*twopi/numc))*cos(t*twopi/numt);
+            y = (1+.1*cos(s*twopi/numc))*sin(t*twopi/numt);
+            z = .1 * sin(s * twopi / numc);
+
+            glColor3f(GL_Color(x* 255.0),GL_Color(y* 255.0),GL_Color(z * 255.0));
+            glVertex3f(x ,y, z);
+         }
+      }
+      glEnd();
+   }
    glEndList();
+}
+ 
+void Torus::Rotate(float x, float y, float z){
+    Rotation.x+=x;
+    Rotation.y+=y;
+    Rotation.z+=z;
+}
+void Torus::Set_Position(float x, float y, float z){
+    Position.x=x;
+    Position.y=y;
+    Position.z=z;
+}
+void Torus::Render(){
 
-   glShadeModel(GL_FLAT);
-   glClearColor(0.0, 0.0, 0.0, 0.0);
-}                                                                                    
-                                                                                    
-                                                                                    
-void Primitive::reshape(int w, int h)
+glPushMatrix();
+
+  glScalef(Scale.x,Scale.y,Scale.z);
+  glRotatef(Rotation.x, 1.0, 0.0, 0.0);
+  glRotatef(Rotation.y, 0.0, 1.0, 0.0);
+  glRotatef(Rotation.z, 0.0, 0.0, 1.0);
+
+    glTranslatef(Position.x, 0.0f, 0.0f);
+    glTranslatef(0.0f, Position.y, 0.0f);
+    glTranslatef(0.0f, 0.0f, Position.z);
+    glCallList(List);
+glPopMatrix();
+
+}
+
+
+Sphere::Sphere(Vec3 pos, float radius)     
 {
-   glViewport(0, 0, (GLsizei) w, (GLsizei) h);
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-   gluPerspective(30, (GLfloat) w/(GLfloat) h, 1.0, 100.0);
-   glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
-   gluLookAt(0, 0, 10, 0, 0, 0, 0, 1, 0);
-}                                                                 
+    Position = pos;
+    Scale = 2;
+    ObjectType = Sphere_t;
 
-//struct Vec3_COLOR{
-//        Vec3   m_Pos;
- //       Vec3   m_Color; 
-//};
+       float x=0,y=0,z=0;
+       float x1=0,y1=0,z1=0;
+       float x2=0,y2=0,z2=0;
+       float x3=0,y3=0,z3=0;
+       float size = 20;
 
 
-GLuint Primitive::CUBE2 (Vec3 pos,float size){
-        Vec3_COLOR Mesh[8] = {
-            { Vec3(  1,  1,  1 ), Vec3( 1, 1, 1 ) }, // 0
-            { Vec3( -1,  1,  1 ), Vec3( 0, 0, 0 ) }, // 1
-            { Vec3( -1, -1,  1 ), Vec3( 0, 0, 1 ) }, // 2
-            { Vec3(  1, -1,  1 ), Vec3( 1, 0, 1 ) }, // 3
-            { Vec3(  1, -1, -1 ), Vec3( 1, 0, 0 ) }, // 4
-            { Vec3( -1, -1, -1 ), Vec3( 0, 0, 0 ) }, // 5
-            { Vec3( -1,  1, -1 ), Vec3( 0, 1, 0 ) }, // 6
-            { Vec3(  1,  1, -1 ), Vec3( 1, 1, 0 ) }, // 7
-        };
+List = glGenLists(1);
+glNewList(List, GL_COMPILE);
+
+   for(float Long =0;Long < 180;Long+=size){
+       glBegin(GL_TRIANGLE_STRIP);
+       for(float Lat =0;Lat < 360;Lat+=size){
+           x = radius * (sin(RADIANS(Lat)) * cos(RADIANS(Long)));
+           y = radius * (sin(RADIANS(Lat)) * sin(RADIANS(Long)));
+           z = radius *  cos(RADIANS(Lat));
+  
+           x1 = radius * (sin(RADIANS(Lat + size)) * cos(RADIANS(Long)));
+           y1 = radius * (sin(RADIANS(Lat + size)) * sin(RADIANS(Long)));
+           z1 = radius *  cos(RADIANS(Lat + size));
+  
+           x2 = radius * (sin(RADIANS(Lat)) * cos(RADIANS(Long+size)));
+           y2 = radius * (sin(RADIANS(Lat)) * sin(RADIANS(Long+size)));
+           z2 = radius *  cos(RADIANS(Lat));
+  
+           x3 = radius * (sin(RADIANS(Lat+ size)) * cos(RADIANS(Long+ size)));
+           y3 = radius * (sin(RADIANS(Lat+ size)) * sin(RADIANS(Long+ size)));
+           z3 = radius *  cos(RADIANS(Lat+ size));
+  
+  
+           glColor3f(GL_Color(x* 255.0),GL_Color(y* 255.0),GL_Color(z * 255.0));
+           glVertex3f(x + 10, y + 10, z + 10);
+  
+           glColor3f(GL_Color(x* 255.0),GL_Color(y* 255.0),GL_Color(z * 255.0));
+           glVertex3f(x1 + 10, y1 + 10, z1 + 10);
+  
+           glColor3f(GL_Color(x* 255.0),GL_Color(y* 255.0),GL_Color(z * 255.0));
+           glVertex3f(x2 + 10, y2 + 10, z2 + 10);
+           glVertex3f(x3 + 10, y3 + 10, z3 + 10);
+       }
+              glEnd();
+   }
+  
+   glEndList();
+}
+void Sphere::Render()
+{
+    
+glPushMatrix();
+
+ //glScalef(Scale.x,Scale.y,Scale.z);
+ //glRotatef(Rotation.x, 1.0, 0.0, 0.0);
+ //glRotatef(Rotation.y, 0.0, 1.0, 0.0);
+ //glRotatef(Rotation.z, 0.0, 0.0, 1.0);
+ //
+    glTranslatef(Position.x, 0.0f, 0.0f);
+    glTranslatef(0.0f, Position.y, 0.0f);
+    glTranslatef(0.0f, 0.0f, Position.z);
+    glCallList(List);
+glPopMatrix();
+}
+void Mesh::Render(){
+
+_GL(glPushMatrix());
+
+_GL(  glScalef(Scale.x,Scale.y,Scale.z));
+_GL(  glRotatef(Rotation.x, 1.0, 0.0, 0.0));
+_GL(  glRotatef(Rotation.y, 0.0, 1.0, 0.0));
+_GL(  glRotatef(Rotation.z, 0.0, 0.0, 1.0));
+
+_GL(    glTranslatef(Position.x, 0.0f, 0.0f));
+_GL(    glTranslatef(0.0f, Position.y, 0.0f));
+ _GL(   glTranslatef(0.0f, 0.0f, Position.z));
+ _GL(   glCallList(List));
+_GL(glPopMatrix());
+
+}
+
+
+Cube::Cube(Vec3 pos, float size)
+{
+    List = glGenLists(1);
+    Position = pos;
+    ObjectType = Cube_t;
+   _GL( glNewList(List, GL_COMPILE));
+       _GL(   glBegin(GL_QUADS));       
+       _GL(    glColor3f(GL_Color(255.0 / size),GL_Color(255.0 / size),GL_Color(255.0 / size)));
+            _GL(       glVertex3f(-1.0f * size, -1.0f * size, -1.0f * size));  
+               _GL(    glVertex3f( 1.0f * size, -1.0f * size, -1.0f * size));  
+              _GL(     glVertex3f( 1.0f * size, -1.0f * size,  1.0f * size));  
+              _GL(     glVertex3f(-1.0f * size, -1.0f * size,  1.0f * size));  
+                                                                        
+              _GL(     glVertex3f(-1.0f * size, -1.0f * size,  1.0f * size));  
+              _GL(     glVertex3f( 1.0f * size, -1.0f * size,  1.0f * size));  
+              _GL(     glVertex3f( 1.0f * size,  1.0f * size,  1.0f * size));  
+              _GL(     glVertex3f(-1.0f * size,  1.0f * size,  1.0f * size));  
+                                                                        
+             _GL(      glVertex3f(-1.0f * size, -1.0f * size, -1.0f * size));  
+             _GL(      glVertex3f(-1.0f * size,  1.0f * size, -1.0f * size));  
+             _GL(      glVertex3f( 1.0f * size,  1.0f * size, -1.0f * size));  
+             _GL(      glVertex3f( 1.0f * size, -1.0f * size, -1.0f * size));  
+                                                                        
+            _GL(       glVertex3f( 1.0f * size, -1.0f * size, -1.0f * size));  
+            _GL(       glVertex3f( 1.0f * size,  1.0f * size, -1.0f * size));  
+            _GL(       glVertex3f( 1.0f * size,  1.0f * size,  1.0f * size));  
+             _GL(      glVertex3f( 1.0f * size, -1.0f * size,  1.0f * size));  
+                                                                        
+             _GL(      glVertex3f(-1.0f * size, -1.0f * size, -1.0f * size));  
+             _GL(      glVertex3f(-1.0f * size, -1.0f * size,  1.0f * size));  
+              _GL(     glVertex3f(-1.0f * size,  1.0f * size,  1.0f * size));  
+             _GL(      glVertex3f(-1.0f * size,  1.0f * size, -1.0f * size));  
+       _GL(   glEnd());     
+   _GL(   glEndList());
+}
+void Cube::Render(){
+    glPushMatrix();
+   
+    glScalef(Scale.x,Scale.y,Scale.z);
+    glRotatef(Rotation.x, 1.0, 0.0, 0.0);
+    glRotatef(Rotation.y, 0.0, 1.0, 0.0);
+    glRotatef(Rotation.z, 0.0, 0.0, 1.0);
+   
+    glTranslatef(Position.x, 0.0f, 0.0f);
+    glTranslatef(0.0f, Position.y, 0.0f);
+    glTranslatef(0.0f, 0.0f, Position.z);
+    glCallList(List);
+    glPopMatrix();
+
+}
+
+
+
+Ball::Ball(Vec3 pos, float radius) 
+    : Position (pos),
+      VertexCount(0),
+      Radius(radius)   
+{
+
+    int ColorCount=0;
+    
+ 
+   GLuint BufferID;
+     
+   float size = 20;
+   float x=0,y=0,z=0;
+   float x1=0,y1=0,z1=0;
+   float x2=0,y2=0,z2=0;
+   float x3=0,y3=0,z3=0;
+
+   int vertex_count=0, vcount=0;
+   int counter =0;
+   for(float Long =0;Long < 180;Long+=size){
+        for(float Lat =0;Lat < 360;Lat+=size){
+               x = radius * (sin(RADIANS(Lat)) * cos(RADIANS(Long)));
+               y = radius * (sin(RADIANS(Lat)) * sin(RADIANS(Long)));
+               z = radius *  cos(RADIANS(Lat));
+            
+               x1 = radius * (sin(RADIANS(Lat + size)) * cos(RADIANS(Long)));
+               y1 = radius * (sin(RADIANS(Lat + size)) * sin(RADIANS(Long)));
+               z1 = radius *  cos(RADIANS(Lat + size));
+            
+               x2 = radius * (sin(RADIANS(Lat)) * cos(RADIANS(Long+size)));
+               y2 = radius * (sin(RADIANS(Lat)) * sin(RADIANS(Long+size)));
+               z2 = radius *  cos(RADIANS(Lat));
+            
+               x3 = radius * (sin(RADIANS(Lat+ size)) * cos(RADIANS(Long+ size)));
+               y3 = radius * (sin(RADIANS(Lat+ size)) * sin(RADIANS(Long+ size)));
+               z3 = radius *  cos(RADIANS(Lat+ size));
+
+               Colors[ColorCount].r = GL_Color(x * 255);
+               Colors[ColorCount].g = GL_Color(y * 255);
+               Colors[ColorCount].b = GL_Color(z * 255);
+               Vertices[VertexCount].Coord[0]   =  x + 10;
+               Vertices[VertexCount].Coord[1]   =  y + 10;
+               Vertices[VertexCount].Coord[2]   =  z + 10;
+
+               Colors[ColorCount + 1].r = GL_Color(x * 255);
+               Colors[ColorCount + 1].g = GL_Color(y * 255);
+               Colors[ColorCount + 1].b = GL_Color(z * 255);
+               Vertices[VertexCount + 1].Coord[0]    =  x1 + 10;
+               Vertices[VertexCount + 1].Coord[1]    =  y1 + 10;
+               Vertices[VertexCount + 1].Coord[2]    =  z1 + 10;
+
+               Colors[ColorCount + 2].r = GL_Color(x * 255);
+               Colors[ColorCount + 2].g = GL_Color(y * 255);
+               Colors[ColorCount + 2].b = GL_Color(z * 255);
+               Vertices[VertexCount + 2].Coord[0]    =  x2 + 10;
+               Vertices[VertexCount + 2].Coord[1]    =  y2 + 10;
+               Vertices[VertexCount + 2].Coord[2]    =  z2 + 10;
+
+               Colors[ColorCount + 3].r = GL_Color(x * 255);
+               Colors[ColorCount + 3].g = GL_Color(y * 255);
+               Colors[ColorCount + 3].b = GL_Color(z * 255);
+               Vertices[VertexCount + 3].Coord[0]    =  x3 + 10;
+               Vertices[VertexCount + 3].Coord[1]    =  y3 + 10;
+               Vertices[VertexCount + 3].Coord[2]    =  z3 + 10;
+
+
+               VertexCount += 4;
+               ColorCount  += 4;
+        }
+   }
+
+    glGenBuffers(2 , &BUFFER_ID[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID[0]);
+    glBufferData(GL_ARRAY_BUFFER,VertexCount * sizeof(Vec3), Vertices, GL_STATIC_DRAW) ; 
+    glBindBuffer(GL_ARRAY_BUFFER,0);         // DELETE BUFFER since its now bound to the ID;
+
+glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID[1]); // Bind our second Vertex Buffer Object  
+glBufferData(GL_ARRAY_BUFFER, ColorCount * sizeof(RGBf), Colors, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
+glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
+glEnableVertexAttribArray(1); 
+
+ }
+
+//Buffer::Buffer(GLfloat *data,GLsizei count,GLint componentcount)
+//glGenBuffersARB(1,&BUFFER_ID));                                                //Allocate memory and Assign Pointer to BUFFER_ID
+//glBindBuffer(GL_ARRAY_BUFFER,BUFFER_ID));                                   //Bind the Data to the BUFFER ID so it points to it
+//glBufferData(GL_ARRAY_BUFFER,count * sizeof(GLfloat),data,GL_STATIC_DRAW)); //<------------------------------------------------
+//glBindBuffer(GL_ARRAY_BUFFER,0));    
+
+
+
+
+
+
+
+void Ball::Render(){
+// NOTE:: 646 Vetices in Buffer When draw as normal array 648
+    glPushMatrix();
+        glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID[1]);
+            glColorPointer(3,GL_FLOAT,0,(char *) NULL);
+                glEnableClientState(GL_COLOR_ARRAY);
+
+        glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID[0]);
+            glVertexPointer( 3, GL_FLOAT, 0, (char *) NULL);
+                glEnableClientState(GL_VERTEX_ARRAY);
+                    glDrawArrays(GL_TRIANGLE_STRIP, 0, VertexCount);
+                glDisableClientState(GL_VERTEX_ARRAY);
+                glDisableClientState(GL_COLOR_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER,0);
+    glPopMatrix();
+}
+
+
+void Ball::ChangeVerts()
+{
+ 
+       for_loop(count, 100){
+       //    Vertices[count] += RANDOM(6) - 3;
+       }
         
-        GLuint g_Indices[24] = {
-            0, 1, 2, 3,                 // Front face
-            7, 4, 5, 6,                 // Back face
-            6, 5, 2, 1,                 // Left face
-            7, 0, 3, 4,                 // Right face
-            7, 6, 1, 0,                 // Top face
-            3, 2, 5, 4,                 // Bottom face
-        };
 }
-
-
-
-
-
-                                                                                                                                                                                                                                                                            
-GLuint Make_Triangle(float size)
-{
-    size = -1;
-    float z = -4;
-        GLuint displayList = glGenLists(1);
-        glNewList( displayList, GL_COMPILE );
-                glBegin(GL_TRIANGLES);
-                        glVertex3f(-size, -size/2, -z);
-                        glVertex3f( size, -size/2, -z);
-                        glVertex3f( 0.0f,  size/2, -z);
-                glEnd();
-return displayList;
-}
-
-void Draw_Mesh(std::vector<Mesh> meshes){
-      for(Mesh &mesh : meshes){   
-
-      // glVertexAttribPointer (  posAttrLoc,  3, GL_FLOAT, false, sizeof(Vec3), mesh.OFFSET + offsetof(Vertex, pos));
-        glBindBuffer(GL_ARRAY_BUFFER, mesh.VBO);
-       //  glVertexAttribPointer (normalAttrLoc, 3, GL_FLOAT, false, sizeof(Vec3), mesh.OFFSET + offsetof(Vertex, normal));
-        //...                                ^numverts ^data type
-//        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.ebo);
-
-    //    glDrawElements(GL_TRIANGLES, mesh.vertexCount, GL_UNSIGNED_INT, mesh.indexOffset);
-    }
-}                                                                                                                                                                                                                                                                             
-
-
-
-
-
-

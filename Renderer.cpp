@@ -5,19 +5,20 @@ void GenVertexArrays(GLsizei n, GLuint *arrays);
 
 Buffer::Buffer(){} ; Buffer::~Buffer(){}
 
-
 Buffer::Buffer(GLfloat *data,GLsizei count,GLint componentcount)
+    :NUM_COMPONENTS(componentcount), 
+     COUNT(count)
 {
-        _GL(glGenBuffers(1,&BUFFER_ID));                                                //Allocate memory and Assign Pointer to BUFFER_ID
+        _GL(glGenBuffersARB(1,&BUFFER_ID));                                                //Allocate memory and Assign Pointer to BUFFER_ID
         _GL(glBindBuffer(GL_ARRAY_BUFFER,BUFFER_ID));                                   //Bind the Data to the BUFFER ID so it points to it
         _GL(glBufferData(GL_ARRAY_BUFFER,count * sizeof(GLfloat),data,GL_STATIC_DRAW)); //<------------------------------------------------
         _GL(glBindBuffer(GL_ARRAY_BUFFER,0));                                           // DELETE BUFFER since its now bound to the ID;
-
 }
         
 void Buffer::Bind(){
         _GL(glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID));
 }
+
 void Buffer::Unbind(){
         _GL(glBindBuffer(GL_ARRAY_BUFFER,0));
 }
@@ -27,7 +28,8 @@ void Buffer::Unbind(){
 IndexBuffer::IndexBuffer(){} ; IndexBuffer::~IndexBuffer(){}
 
 
-IndexBuffer::IndexBuffer(GLushort *data,GLsizei count): COUNT(count)
+IndexBuffer::IndexBuffer(GLushort *data,GLsizei count)
+    : COUNT(count)
 {
         _GL(glGenBuffers(1,&BUFFER_ID));
         _GL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,BUFFER_ID));
@@ -47,10 +49,13 @@ void IndexBuffer::Unbind()
 //===================================================================================================================================================
 //__________________________________ VERTEX BUFFER CLASS ____________________________________________________________________________________________
 
+ 
 VertexArray::VertexArray(){ 
-  //  GLuint ARRAY_ID = malloc;
+ ARRAY_ID = 0;
+#if GL_VERSION > 2
   _GL(glGenVertexArrays(1, &ARRAY_ID));  //<--- I hate you and your Children!
           Print("SUCCESS");//<-LIAR!!!
+#endif
 }
 VertexArray::~VertexArray()
 {
@@ -58,11 +63,12 @@ VertexArray::~VertexArray()
 }
 
 void VertexArray::Addbuffer (Buffer *buffer, GLuint index){
-        Bind();
+       Print("enter"); 
+     //   Bind();
         buffer->Bind();
        
         glEnableVertexAttribArray(index);
-        glVertexAttribPointer(index, buffer->Get_Count(), GL_FLOAT, false, 0  , 0 );
+        glVertexAttribPointer(index, buffer->Get_Component(), GL_FLOAT, false, 0  , 0 );
        
         buffer->Unbind();
 }

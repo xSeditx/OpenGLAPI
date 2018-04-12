@@ -1,14 +1,54 @@
 #pragma once
 
-
 #include "Window.h"
+#include"3d_Primitive.h"
+
+#include<vector>
+
+ class CollisionSphere{
+ public:
+     CollisionSphere(Vec3 pos, float radius);
+
+//     Mesh *Object;
+
+     unsigned int ID;
+//------------ Getters && Setters ------------------------
+     void  SetPosition(Vec3 pos);
+     void  SetRadius(float radius){Radius=radius;}
+ 
+     Vec3  GetPosition(){return Position;}
+     float GetRadius(){return Radius;}
+
+//--------------------------------------------------------
+
+     bool  Is_Collision(CollisionSphere &other);
+
+ private:
+     float Radius;
+     Vec3  Position;
+// Static object list
+ public:
+     static std::vector<CollisionSphere*> ObjectList;
+     static unsigned int ObjectCount;
+ };
 
 
+
+ 
 class AABB{
 public: 
     AABB(Vec2 points);
 
+    struct boundingbox{
+        Vec3 Corners[8];
+        void Set(Vec3 pos, float size);
+    }BoundingBox;
 
+    struct{
+        Vec3 Location;
+        float Radius;
+        void Set(Vec3 pos, float radius);
+    }BoundingSphere;
 
     void Merge(AABB other){
 	     // const minA:Vector2 = a.m_centre.Sub( a.m_halfExtents );
@@ -29,3 +69,13 @@ public:
 
     static void Merge(AABB first, AABB second);
 };
+
+////typedef AABB::Box::Se  Boxes;
+// void AABB::boundingbox::Set(Vec3 pos, float size)
+//{
+//    Corners[0].x = pos.x + size;
+//    Corners[0].y = pos.y + size;
+//    Corners[0].z = pos.z + size;
+//
+//}
+//

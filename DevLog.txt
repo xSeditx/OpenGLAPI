@@ -127,8 +127,6 @@ This is not accurate or currently correct however it is now possible to look aro
 Normalized space
 
 
-
-
 ======================================================================================================================================================
 ______________________________________________________________________________________________________________________________________________________
 3/31:        MOUSE & KEY CONTROLLED CAMERA
@@ -138,3 +136,23 @@ ________________________________________________________________________________
  Translation is off however it rotates and translates and I can finally see the world around me for what it is so I have gained my bearings in this 
  3D world.
  TODO: Fix RTS and the proceed to setup a sphere class. Once the Camera view is cleared up remove all unneeded garbage from the project;
+
+
+
+======================================================================================================================================================
+______________________________________________________________________________________________________________________________________________________
+4/12:       VERTEX BUFFER OBJECT ADDED
+______________________________________________________________________________________________________________________________________________________
+
+- Ball class added in effort to change the Sphere class to render using VBO instead of Displaylist. *This was Successful*
+
+-Vertex Buffer Object Replaced Displaylist as the main rendering method. 
+
+-Updated Buffer class so that on creation Vertex and Color data is feed into it and it produces correct buffers needed for rendering
+
+-Camera class perfected so now it always goes the direction one is facing
+
+-Collision detection class added starting with Bounding Spheres
+
+-Simple Lighting Added however there are some issues with this at the moment but it could either be a default shader issue or due to the way the
+ world is currently translated

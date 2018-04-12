@@ -15,6 +15,7 @@ Camera::Camera()
 
 void Camera::MoveForward(const float &speed)
 {
+    Speed = speed;
 float  SIN_X = sin(RADIANS( Rotation.x  - 90));
             Position.x -= (cos(RADIANS(Rotation.y - 90)) * SIN_X) * Speed;
             Position.y -=  cos(RADIANS(Rotation.x - 90));
@@ -22,18 +23,21 @@ float  SIN_X = sin(RADIANS( Rotation.x  - 90));
 }
 void Camera::MoveBack(const float &speed)
 {
+        Speed = speed;
 float  SIN_X = sin(RADIANS( Rotation.x  - 90));
             Position.x += (cos(RADIANS(Rotation.y - 90))* SIN_X) * Speed;
             Position.y +=  cos(RADIANS(Rotation.x - 90));
             Position.z += (sin(RADIANS(Rotation.y - 90))* SIN_X) * Speed;
 }
-void Camera::MoveLeft(const float &Speed)
+void Camera::MoveLeft(const float &speed)
 {
+            Speed = speed;
             Position.x +=  cos(RADIANS(Rotation.y - 0)) * Speed;
             Position.z +=  sin(RADIANS(Rotation.y - 0)) * Speed;
 }
-void Camera::MoveRight(const float &Speed)
+void Camera::MoveRight(const float &speed)
 {
+            Speed = speed;
             Position.x += cos(RADIANS(Rotation.y - 180)) * Speed;
             Position.z += sin(RADIANS(Rotation.y - 180)) * Speed;
 }

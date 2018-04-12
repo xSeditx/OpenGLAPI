@@ -265,6 +265,34 @@ return Vec3(
 }
 
 
+Vec3 Vec3::GetNormal(Vec3 v1, Vec3 v2, Vec3 v3)
+ {
+     Vec3 Normal;
+	  // Calculate vectors
+	  float var1_x = v2.x - v1.x;
+	  float var1_y = v2.y - v1.y;
+	  float var1_z = v2.z - v1.z;
+ 
+	  float var2_x = v3.x - v1.x;
+	  float var2_y = v3.y - v1.y;
+	  float var2_z = v3.z - v1.z;
+ 
+  	// Get cross product of vectors
+  	Normal.x = (var1_y * var2_z) - (var2_y * var1_z);
+	Normal.y = (var1_z * var2_x) - (var2_z * var1_x);
+  	Normal.z = (var1_x * var2_y) - (var2_x * var1_y);
+ 
+	// Normalise final vector
+  	float vLen = sqrt( (Normal.x * Normal.x) + (Normal.y * Normal.y) + (Normal.z * Normal.z) );
+ 
+	Normal.x = Normal.x/vLen;
+	Normal.y = Normal.y/vLen;
+  	Normal.z = Normal.z/vLen;
+    return Normal;
+ }
+
+
+
 
 
 //=====================================================================================================================================

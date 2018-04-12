@@ -118,6 +118,9 @@ static Vec3 Vec3::CrossProduct(const Vec3 &first, const Vec3 &other);
 static Vec3  Normalize(const Vec3 &vec);
 static float GetDistance(const Vec3 &v1, const Vec3 &v2);
 static float DotProduct(const Vec3 &vec, const Vec3 &vec2);
+
+static Vec3 GetNormal(Vec3 v1, Vec3 v2, Vec3 v3);
+
 };
 
 //Vec3 GlmtoVec3(glm::vec3  vec);

@@ -5,22 +5,25 @@
 
 using namespace std;
 
+
 class Buffer{
 public:
-        Buffer();
-       ~Buffer();
-        Buffer(GLfloat *data,GLsizei count,GLint componentcount);
+        Buffer(){}
+        Buffer(Vec3 *Vertexdata, Vec3 *Colordata, GLsizei count, GLint colorcount);
         
-        void Bind();
-        void Unbind();
-public:
-        inline GLuint Get_Component(){return NUM_COMPONENTS;}
-        inline GLint Get_Count(){return COUNT;}
-private:
-        GLuint COUNT;
-        GLuint BUFFER_ID;
-        GLuint NUM_COMPONENTS; //How many vertex per count
-};
+        GLuint ID[2];
+
+        GLint  VertexCount;
+        GLint  ColorCount;
+
+      void Bind();
+      void Unbind();
+};  
+
+
+
+
+
 
 class IndexBuffer{
 public:
@@ -36,22 +39,6 @@ private:
         GLsizei COUNT; // Number of Indices
         GLuint  BUFFER_ID;
 };
-
-
-class VertexArray{/*      THIS MOTHER FUCKER RIGHT HERE HAS WASTED A WEEK OR SO OF MY FUCKING LIFE RESEARCHING SHIT !!! FUCK YOU VAO !!!*/
-public:
-    VertexArray();
-   ~VertexArray();
-
-    GLuint ARRAY_ID;
-    vector<Buffer*> BUFFERS;
-
-    void Bind();
-    void Unbind();
-    void Addbuffer (Buffer *buffer, GLuint index);
-};
-
-
 
 
 class Renderer{

@@ -208,25 +208,20 @@ void Cube::Render(){
 
 
 
-Ball::Ball(Vec3 pos, float radius) 
+Ball::Ball(Vec3 pos, float radius, int sectors) 
     : Position (pos),
       VertexCount(0),
+      ColorCount(0),
       Radius(radius)   
 {
 
-    int ColorCount=0;
-    
- 
-   GLuint BufferID;
-     
    float size = 20;
-   float x=0,y=0,z=0;
-   float x1=0,y1=0,z1=0;
-   float x2=0,y2=0,z2=0;
-   float x3=0,y3=0,z3=0;
 
-   int vertex_count=0, vcount=0;
-   int counter =0;
+   float  x=0,   y=0,   z=0;
+   float x1=0,  y1=0,  z1=0;
+   float x2=0,  y2=0,  z2=0;
+   float x3=0,  y3=0,  z3=0;
+
    for(float Long =0;Long < 180;Long+=size){
         for(float Lat =0;Lat < 360;Lat+=size){
                x = radius * (sin(RADIANS(Lat)) * cos(RADIANS(Long)));
@@ -273,59 +268,23 @@ Ball::Ball(Vec3 pos, float radius)
                Vertices[VertexCount + 3].Coord[1]    =  y3 + 10;
                Vertices[VertexCount + 3].Coord[2]    =  z3 + 10;
 
-
                VertexCount += 4;
                ColorCount  += 4;
         }
    }
 
-    glGenBuffers(2 , &BUFFER_ID[0]);
-    glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID[0]);
-    glBufferData(GL_ARRAY_BUFFER,VertexCount * sizeof(Vec3), Vertices, GL_STATIC_DRAW) ; 
-    glBindBuffer(GL_ARRAY_BUFFER,0);         // DELETE BUFFER since its now bound to the ID;
-
-glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID[1]); // Bind our second Vertex Buffer Object  
-glBufferData(GL_ARRAY_BUFFER, ColorCount * sizeof(RGBf), Colors, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
-glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
-glEnableVertexAttribArray(1); 
-
- }
-
-//Buffer::Buffer(GLfloat *data,GLsizei count,GLint componentcount)
-//glGenBuffersARB(1,&BUFFER_ID));                                                //Allocate memory and Assign Pointer to BUFFER_ID
-//glBindBuffer(GL_ARRAY_BUFFER,BUFFER_ID));                                   //Bind the Data to the BUFFER ID so it points to it
-//glBufferData(GL_ARRAY_BUFFER,count * sizeof(GLfloat),data,GL_STATIC_DRAW)); //<------------------------------------------------
-//glBindBuffer(GL_ARRAY_BUFFER,0));    
-
-
-
-
-
-
-
-void Ball::Render(){
-// NOTE:: 646 Vetices in Buffer When draw as normal array 648
-    glPushMatrix();
-        glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID[1]);
-            glColorPointer(3,GL_FLOAT,0,(char *) NULL);
-                glEnableClientState(GL_COLOR_ARRAY);
-
-        glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID[0]);
-            glVertexPointer( 3, GL_FLOAT, 0, (char *) NULL);
-                glEnableClientState(GL_VERTEX_ARRAY);
-                    glDrawArrays(GL_TRIANGLE_STRIP, 0, VertexCount);
-                glDisableClientState(GL_VERTEX_ARRAY);
-                glDisableClientState(GL_COLOR_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER,0);
-    glPopMatrix();
+   Vbo = Buffer(Vertices, Colors, VertexCount, ColorCount);
 }
 
+void Ball::Render(){
 
-void Ball::ChangeVerts()
-{
- 
-       for_loop(count, 100){
-       //    Vertices[count] += RANDOM(6) - 3;
-       }
-        
+   glPushMatrix();
+
+      glTranslatef(Position.x,  Position.y, Position.z);
+
+      Vbo.Bind();
+          glDrawArrays(GL_TRIANGLE_STRIP, 0, VertexCount);
+      Vbo.Unbind();
+
+  glPopMatrix();
 }

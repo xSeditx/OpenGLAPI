@@ -3,28 +3,50 @@ void GenVertexArrays(GLsizei n, GLuint *arrays);
 //===================================================================================================================================================
 //_______________________________________BUFFER CLASS _______________________________________________________________________________________________
 
-Buffer::Buffer(){} ; Buffer::~Buffer(){}
 
-Buffer::Buffer(GLfloat *data,GLsizei count,GLint componentcount)
-    :NUM_COMPONENTS(componentcount), 
-     COUNT(count)
+
+Buffer::Buffer(Vec3 *Vertexdata,Vec3 *Colordata ,GLsizei vcount, GLint colorcount)
+    :VertexCount(vcount), 
+     ColorCount(colorcount)
 {
-        _GL(glGenBuffersARB(1,&BUFFER_ID));                                                //Allocate memory and Assign Pointer to BUFFER_ID
-        _GL(glBindBuffer(GL_ARRAY_BUFFER,BUFFER_ID));                                   //Bind the Data to the BUFFER ID so it points to it
-        _GL(glBufferData(GL_ARRAY_BUFFER,count * sizeof(GLfloat),data,GL_STATIC_DRAW)); //<------------------------------------------------
-        _GL(glBindBuffer(GL_ARRAY_BUFFER,0));                                           // DELETE BUFFER since its now bound to the ID;
+    glGenBuffers(2 , &ID[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, ID[0]);
+        glBufferData(GL_ARRAY_BUFFER,VertexCount * sizeof(Vec3), Vertexdata, GL_STATIC_DRAW) ; 
+    glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;
+
+    glBindBuffer(GL_ARRAY_BUFFER, ID[1]); // Bind our second Vertex Buffer Object  
+        glBufferData(GL_ARRAY_BUFFER, ColorCount * sizeof(RGBf), Colordata, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
+        glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
+            glEnableVertexAttribArray(1); 
+    glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;}
+
 }
-        
-void Buffer::Bind(){
-        _GL(glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID));
+
+void Buffer::Bind()
+{
+    glBindBuffer(GL_ARRAY_BUFFER, ID[1]);
+        glColorPointer(3,GL_FLOAT,0,(char *) NULL);
+            glEnableClientState(GL_COLOR_ARRAY);
+
+    glBindBuffer(GL_ARRAY_BUFFER, ID[0]);
+        glVertexPointer( 3, GL_FLOAT, 0, (char *) NULL);
+            glEnableClientState(GL_VERTEX_ARRAY);
 }
 
 void Buffer::Unbind(){
-        _GL(glBindBuffer(GL_ARRAY_BUFFER,0));
+                glDisableClientState(GL_VERTEX_ARRAY);
+            glDisableClientState(GL_COLOR_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER,0);
 }
+
+
+
+
 
 //===================================================================================================================================================
 //__________________________________ INDEX BUFFER CLASS _____________________________________________________________________________________________
+
+
 IndexBuffer::IndexBuffer(){} ; IndexBuffer::~IndexBuffer(){}
 
 
@@ -49,36 +71,6 @@ void IndexBuffer::Unbind()
 //===================================================================================================================================================
 //__________________________________ VERTEX BUFFER CLASS ____________________________________________________________________________________________
 
- 
-VertexArray::VertexArray(){ 
- ARRAY_ID = 0;
-#if GL_VERSION > 2
-  _GL(glGenVertexArrays(1, &ARRAY_ID));  //<--- I hate you and your Children!
-          Print("SUCCESS");//<-LIAR!!!
-#endif
-}
-VertexArray::~VertexArray()
-{
-        for (int i =0;i< BUFFERS.size(); i++)delete(BUFFERS[i]);
-}
-
-void VertexArray::Addbuffer (Buffer *buffer, GLuint index){
-       Print("enter"); 
-     //   Bind();
-        buffer->Bind();
-       
-        glEnableVertexAttribArray(index);
-        glVertexAttribPointer(index, buffer->Get_Component(), GL_FLOAT, false, 0  , 0 );
-       
-        buffer->Unbind();
-}
-
-void VertexArray::Bind(){
-        glBindVertexArray(ARRAY_ID);
-}
-void VertexArray::Unbind(){
-        glBindVertexArray(0);
-}
 
 
 //===================================================================================================================================================

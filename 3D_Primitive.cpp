@@ -5,6 +5,143 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
+#define BallList   Ball::s_BallList
+std::vector<Ball*> Ball::s_BallList;
+unsigned int Ball::BallCount = 0;
+
+
+ Ball::Ball(Vec3 pos, float radius, int sectors) 
+    : Position (pos),
+      VertexCount(0),
+      ColorCount(0),
+      Radius(radius)
+      
+{
+   
+
+   float size = 20;
+
+   float  x=0,   y=0,   z=0;
+   float x1=0,  y1=0,  z1=0;
+   float x2=0,  y2=0,  z2=0;
+   float x3=0,  y3=0,  z3=0;
+
+   for(float Long =0;Long < 180;Long+=size){
+        for(float Lat =0;Lat < 360;Lat+=size){
+               x = radius * (sin(RADIANS(Lat)) * cos(RADIANS(Long)));
+               y = radius * (sin(RADIANS(Lat)) * sin(RADIANS(Long)));
+               z = radius *  cos(RADIANS(Lat));
+            
+               x1 = radius * (sin(RADIANS(Lat + size)) * cos(RADIANS(Long)));
+               y1 = radius * (sin(RADIANS(Lat + size)) * sin(RADIANS(Long)));
+               z1 = radius *  cos(RADIANS(Lat + size));
+            
+               x2 = radius * (sin(RADIANS(Lat)) * cos(RADIANS(Long+size)));
+               y2 = radius * (sin(RADIANS(Lat)) * sin(RADIANS(Long+size)));
+               z2 = radius *  cos(RADIANS(Lat));
+            
+               x3 = radius * (sin(RADIANS(Lat+ size)) * cos(RADIANS(Long+ size)));
+               y3 = radius * (sin(RADIANS(Lat+ size)) * sin(RADIANS(Long+ size)));
+               z3 = radius *  cos(RADIANS(Lat+ size));
+
+               Colors[ColorCount].r = GL_Color(x * 255);
+               Colors[ColorCount].g = GL_Color(y * 255);
+               Colors[ColorCount].b = GL_Color(z * 255);
+               Vertices[VertexCount].Coord[0]   =  x ;
+               Vertices[VertexCount].Coord[1]   =  y ;
+               Vertices[VertexCount].Coord[2]   =  z ;
+
+               Colors[ColorCount + 1].r = GL_Color(x * 255);
+               Colors[ColorCount + 1].g = GL_Color(y * 255);
+               Colors[ColorCount + 1].b = GL_Color(z * 255);
+               Vertices[VertexCount + 1].Coord[0]    =  x1 ;
+               Vertices[VertexCount + 1].Coord[1]    =  y1;
+               Vertices[VertexCount + 1].Coord[2]    =  z1;
+
+               Colors[ColorCount + 2].r = GL_Color(x * 255);
+               Colors[ColorCount + 2].g = GL_Color(y * 255);
+               Colors[ColorCount + 2].b = GL_Color(z * 255);
+               Vertices[VertexCount + 2].Coord[0]    =  x2 ;
+               Vertices[VertexCount + 2].Coord[1]    =  y2 ;
+               Vertices[VertexCount + 2].Coord[2]    =  z2 ;
+
+               Colors[ColorCount + 3].r = GL_Color(x * 255);
+               Colors[ColorCount + 3].g = GL_Color(y * 255);
+               Colors[ColorCount + 3].b = GL_Color(z * 255);
+               Vertices[VertexCount + 3].Coord[0]    =  x3 ;
+               Vertices[VertexCount + 3].Coord[1]    =  y3 ;
+               Vertices[VertexCount + 3].Coord[2]    =  z3 ;
+
+               VertexCount += 4;
+               ColorCount  += 4;
+        }
+   }
+
+   Vbo = Buffer(Vertices, Colors, VertexCount, ColorCount);
+   Mesh_ID = BallCount++;
+   CollisionID = MakeCollisionSphere(Position, Radius, Mesh_ID);
+
+   BallList.push_back(this);
+   Print(CollisionID);
+}
+
+ void Ball::Update(){
+   Collider[CollisionID]->Update();
+   Set_Position(Collider[CollisionID]->Position);
+   //Submit(Vertices);
+}
+ void Ball::Render(){
+
+   glPushMatrix();
+
+      glTranslatef(Position.x,  Position.y, Position.z);
+
+      Vbo.Bind();
+          glDrawArrays(GL_TRIANGLE_STRIP, 0, VertexCount);
+      Vbo.Unbind();
+
+  glPopMatrix();
+}
+ void Ball::ChangeVert(int index, Vec3 newpos){
+    Vertices[index] = newpos;
+}
+ void Ball::Submit(Vec3 *data)
+{
+   Vbo = Buffer(data, Colors, VertexCount, ColorCount);
+}
+
+
+
+ int Ball::MakeCollisionSphere(Vec3 pos, float rad, int p)
+{
+    CollisionSphere *Bounds = new CollisionSphere(pos, rad, p);
+
+    Bounds->Position = pos;
+    Bounds->Radius   = rad;
+    Bounds->ParentID = p;
+
+    return Bounds->ID;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  Torus::Torus(int numc, int numt, float X, float Y, float Z, float scale)
 {
     Scale.x = scale;
@@ -41,18 +178,17 @@
    }
    glEndList();
 }
- 
-void Torus::Rotate(float x, float y, float z){
+ void Torus::Rotate(float x, float y, float z){
     Rotation.x+=x;
     Rotation.y+=y;
     Rotation.z+=z;
 }
-void Torus::Set_Position(float x, float y, float z){
+ void Torus::Set_Position(float x, float y, float z){
     Position.x=x;
     Position.y=y;
     Position.z=z;
 }
-void Torus::Render(){
+ void Torus::Render(){
 
 glPushMatrix();
 
@@ -70,7 +206,7 @@ glPopMatrix();
 }
 
 
-Sphere::Sphere(Vec3 pos, float radius)     
+ Sphere::Sphere(Vec3 pos, float radius)     
 {
     Position = pos;
     Scale = 2;
@@ -121,7 +257,7 @@ glNewList(List, GL_COMPILE);
   
    glEndList();
 }
-void Sphere::Render()
+ void Sphere::Render()
 {
     
 glPushMatrix();
@@ -137,7 +273,7 @@ glPushMatrix();
     glCallList(List);
 glPopMatrix();
 }
-void Mesh::Render(){
+ void Mesh::Render(){
 
 _GL(glPushMatrix());
 
@@ -155,7 +291,7 @@ _GL(glPopMatrix());
 }
 
 
-Cube::Cube(Vec3 pos, float size)
+ Cube::Cube(Vec3 pos, float size)
 {
     List = glGenLists(1);
     Position = pos;
@@ -190,7 +326,7 @@ Cube::Cube(Vec3 pos, float size)
        _GL(   glEnd());     
    _GL(   glEndList());
 }
-void Cube::Render(){
+ void Cube::Render(){
     glPushMatrix();
    
     glScalef(Scale.x,Scale.y,Scale.z);
@@ -208,83 +344,6 @@ void Cube::Render(){
 
 
 
-Ball::Ball(Vec3 pos, float radius, int sectors) 
-    : Position (pos),
-      VertexCount(0),
-      ColorCount(0),
-      Radius(radius)   
-{
 
-   float size = 20;
 
-   float  x=0,   y=0,   z=0;
-   float x1=0,  y1=0,  z1=0;
-   float x2=0,  y2=0,  z2=0;
-   float x3=0,  y3=0,  z3=0;
 
-   for(float Long =0;Long < 180;Long+=size){
-        for(float Lat =0;Lat < 360;Lat+=size){
-               x = radius * (sin(RADIANS(Lat)) * cos(RADIANS(Long)));
-               y = radius * (sin(RADIANS(Lat)) * sin(RADIANS(Long)));
-               z = radius *  cos(RADIANS(Lat));
-            
-               x1 = radius * (sin(RADIANS(Lat + size)) * cos(RADIANS(Long)));
-               y1 = radius * (sin(RADIANS(Lat + size)) * sin(RADIANS(Long)));
-               z1 = radius *  cos(RADIANS(Lat + size));
-            
-               x2 = radius * (sin(RADIANS(Lat)) * cos(RADIANS(Long+size)));
-               y2 = radius * (sin(RADIANS(Lat)) * sin(RADIANS(Long+size)));
-               z2 = radius *  cos(RADIANS(Lat));
-            
-               x3 = radius * (sin(RADIANS(Lat+ size)) * cos(RADIANS(Long+ size)));
-               y3 = radius * (sin(RADIANS(Lat+ size)) * sin(RADIANS(Long+ size)));
-               z3 = radius *  cos(RADIANS(Lat+ size));
-
-               Colors[ColorCount].r = GL_Color(x * 255);
-               Colors[ColorCount].g = GL_Color(y * 255);
-               Colors[ColorCount].b = GL_Color(z * 255);
-               Vertices[VertexCount].Coord[0]   =  x + 10;
-               Vertices[VertexCount].Coord[1]   =  y + 10;
-               Vertices[VertexCount].Coord[2]   =  z + 10;
-
-               Colors[ColorCount + 1].r = GL_Color(x * 255);
-               Colors[ColorCount + 1].g = GL_Color(y * 255);
-               Colors[ColorCount + 1].b = GL_Color(z * 255);
-               Vertices[VertexCount + 1].Coord[0]    =  x1 + 10;
-               Vertices[VertexCount + 1].Coord[1]    =  y1 + 10;
-               Vertices[VertexCount + 1].Coord[2]    =  z1 + 10;
-
-               Colors[ColorCount + 2].r = GL_Color(x * 255);
-               Colors[ColorCount + 2].g = GL_Color(y * 255);
-               Colors[ColorCount + 2].b = GL_Color(z * 255);
-               Vertices[VertexCount + 2].Coord[0]    =  x2 + 10;
-               Vertices[VertexCount + 2].Coord[1]    =  y2 + 10;
-               Vertices[VertexCount + 2].Coord[2]    =  z2 + 10;
-
-               Colors[ColorCount + 3].r = GL_Color(x * 255);
-               Colors[ColorCount + 3].g = GL_Color(y * 255);
-               Colors[ColorCount + 3].b = GL_Color(z * 255);
-               Vertices[VertexCount + 3].Coord[0]    =  x3 + 10;
-               Vertices[VertexCount + 3].Coord[1]    =  y3 + 10;
-               Vertices[VertexCount + 3].Coord[2]    =  z3 + 10;
-
-               VertexCount += 4;
-               ColorCount  += 4;
-        }
-   }
-
-   Vbo = Buffer(Vertices, Colors, VertexCount, ColorCount);
-}
-
-void Ball::Render(){
-
-   glPushMatrix();
-
-      glTranslatef(Position.x,  Position.y, Position.z);
-
-      Vbo.Bind();
-          glDrawArrays(GL_TRIANGLE_STRIP, 0, VertexCount);
-      Vbo.Unbind();
-
-  glPopMatrix();
-}

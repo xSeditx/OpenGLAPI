@@ -11,8 +11,6 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <Windows.h>
-//#include"gml.hpp"
-
 #include "vertex.h"
 
 #define GetRandom( min, max )     ((rand() % (int)(((max) + 1) - (min))) + (min))  
@@ -178,6 +176,10 @@ static void Mouse_Callback           (GLFWwindow *window,    int,    int, int);
 static void MouseMove_Callback       (GLFWwindow *window, double, double);
 static void DropFile_callback        (GLFWwindow *window,    int, const char**);
 static void Window_Size_Callback     (GLFWwindow *window,    int,    int);
+
+
+
+
 };
  
 
@@ -206,6 +208,16 @@ extern bool GLLogCall(const char *function, const char *file, int line);
 //
 extern void *GetAnyGLFuncAddress(const char *name);
 extern float WrapAngle(float angle);
+// SCREEN RAYCASTER TO GET THE MOUSE XY Position in 3D SPACE
+//    http://antongerdelan.net/opengl/raycasting.html
+
+
+
+
+
+
+
+
 //
 ////In a header somewhere.
 

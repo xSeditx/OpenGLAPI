@@ -293,6 +293,41 @@ Vec3 Vec3::GetNormal(Vec3 v1, Vec3 v2, Vec3 v3)
 
 
 
+//TODO:
+// THIS NEEDS TO BE REVIDE
+Vec3 Vec3::RayCast(Vec3 pos, Vec3 angle, float distance)
+{
+    float Offset = 90;
+
+    float  SIN_X = sin(RADIANS(angle.x  - Offset));
+
+    return Vec3((-pos.x) - (cos(RADIANS(angle.y - Offset)) * SIN_X) * distance,
+                (-pos.y) -  cos(RADIANS(angle.x - Offset)) * distance,
+                (-pos.z) - (sin(RADIANS(angle.y - Offset)) * SIN_X) * distance);
+
+}
+
+
+// REVIEW THESE I BELIEVE THEM TO BE FLAWED
+
+float Vec3::RayX(float x, float angle, float distance)
+{
+        return (x) - (cos(RADIANS(angle - 90)) * sin(RADIANS(angle - 90)) * distance);
+}
+
+float Vec3::RayY(float y, float angle, float distance)
+{
+        return (y) -  cos(RADIANS(angle - 90)) * distance;
+}
+
+float Vec3::RayZ(float z, float angle, float distance)
+{
+     return (z - (sin(RADIANS(angle - 90)) * sin(RADIANS(angle - 90))) * distance);
+}
+
+//--------------------------------------------------------------------------------------------------------------
+//
+
 
 
 //=====================================================================================================================================

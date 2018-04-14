@@ -121,6 +121,14 @@ static float DotProduct(const Vec3 &vec, const Vec3 &vec2);
 
 static Vec3 GetNormal(Vec3 v1, Vec3 v2, Vec3 v3);
 
+
+static Vec3 RayCast(Vec3 pos, Vec3 angle, float distance); // Need to review the following three functions
+static float RayX(float x, float angle, float distance);   // They need to work independent of the Current ModelView Matrix I believe
+static float RayY(float y, float angle, float distance);
+static float RayZ(float z, float angle, float distance);
+
+
+
 };
 
 //Vec3 GlmtoVec3(glm::vec3  vec);
@@ -220,5 +228,15 @@ inline float Squared(float x) { return x*x; }
 
 typedef Vec3 RGBf;
 typedef Vec4 RGBAf;
+
+
+
+
+
+
+
+
+
+
 
 #endif _VERTEX_H_

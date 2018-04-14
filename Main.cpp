@@ -8,6 +8,7 @@
 //
 // THIS FILE IS JUST USED TO TEST THE SYSTEM AND IS SUBJECT TO CHANGE ON A DAILY BASIS.
 
+#include"Collision.h"
 #include"window.h"
 #include"3d_primitive.h"
 #include"Shader.h"
@@ -32,7 +33,7 @@ void RenderGrid(){
 //                                                    MAIN 
 //__________________________________________________________________________________________________________________________
 //==========================================================================================================================
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+
 
 int main( int argc, char* args[] )
 {
@@ -46,6 +47,7 @@ int main( int argc, char* args[] )
 
     const int NumObjects = 6;
     vector<Mesh> ObjectList;
+    vector<Ball> BallList;
 
     Window MainWindow(0,0,SCREENWIDTH, SCREENHEIGHT, "OpenGL 2.0");
 
@@ -55,81 +57,103 @@ int main( int argc, char* args[] )
     Print( "OpenGL Version: "  ; Print(glGetString(GL_VERSION)));
     Print( "Renderer: "        ; Print(    glGetString(GL_RENDERER)));
     Print( "Current Context: " ; Print(wglGetCurrentContext()));
-  
-    for_loop(zcount, NumObjects){
-         for_loop(ycount, NumObjects){
-             for_loop(xcount, NumObjects){
-                 Torus Temp =  Torus(8,25,(float)(xcount  * rand()%100), 
-                                          (float)(ycount  * rand()%100),
-                                          (float)(zcount  * rand()%100), 
-                                                                      1);
-                 ObjectList.push_back(Temp);
-             }
-                 Mesh Temps =  Sphere(Vec3((float)(rand()%100),
-                                           (float)(rand()%100),
-                                           (float)(rand()%100)),
-                                                             RANDOM(5));
+
+    for_loop(count,400){
+                                 Ball *temp = new Ball(Vec3(rand()%30,
+                                               -rand()%30,
+                                               rand()%30),
+                                               10, 20);
+        BallList.push_back(*temp);
+           
+                 Mesh Temps =  Sphere(Vec3((float)-(rand()%100),
+                                           (float)-(rand()%100),
+                                           (float)-(rand()%100)),
+                                                             10);
                  ObjectList.push_back(Temps);
-         }
-
     }
-  //  for_loop(count , 30){Mesh Temps =  Cube(Vec3((float)(rand()%100),(float)( rand()%100),(float)( rand()%100)),2);
-  //                 ObjectList.push_back(Temps);
-  //  }
 
-   Ball Balls(Vec3(20,20,20), 10);
-
-    LightSource Light = LightSource(Vec3(0, 0, 0),RGBf(.2,.2,.2),RGBf(.8,.8,.8),RGBf(1.,1.,1.));
- 
- 
-
+    LightSource Light = LightSource(Vec3(0, 0, 0),
+                                    RGBf(.2,.2,.2),
+                                    RGBf(.8,.8,.8),
+                                    RGBf(1.,1.,1.));
 
     while (GAME_LOOP())
     {
     CLS(); 
         
 // --------------------- Handle Input ---------------------------------------------
-        if(SCREEN->KEY_BOARD.Key == GLFW_KEY_SPACE){}    
+        if(SCREEN->KEY_BOARD.Key == GLFW_KEY_SPACE)
+        {
+                    for(Ball &List:BallList)List.Update();
+                 //    BallList[rand()%100].Set_Position( Vec3(0,0,0));
+        }
+
+
         if(SCREEN->KEY_BOARD.Key == GLFW_KEY_RIGHT)
         {
-            Cam.MoveRight(.05);
+            Cam.MoveRight(2);
         } 
         if(SCREEN->KEY_BOARD.Key == GLFW_KEY_LEFT)
         {
-            Cam.MoveLeft(.05);
+            Cam.MoveLeft(2);
         }
         if(SCREEN->KEY_BOARD.Key == GLFW_KEY_DOWN)
         { 
-                Cam.MoveForward(.1);
+              Cam.MoveForward(2);
         }
         
         if(SCREEN->KEY_BOARD.Key == GLFW_KEY_UP) 
         {
-                Cam.MoveBack(.1);
+                Cam.MoveBack(2);
         }
 
+
+  //   Light.SetPosition(Cam.Position,Cam.Position);//  <---- LIGHTS
  //--------------------- Get the MouseMovement ------------------------------------
-        MOVEX = SCREEN->MOUSE.X - OLDMX;     OLDMX = SCREEN->MOUSE.X; 
-        MOVEY = SCREEN->MOUSE.Y - OLDMY;     OLDMY = SCREEN->MOUSE.Y;
+        MOVEX = SCREEN->MOUSE.X - OLDMX;     OLDMX = SCREEN->MOUSE.X; // MOUSE.MouseMove.X only works when the callback is being activated
+        MOVEY = SCREEN->MOUSE.Y - OLDMY;     OLDMY = SCREEN->MOUSE.Y; // Must gather the true mousemovement here in this function 
+
         Cam.Rotate(MOVEX,MOVEY);
-        Cam.Update();
+        Cam.Update();                                // <---- CAMERA
 //---------------------------------------------------------------------------------
 
-    //  Light.SetPosition(Cam.Position,Cam.Position);
 
-      RenderGrid();
-      Balls.Render();
-     // Balls.ChangeVerts();
-    //  glFlush();
+        BallList[0].Set_Position( Vec3::RayCast(Cam.Position, Cam.Rotation, 100));
+        Collider[BallList[0].CollisionID]->SetPosition(BallList[0].Position);
 
-   // for(Mesh &List: ObjectList)
-   // {
-   //       List.Render();
-   //  }
+        RenderGrid();
+
+        for(Ball &List:BallList){
+
+
+
+           Collider[List.CollisionID]->Force.y = 4.82;
+           List.Update();
+           List.Render();                            // <---- ACTION
+        }
+
+        if(SCREEN->MOUSE.IsButtonPressed(0) == true)
+        {
+            Print("MOUSE");
+
+             for(Ball &List: BallList){
+              //  Collider[List.CollisionID]->SetPosition(Vec3(0,0,0));
+             Collider[List.CollisionID]->SetPosition(Vec3((float)-(rand()%4),
+                                                          (float)-(rand()%6000),
+                                                          (float)-(rand()%4)));
+             }
+        }
+
+
+
       Print(SCREEN->FPS);
-        SYNC();
+      SYNC();
     }
+
 }
+
+
+
 
 
 //cx,cy,cz,

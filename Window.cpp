@@ -12,10 +12,8 @@
 //======================================================================================================================================================================
 
 #include"Window.h"
-
+#include<Thread>
 Window *SCREEN;  // Target window for my API
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,19 +240,21 @@ Vec2 Window::GET_WINDOW_POSITION(){
 
 //======================================================================================================================================================================
 //______________________________________________________  EVENT HANDLER AND MESSAGE DISPATCHER  ________________________________________________________________________
-    bool GAME_LOOP(){          /*----- May be overloaded -----*/
+bool GAME_LOOP(){          /*----- May be overloaded -----*/
 
-      SCREEN->MOUSE.MouseMoveX -= SCREEN->MOUSE.X;
-      SCREEN->MOUSE.MouseMoveY -= SCREEN->MOUSE.Y;
+    //  SCREEN->MOUSE.MouseMoveX -= SCREEN->MOUSE.X;
+    //  SCREEN->MOUSE.MouseMoveY -= SCREEN->MOUSE.Y;
+
                SCREEN->MOUSE.OldX = SCREEN->MOUSE.X;
                SCREEN->MOUSE.Oldy = SCREEN->MOUSE.Y;
+
             SCREEN->MOUSE.MouseMoveX += SCREEN->MOUSE.X;
             SCREEN->MOUSE.MouseMoveY += SCREEN->MOUSE.Y;
 
             glfwPollEvents();
             if (glfwWindowShouldClose(SCREEN->glCONTEXT))return false;
     return true;
-    }                               
+}                               
             
 //======================================================================================================================================================================
 //__________________________________________________________ CLIPBOARD GETTERS AND SETTERS _____________________________________________________________________________

@@ -3,6 +3,9 @@
 #include"Vertex.h"
 #include"Window.h"
 
+#define BUFFER_OFFSET(i)   ((char *)NULL + (i))
+
+
 using namespace std;
 
 
@@ -19,10 +22,6 @@ public:
       void Bind();
       void Unbind();
 };  
-
-
-
-
 
 
 class IndexBuffer{

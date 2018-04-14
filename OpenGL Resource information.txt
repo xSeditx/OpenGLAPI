@@ -2342,24 +2342,7 @@ public:
 
 
 
-
-
-
 SPHERE DRAWING ROUTINES THAT FAILED OR UNDERPERFORMED
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //Sphere::Sphere(float R, float H, float K, float Z) 
 //{
@@ -2756,5 +2739,617 @@ SolidSphere::SolidSphere(float radius, unsigned int rings, unsigned int sectors)
     Print(sizeof(Vertices));
 
 
+      //Balls.Render();
+     // Balls.ChangeVerts();
+    //  glFlush();
+
+   // for(Mesh &List: ObjectList)
+   // {
+   //       List.Render();
+   //  }
+   
 
 
+
+  //  vertices.resize(rings * sectors * 3);
+  //  normals.resize(rings * sectors * 3);
+  //  texcoords.resize(rings * sectors * 2);
+  //
+  //  std::vector<GLfloat>::iterator v = vertices.begin();
+  //  std::vector<GLfloat>::iterator n = normals.begin();
+  // std::vector<GLfloat>::iterator t = texcoords.begin();
+
+
+
+//
+//
+//#define _USE_MATH_DEFINES
+//#include"Window.h"
+//
+//// your framework of choice here
+//
+//class SolidSphere
+//{
+//protected:
+//    std::vector<GLfloat> vertices;
+//    std::vector<GLfloat> normals;
+//    std::vector<GLfloat> texcoords;
+//    std::vector<GLushort> indices;
+//
+//public:
+//    SolidSphere(float radius, unsigned int rings, unsigned int sectors)
+//    {
+//        float const R = 1./(float)(rings-1);
+//        float const S = 1./(float)(sectors-1);
+//        int r, s;
+//
+//        vertices.resize(rings * sectors * 3);
+//        normals.resize(rings * sectors * 3);
+//        texcoords.resize(rings * sectors * 2);
+//        std::vector<GLfloat>::iterator v = vertices.begin();
+//        std::vector<GLfloat>::iterator n = normals.begin();
+//        std::vector<GLfloat>::iterator t = texcoords.begin();
+//        for(r = 0; r < rings; r++) for(s = 0; s < sectors; s++) {
+//                float const y = sin( -M_PI_2 + M_PI * r * R );
+//                float const x = cos(2*M_PI * s * S) * sin( M_PI * r * R );
+//                float const z = sin(2*M_PI * s * S) * sin( M_PI * r * R );
+//
+//                *t++ = s*S;
+//                *t++ = r*R;
+//
+//                *v++ = x * radius;
+//                *v++ = y * radius;
+//                *v++ = z * radius;
+//
+//                *n++ = x;
+//                *n++ = y;
+//                *n++ = z;
+//        }
+//
+//        indices.resize(rings * sectors * 4);
+//        std::vector<GLushort>::iterator i = indices.begin();
+//        for(r = 0; r < rings-1; r++) for(s = 0; s < sectors-1; s++) {
+//                *i++ = r * sectors + s;
+//                *i++ = r * sectors + (s+1);
+//                *i++ = (r+1) * sectors + (s+1);
+//                *i++ = (r+1) * sectors + s;
+//        }
+//    }
+//
+//    void draw(GLfloat x, GLfloat y, GLfloat z)
+//    {
+//        glMatrixMode(GL_MODELVIEW);
+//        glPushMatrix();
+//        glTranslatef(x,y,z);
+//
+//        glEnableClientState(GL_VERTEX_ARRAY);
+//        glEnableClientState(GL_NORMAL_ARRAY);
+//        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+//
+//        glVertexPointer(3, GL_FLOAT, 0, &vertices[0]);
+//        glNormalPointer(GL_FLOAT, 0, &normals[0]);
+//        glTexCoordPointer(2, GL_FLOAT, 0, &texcoords[0]);
+//        glDrawElements(GL_QUADS, indices.size(), GL_UNSIGNED_SHORT, &indices[0]);
+//        glPopMatrix();
+//    }
+//};
+//
+//SolidSphere sphere(1, 12, 24);
+//
+//void display()
+//{
+//    int const win_width  = …; // retrieve window dimensions from
+//    int const win_height = …; // framework of choice here
+//    float const win_aspect = (float)win_width / (float)win_height;
+//
+//    glViewport(0, 0, win_width, win_height);
+//
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//
+//    glMatrixMode(GL_PROJECTION);
+//    glLoadIdentity();
+//    gluPerspective(45, win_aspect, 1, 10);
+//
+//    glMatrixMode(GL_MODELVIEW);
+//    glLoadIdentity();
+//
+//#ifdef DRAW_WIREFRAME
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//#endif
+//    sphere.draw(0, 0, -5);
+//
+//    swapBuffers();
+//}
+//
+//int main(int argc, char *argv[])
+//{
+//    // initialize and register your framework of choice here
+//    return 0;
+//}
+//
+//
+//
+
+
+
+
+
+
+
+
+
+
+
+
+                  
+
+                                            
+/*void glVertexAttribPointer(	GLuint index,
+ 	GLint size,
+ 	GLenum type,
+ 	GLboolean normalized,
+ 	GLsizei stride,
+ 	const GLvoid * pointer);*/
+
+
+
+
+
+
+/*
+Vertex_buffer_object::Vertex_buffer_object()
+{
+    initVB();
+}
+ 
+Vertex_buffer_object::~Vertex_buffer_object() {}
+ 
+void Vertex_buffer_object::draw()
+{
+    glEnable(GL_DEPTH_TEST);
+ 
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+ 
+    glPushMatrix();
+ 
+    glBindVertexArray(_vao);
+ 
+    // bind buffer storing positions
+    glBindBuffer(GL_ARRAY_BUFFER, _positionVBO);
+    glEnableClientState(GL_VERTEX_ARRAY);
+ 
+    // take positions from buffer bound to GL_ARRAY_BUFFER
+    // this command 'remembers' which buffer is bound to
+    // GL_ARRAY_BUFFER at the time of the call
+    glVertexPointer(3, GL_FLOAT, 0, 0);
+ 
+    // bind buffer storing normals
+    // this has no effect on which buffer the positions are taken from
+    glBindBuffer(GL_ARRAY_BUFFER, _normalVBO);
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glNormalPointer(GL_FLOAT, 0, 0);
+ 
+    // bind buffer storing colors
+    glBindBuffer(GL_ARRAY_BUFFER, _colorVBO);
+    glEnableClientState(GL_COLOR_ARRAY);
+    glColorPointer(3, GL_UNSIGNED_BYTE, 0, NULL);
+ 
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexVBO);
+ 
+    glEnableClientState(GL_ELEMENT_ARRAY_BUFFER);
+ 
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+ 
+    glBindVertexArray(0);
+ 
+    //desabilitando modos de desenho.
+    glDisableClientState(GL_ELEMENT_ARRAY_BUFFER);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+ 
+    //desabilitando vertex buffer
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+ 
+void Vertex_buffer_object::initVB()
+{
+    if (!glGenBuffers || !glBindBuffer || !glBufferData)
+    {
+        std::cerr << "VBOs are not supported by your graphics card" << std::endl;
+    }
+ 
+ 
+    // Variables for the cube data
+    float _vertex[] =
+    {
+        // front
+        -1.0, -1.0,  1.0,
+        1.0, -1.0,  1.0,
+        1.0,  1.0,  1.0,
+        -1.0,  1.0,  1.0,
+        // back
+        -1.0, -1.0, -1.0,
+        1.0, -1.0, -1.0,
+        1.0,  1.0, -1.0,
+        -1.0,  1.0, -1.0,
+    };
+ 
+    float _normal[] = {((-1.0f, -1.0f, 1.0f),
+                        ( 1.0f, -1.0f, 1.0f),
+                        ( 1.0f, 1.0f, 1.0f),
+                        (-1.0f, 1.0f, 1.0f),
+                        (-1.0f, -1.0f, -1.0f),
+                        (1.0f, -1.0f, -1.0f),
+                        (1.0f, 1.0f, -1.0f),
+                        (-1.0f, 1.0f, -1.0f))
+                      };
+ 
+    static const GLsizeiptr ColorSize = 8 * 3 * sizeof(GLubyte);
+    static const GLubyte _color[] =
+    {
+        255,   0,   0,
+        255, 255,   0,
+        0, 255,   0,
+        0, 255,   0,
+        0,   0, 255,
+        255,   0,   0,
+        255, 255,   0,
+        0, 255,   0
+    };
+    // Element Indicies for the Cube
+    unsigned int _index[] =
+    {
+        // front
+        0, 1, 2,
+        2, 3, 0,
+        // top
+        3, 2, 6,
+        6, 7, 3,
+        // back
+        7, 6, 5,
+        5, 4, 7,
+        // bottom
+        4, 5, 1,
+        1, 0, 4,
+        // left
+        4, 0, 3,
+        3, 7, 4,
+        // right
+        1, 5, 6,
+        6, 2, 1,
+    };
+ 
+    const unsigned _vertexSize = 24;
+ 
+    glGenVertexArrays(1, &_vao);
+    glBindVertexArray(_vao);
+ 
+    //gerando a vbo para as posições
+    glGenBuffers(1, &_positionVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, _positionVBO);
+    glBufferData(GL_ARRAY_BUFFER, _vertexSize * sizeof(float), NULL, GL_STATIC_DRAW);
+    void* positionPtr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    memcpy(positionPtr, (float*) _vertex, 24 * sizeof(float));
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+ 
+    //gerando a vbo para as normais
+    glGenBuffers(1, &_normalVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, _normalVBO);
+    glBufferData(GL_ARRAY_BUFFER, 24 * sizeof(float) , NULL, GL_STATIC_DRAW);
+    void* normalPtr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    memcpy(normalPtr, (float*) _normal, 24 * sizeof(float));
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+ 
+    //gerando a vbo para as cores
+    glGenBuffers(1, &_colorVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, _colorVBO);
+    glBufferData(GL_ARRAY_BUFFER, ColorSize , NULL, GL_STATIC_DRAW);
+    void* colorPtr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    memcpy(colorPtr, (GLubyte*) _color, ColorSize);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+ 
+    //gerando a vbo para os indices
+    glGenBuffers(1, &_indexVBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexVBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(unsigned int), NULL, GL_STATIC_DRAW);
+ 
+    //setando os dados para index
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _indexVBO);
+    void* indexPtr = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+    memcpy(indexPtr,(unsigned int*) _index,  36 * sizeof(unsigned int));
+    glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+ 
+    glBindVertexArray(0);
+}
+
+*/
+
+
+
+
+
+
+// RENDERER.CPP/H
+
+//class Buffer{
+//public:
+//        Buffer();
+//       ~Buffer();
+//        Buffer(GLfloat *data,GLsizei count,GLint componentcount);
+//        
+//        void Bind();
+//        void Unbind();
+//public:
+//        inline GLuint Get_Component(){return NUM_COMPONENTS;}
+//        inline GLint Get_Count(){return COUNT;}
+//private:
+//        GLuint COUNT;
+//        GLuint BUFFER_ID;
+//        GLuint NUM_COMPONENTS; //How many vertex per count
+//};
+
+//Buffer::Buffer(){} ; Buffer::~Buffer(){}
+//
+//Buffer::Buffer(GLfloat *data,GLsizei count,GLint componentcount)
+//    :NUM_COMPONENTS(componentcount), 
+//     COUNT(count)
+//{
+//        _GL(glGenBuffersARB(1,&BUFFER_ID));                                                //Allocate memory and Assign Pointer to BUFFER_ID
+//        _GL(glBindBuffer(GL_ARRAY_BUFFER,BUFFER_ID));                                   //Bind the Data to the BUFFER ID so it points to it
+//        _GL(glBufferData(GL_ARRAY_BUFFER,count * sizeof(GLfloat),data,GL_STATIC_DRAW)); //<------------------------------------------------
+//        _GL(glBindBuffer(GL_ARRAY_BUFFER,0));                                           // DELETE BUFFER since its now bound to the ID;
+//}
+//        
+//void Buffer::Bind(){
+//        _GL(glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID));
+//}
+//
+//void Buffer::Unbind(){
+//        _GL(glBindBuffer(GL_ARRAY_BUFFER,0));
+//}
+//
+
+
+
+
+
+// PRIMATIVE.H
+
+//       glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID[1]);
+//           glColorPointer(3,GL_FLOAT,0,(char *) NULL);
+//               glEnableClientState(GL_COLOR_ARRAY);
+//
+//       glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID[0]);
+//           glVertexPointer( 3, GL_FLOAT, 0, (char *) NULL);
+//               glEnableClientState(GL_VERTEX_ARRAY);
+//                   glDrawArrays(GL_TRIANGLE_STRIP, 0, VertexCount);
+//               glDisableClientState(GL_VERTEX_ARRAY);
+//               glDisableClientState(GL_COLOR_ARRAY);
+//       glBindBuffer(GL_ARRAY_BUFFER,0);
+
+//Buffer::Buffer(GLfloat *data,GLsizei count,GLint componentcount)
+//glGenBuffersARB(1,&BUFFER_ID));                                                //Allocate memory and Assign Pointer to BUFFER_ID
+//glBindBuffer(GL_ARRAY_BUFFER,BUFFER_ID));                                   //Bind the Data to the BUFFER ID so it points to it
+//glBufferData(GL_ARRAY_BUFFER,count * sizeof(GLfloat),data,GL_STATIC_DRAW)); //<------------------------------------------------
+//glBindBuffer(GL_ARRAY_BUFFER,0));    
+
+Primative.CPP
+
+    glGenBuffers(2 , &BUFFER_ID[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID[0]);
+        glBufferData(GL_ARRAY_BUFFER,VertexCount * sizeof(Vec3), Vertices, GL_STATIC_DRAW) ; 
+    glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;
+
+    glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID[1]); // Bind our second Vertex Buffer Object  
+        glBufferData(GL_ARRAY_BUFFER, ColorCount * sizeof(RGBf), Colors, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
+        glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
+            glEnableVertexAttribArray(1); 
+    glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;
+
+
+
+
+//==============================================================================================================================================
+                                         THIS CODE IS TO PLACE AN OBJECT IN FRONT OF THE CAMERA 100 PACES...
+										 THIS IS THE RAYCASTING CODE THAT WITHOUT A DOUBT NEEDS WORK
+										 HOWEVER DO NOT FUCKING LOSE THIS AGAIN                                                                                                              
+//==============================================================================================================================================
+//______________________________________________________________________________________________________________________________________________
+	
+   Vec3   newposition = Cam.Position, 
+                  rot = Cam.Rotation;
+
+        newposition.x = -Cam.Position.x;
+        newposition.y = -Cam.Position.y;
+        newposition.z = -Cam.Position.z;
+
+        newposition = Vec3::RayCast(newposition, rot, 100);
+
+        RenderGrid();
+        for(Ball &List:BallList){
+
+        //  Vec3 pos = List.Get_Position();
+
+        List.Set_Position(newposition);
+            List.Render();
+        }
+//______________________________________________________________________________________________________________________________________________
+//==============================================================================================================================================
+//==============================================================================================================================================
+
+
+
+
+
+
+
+
+
+        //  Vec3 pos = List.Get_Position();
+
+         // pos.x += RANDOM(10)-5;
+         // pos.y += RANDOM(10)-5;    
+         // pos.z += RANDOM(10)-5;    
+         // List.Set_Position(pos);
+        //  List.Update();
+
+        // for_loop(count, List.VertexCount){
+        //     Vec3 Verts = List.Vertices[count];
+        //      List.Vertices[count].x 
+        //      List.Vertices[count].y         
+        //      List.Vertices[count].z 
+        //
+        //    List.ChangeVert(count, List.Vertices[count]);
+        //    List.Submit(List.Vertices);
+    // for(Mesh &List: ObjectList)
+    // {
+    //     List.Render();
+    // }
+
+     // Print(Cam.Position.x;Print("   Y:"; Print(Cam.Position.y)));
+
+ //
+ // for_loop(zcount, NumObjects){
+ //      for_loop(ycount, NumObjects){
+ //          for_loop(xcount, NumObjects){
+ //              Torus Temp =  Torus(8,25,(float)(xcount  * rand()%100), 
+ //                                       (float)(ycount  * rand()%100),
+ //                                       (float)(zcount  * rand()%100), 
+ //                                                                   1);
+ //              ObjectList.push_back(Temp);
+ //                      Ball temp = Ball(Vec3(rand()%1000,
+ //                                            rand()%1000,
+ //                                            rand()%1000),
+ //                                            rand()%10, 20);
+ //     BallList.push_back(temp);
+ //          }
+ //              Mesh Temps =  Sphere(Vec3((float)(rand()%100),
+ //                                        (float)(rand()%100),
+ //                                        (float)(rand()%100)),
+ //                                                          RANDOM(5));
+ //              ObjectList.push_back(Temps);
+ //      }
+ //
+ // }
+ //
+
+
+
+
+ 
+//class AABB{
+//public: 
+//    AABB(Vec2 points);
+//
+//    struct boundingbox{
+//        Vec3 Corners[8];
+//        void Set(Vec3 pos, float size);
+//    }BoundingBox;
+//
+//    struct{
+//        Vec3 Location;
+//        float Radius;
+//        void Set(Vec3 pos, float radius);
+//    }BoundingSphere;
+//
+//    void Merge(AABB other){
+//	     // const minA:Vector2 = a.m_centre.Sub( a.m_halfExtents );
+//	     // const maxA:Vector2 = a.m_centre.Add( a.m_halfExtents );
+//         // 
+//	     // const minB:Vector2 = b.m_centre.Sub( b.m_halfExtents );
+//	     // const maxB:Vector2 = b.m_centre.Add( b.m_halfExtents );
+//         // 
+//	     // const min:Vector2 = minA.Min(minB);
+//	     // const max:Vector2 = maxA.Max(maxB);
+//         // 
+//	     // const centre:Vector2 = min.Add(max).MulScalar(0.5);
+//	     // const halfExtents:Vector2 = max.Sub(min).MulScalar(0.5);
+//         // 
+//	     // return new AABB( centre, halfExtents );
+//    }
+//
+//
+//    static void Merge(AABB first, AABB second);
+//};
+//
+////typedef AABB::Box::Se  Boxes;
+// void AABB::boundingbox::Set(Vec3 pos, float size)
+//{
+//    Corners[0].x = pos.x + size;
+//    Corners[0].y = pos.y + size;
+//    Corners[0].z = pos.z + size;
+//
+//}
+//
+
+   
+
+
+     // float nx = c * e * CamX - c * f * CamY + d * CamZ;
+     // float ny = (a * f + b * d * e) * CamX + (a * e - b * d * f) * CamY - b * c * CamZ;
+     // float nz = (b * f - a * d * e) * CamX + (a * d * f + b * e) * CamY + a * c * CamZ;
+
+
+	 // https://r3dux.org/2012/12/a-c-camera-class-for-simple-opengl-fps-controls/
+
+
+
+	 
+
+
+
+// TODO:
+////---------------------------- Static Resolution ------------------------------------------------------------------------------------------------------
+//
+////-----------------------------------------------------------------------------------------------------------------------------------------------------
+//                SET_DRAW_COLOR(RGB(255,0,0)); // DRAW THE LINE SHOWING COLLISION
+//                LINE( Body.Position.X , Body.Position.Y,  B2->Body.Position.X ,  B2->Body.Position.Y);
+//                SET_DRAW_COLOR(RGB(255,255,255));
+//                Ball::CollisionList.emplace_back(this, B2);
+////-----------------------------------------------------------------------------------------------------------------------------------------------------
+//                //float Momentum = 
+//#if 0                 
+//                    float NormalX = (B2->Body.Position.X - Body.Position.X) / Distance;
+//                    float NormalY = (B2->Body.Position.Y - Body.Position.Y) / Distance;
+//
+//                    float TangentX = -NormalY;
+//                    float TangentY =  NormalX;
+//
+//                    float dpTan1 = (Body.Velocity.X     * TangentX) + (Body.Velocity.Y     * TangentY);
+//                    float dpTan2 = (B2->Body.Velocity.X * TangentX) + (B2->Body.Velocity.Y * TangentY);
+//
+//                    float dbNormal1 = (Body.Velocity.X     * NormalX) + (Body.Velocity.Y     * NormalY);
+//                    float dbNormal2 = (B2->Body.Velocity.X * NormalX) + (B2->Body.Velocity.Y * NormalY);
+//                          
+//                    float M1 = (dbNormal1 * (Body.Kg     - B2->Body.Kg) + 2.0f * B2->Body.Kg * dbNormal2) / (Body.Kg + B2->Body.Kg );
+//                    float M2 = (dbNormal2 * (B2->Body.Kg -     Body.Kg) + 2.0f * Body.Kg     * dbNormal1) / (Body.Kg + B2->Body.Kg) ;
+//
+//
+//                        Body.Velocity.X = TangentX  * dpTan1  + NormalX  * M1;
+//                        Body.Velocity.Y = TangentY  * dpTan1  + NormalY  * M1;
+//                    B2->Body.Velocity.X = TangentX  * dpTan2  + NormalX  * M2;
+//                    B2->Body.Velocity.Y = TangentY  * dpTan2  + NormalY  * M2;
+//#endif
+//                    return true;
+//            }
+//        }
+//    }
+//    return false;
+//}
+
+
+
+
+
+
+
+                 //
+                 //List->Position.x +=Displacement * (Position.x - List->Position.x) / CollisionDist;
+                 //List->Position.y +=Displacement * (Position.y - List->Position.y) / CollisionDist;
+                 //List->Position.z +=Displacement * (Position.z - List->Position.z) / CollisionDist;
+                 //Position.x -=Displacement * (Position.x - List->Position.x) / CollisionDist;
+                 //Position.y -=Displacement * (Position.y - List->Position.y) / CollisionDist;
+                 //Position.z -=Displacement * (Position.z - List->Position.z) / CollisionDist;

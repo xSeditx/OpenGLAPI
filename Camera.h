@@ -2,9 +2,7 @@
 
 #include "Window.h"
 #include <iostream>
-#include "Vertex.h"       // Include our custom Vec3 class
-
-
+#include "Vertex.h"       
 
 
 class Camera{

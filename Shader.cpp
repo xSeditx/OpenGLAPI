@@ -90,7 +90,6 @@ void Shader::Disable() const
 }
 
 
-
 GLint GetUniformLocation(GLchar *name){
     return 1;
 }
@@ -112,7 +111,6 @@ glUniform2f(GetUniformLocation(name), vector.x, vector.y);
 void Shader::SetUniform3f(GLchar *name,  Vec3 &vector) {
 glUniform3f(GetUniformLocation(name), vector.x, vector.y,vector.z);
 }
- 
 
 void Shader::SetUniform4f(GLchar *name,  Vec4 &vector) {
 glUniform4f(GetUniformLocation(name), vector.x, vector.y,vector.z, vector.w);
@@ -121,7 +119,6 @@ glUniform4f(GetUniformLocation(name), vector.x, vector.y,vector.z, vector.w);
 void Shader::SetUniformMat4(GLchar *name,  Matrix4 &matrix) {
 glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, matrix.elements);
 }
-
 
 GLint Shader::GetUniformLocation(GLchar *name){
 return glGetUniformLocation(m_ShaderID, name);

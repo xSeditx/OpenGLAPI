@@ -4,22 +4,24 @@ void GenVertexArrays(GLsizei n, GLuint *arrays);
 //_______________________________________BUFFER CLASS _______________________________________________________________________________________________
 
 
-
 Buffer::Buffer(Vec3 *Vertexdata,Vec3 *Colordata ,GLsizei vcount, GLint colorcount)
     :VertexCount(vcount), 
      ColorCount(colorcount)
 {
-    glGenBuffers(2 , &ID[0]);
-    glBindBuffer(GL_ARRAY_BUFFER, ID[0]);
-        glBufferData(GL_ARRAY_BUFFER,VertexCount * sizeof(Vec3), Vertexdata, GL_STATIC_DRAW) ; 
-    glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;
+    if(Colordata != nullptr){
+            glGenBuffers(2 , &ID[0]);
+            glBindBuffer(GL_ARRAY_BUFFER, ID[0]);
+                glBufferData(GL_ARRAY_BUFFER,VertexCount * sizeof(Vec3), Vertexdata, GL_STATIC_DRAW) ; 
+            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;
+    }
 
-    glBindBuffer(GL_ARRAY_BUFFER, ID[1]); // Bind our second Vertex Buffer Object  
-        glBufferData(GL_ARRAY_BUFFER, ColorCount * sizeof(RGBf), Colordata, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
-        glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
-            glEnableVertexAttribArray(1); 
-    glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;}
-
+     if(Vertexdata != nullptr){
+            glBindBuffer(GL_ARRAY_BUFFER, ID[1]); // Bind our second Vertex Buffer Object  
+                glBufferData(GL_ARRAY_BUFFER, ColorCount * sizeof(RGBf), Colordata, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
+                glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
+                    glEnableVertexAttribArray(1); 
+            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;}
+     } 
 }
 
 void Buffer::Bind()
@@ -40,16 +42,11 @@ void Buffer::Unbind(){
 }
 
 
-
-
-
 //===================================================================================================================================================
 //__________________________________ INDEX BUFFER CLASS _____________________________________________________________________________________________
 
 
 IndexBuffer::IndexBuffer(){} ; IndexBuffer::~IndexBuffer(){}
-
-
 IndexBuffer::IndexBuffer(GLushort *data,GLsizei count)
     : COUNT(count)
 {

@@ -2,7 +2,7 @@
  int LightSource::NumberOfLights;
 
 //----------------------- ----------------------------------
-LightSource::LightSource(Vec3 pos, RGBf alight, RGBf dlight, RGBf slight)
+ LightSource::LightSource(Vec3 pos, RGBf alight, RGBf dlight, RGBf slight)
         : LightNumber(NumberOfLights++)
     {
             GLfloat a[] = {alight.r,alight.g,alight.b,1};
@@ -23,21 +23,19 @@ LightSource::LightSource(Vec3 pos, RGBf alight, RGBf dlight, RGBf slight)
            glEnable(GL_COLOR_MATERIAL);
    }
 
- 
- 
-    void LightSource::SetAmbient(RGBAf color)
+ void LightSource::SetAmbient(RGBAf color)
     {
         glLightfv(GL_LIGHT0+LightNumber, GL_AMBIENT,color.Coords);
     }
-    void LightSource::SetSpecular(RGBAf color)
+ void LightSource::SetSpecular(RGBAf color)
     {
         glLightfv(GL_LIGHT0+LightNumber, GL_SPECULAR,color.Coords);
     }
-    void LightSource::SetDiffuse(RGBAf color)
+ void LightSource::SetDiffuse(RGBAf color)
     {
         glLightfv(GL_LIGHT0+LightNumber, GL_DIFFUSE,color.Coords);
     }
-    void LightSource::SetPosition(Vec3 position, Vec3 direction)
+ void LightSource::SetPosition(Vec3 position, Vec3 direction)
     {
         glLightfv(GL_LIGHT0 + LightNumber, GL_POSITION, position.Coord);
     }

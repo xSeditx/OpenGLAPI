@@ -39,9 +39,4 @@ private:
        GLuint Load();
 };
 
-
-
-
-
-
 extern void Load_Shader(GLenum t,const char* code, GLuint *id);

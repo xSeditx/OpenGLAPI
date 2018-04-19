@@ -156,3 +156,28 @@ ________________________________________________________________________________
 
 -Simple Lighting Added however there are some issues with this at the moment but it could either be a default shader issue or due to the way the
  world is currently translated
+
+
+
+ 
+======================================================================================================================================================
+______________________________________________________________________________________________________________________________________________________
+4/13:       VERTEX BUFFER OBJECT ADDED
+______________________________________________________________________________________________________________________________________________________
+
+
+ISSUES: 
+
+No matter what I do I can not seem to set the mouse up to get fluid MoveMovement values. If its done outside of the main function where the rendering
+takes place I am left with a pause in which the mouse movement is Jerky at best because of the delay between the value being set and the time its being 
+used. I suppose Multithreading could possibly help but that feels like overkil just for a simple MouseMove Variable.
+
+
+======================================================================================================================================================
+______________________________________________________________________________________________________________________________________________________
+4/14:       STATIC COLLISION RESPONSE ADDED
+______________________________________________________________________________________________________________________________________________________
+
+
+Collision Sphere Bound by ID to a Mesh Object, Simple Physics is connected to this Collision Sphere as it moves, Test and Response to all other Collider
+Objects in the Vicinity. 

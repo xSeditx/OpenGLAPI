@@ -21,7 +21,7 @@ unsigned int CollisionSphere::Collision_ObjectCount =0;;
       Force(0,0,0),
       Acceleration(0,0,0),
       Velocity(0,0,0),
-      Mass(radius)
+      Mass(radius / 2)
 
 {
     Position = pos;
@@ -41,29 +41,41 @@ unsigned int CollisionSphere::Collision_ObjectCount =0;;
     }
     return false;
 }
+
+
  void  CollisionSphere::CollisionDetection()
  {
+     Force = 0;
+     float DamperCoefficient = .1; // Dampening Factor
+     float K = 1;
      for(CollisionSphere *List: Collider)
      {
          float CollisionDist = Is_Collision(List->ID); // Returns False if Same Object or No Collision
 
          if(CollisionDist != 0 ){                  // Returns Distance from Colliding object or FALSE for no Collision
-                  
-             float Displacement = 0.5f * (CollisionDist - Radius - List->Radius);
-
-                    Position -= (Position - List->Position) * Displacement  / CollisionDist;
-              List->Position += (Position - List->Position) * Displacement  / CollisionDist;
-//            REMINDER: Vec3  -=  (Vec3- Vec3) * Float / Float
-             } 
-     }
+//                         Axis Displacement   * Spring Factor - Damping Factor
+            Force -= ((Position - List->Position) * (-K) - (Velocity * DamperCoefficient)) * .5;   // - DamperX;   
+            List->Force += ((Position - List->Position) * (-K) - (Velocity * DamperCoefficient)) * .5;        
+         }
      if (Position.y + Radius >= 0)  Position.y  = -Radius; /// CHEEP GROUND COLLISION DETECTION, Just dont let it go below 0;
+     }
  }
- 
- void CollisionSphere::Update()
+
+
+
+ void CollisionSphere::Update(float TimeStep)
  {
-            Velocity = Velocity * .90f ;
-            Acceleration = Force / Mass;
-            Velocity += Acceleration;
-            Position += Velocity;     // Change in Position over time equals Velocity  
-            CollisionDetection();
+     Vec3  Last_Acceleration = Acceleration;
+           Position += Velocity * TimeStep + ( Last_Acceleration * 0.5f * Squared(TimeStep) );
+           Acceleration = Force / Mass ;
+
+     Vec3  Avg_Acceleration = ( Last_Acceleration + Acceleration ) / 2;
+           Velocity += Avg_Acceleration * TimeStep;
+
+           CollisionDetection();  
+           Velocity = Velocity * .95f ;  
  }
+
+
+
+ 

@@ -3,21 +3,21 @@
 #include"3D_Primitive.h"
 #include "window.h"
 
+
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-#define BallList   Ball::s_BallList
-std::vector<Ball*> Ball::s_BallList;
-unsigned int Ball::BallCount = 0;
+#define SphereList   Sphere::s_SphereList
+std::vector<Sphere*> Sphere::s_SphereList;
+unsigned int Sphere::SphereCount = 0;
 
 
- Ball::Ball(Vec3 pos, float radius, int sectors) 
+ Sphere::Sphere(Vec3 pos, float radius, int sectors) 
     : Position (pos),
       VertexCount(0),
       ColorCount(0),
       Radius(radius)
-      
+      //(Shader("Basic.vert", "Basic.Frag"))
 {
-   
 
    float size = 20;
 
@@ -78,19 +78,23 @@ unsigned int Ball::BallCount = 0;
    }
 
    Vbo = Buffer(Vertices, Colors, VertexCount, ColorCount);
-   Mesh_ID = BallCount++;
+   Mesh_ID = SphereCount++;
    CollisionID = MakeCollisionSphere(Position, Radius, Mesh_ID);
 
-   BallList.push_back(this);
+   SphereList.push_back(this);
    Print(CollisionID);
+
 }
 
- void Ball::Update(){
-   Collider[CollisionID]->Update();
+ void Sphere::Update ()
+ {
+
+   Collider[CollisionID]->Update(1.f);
    Set_Position(Collider[CollisionID]->Position);
    //Submit(Vertices);
 }
- void Ball::Render(){
+ void Sphere::Render ()
+ {
 
    glPushMatrix();
 
@@ -102,17 +106,17 @@ unsigned int Ball::BallCount = 0;
 
   glPopMatrix();
 }
- void Ball::ChangeVert(int index, Vec3 newpos){
+ void Sphere::ChangeVert (int index, Vec3 newpos){
     Vertices[index] = newpos;
 }
- void Ball::Submit(Vec3 *data)
+ void Sphere::Submit (Vec3 *data)
 {
+// In DirectX MapBuffer Moves the Vertex Buffer to the CPU
+ // DX CODE: Vbo->Map(Buffer_ID, 0 , Map Write Discoard, 0 , &MappedResource<- returns the buffer);
+// So I need OpenGL Map Buffer code;
    Vbo = Buffer(data, Colors, VertexCount, ColorCount);
 }
-
-
-
- int Ball::MakeCollisionSphere(Vec3 pos, float rad, int p)
+ int  Sphere::MakeCollisionSphere (Vec3 pos, float rad, int p)
 {
     CollisionSphere *Bounds = new CollisionSphere(pos, rad, p);
 
@@ -122,8 +126,11 @@ unsigned int Ball::BallCount = 0;
 
     return Bounds->ID;
 }
-
-
+      
+//===============================================================================================================================================
+//_______________________________________________________________________________________________________________________________________________________________
+//==============================================================================================================================================================
+ 
 
 
 
@@ -178,6 +185,7 @@ unsigned int Ball::BallCount = 0;
    }
    glEndList();
 }
+
  void Torus::Rotate(float x, float y, float z){
     Rotation.x+=x;
     Rotation.y+=y;
@@ -206,73 +214,9 @@ glPopMatrix();
 }
 
 
- Sphere::Sphere(Vec3 pos, float radius)     
-{
-    Position = pos;
-    Scale = 2;
-    ObjectType = Sphere_t;
-
-       float x=0,y=0,z=0;
-       float x1=0,y1=0,z1=0;
-       float x2=0,y2=0,z2=0;
-       float x3=0,y3=0,z3=0;
-       float size = 20;
 
 
-List = glGenLists(1);
-glNewList(List, GL_COMPILE);
 
-   for(float Long =0;Long < 180;Long+=size){
-       glBegin(GL_TRIANGLE_STRIP);
-       for(float Lat =0;Lat < 360;Lat+=size){
-           x = radius * (sin(RADIANS(Lat)) * cos(RADIANS(Long)));
-           y = radius * (sin(RADIANS(Lat)) * sin(RADIANS(Long)));
-           z = radius *  cos(RADIANS(Lat));
-  
-           x1 = radius * (sin(RADIANS(Lat + size)) * cos(RADIANS(Long)));
-           y1 = radius * (sin(RADIANS(Lat + size)) * sin(RADIANS(Long)));
-           z1 = radius *  cos(RADIANS(Lat + size));
-  
-           x2 = radius * (sin(RADIANS(Lat)) * cos(RADIANS(Long+size)));
-           y2 = radius * (sin(RADIANS(Lat)) * sin(RADIANS(Long+size)));
-           z2 = radius *  cos(RADIANS(Lat));
-  
-           x3 = radius * (sin(RADIANS(Lat+ size)) * cos(RADIANS(Long+ size)));
-           y3 = radius * (sin(RADIANS(Lat+ size)) * sin(RADIANS(Long+ size)));
-           z3 = radius *  cos(RADIANS(Lat+ size));
-  
-  
-           glColor3f(GL_Color(x* 255.0),GL_Color(y* 255.0),GL_Color(z * 255.0));
-           glVertex3f(x + 10, y + 10, z + 10);
-  
-           glColor3f(GL_Color(x* 255.0),GL_Color(y* 255.0),GL_Color(z * 255.0));
-           glVertex3f(x1 + 10, y1 + 10, z1 + 10);
-  
-           glColor3f(GL_Color(x* 255.0),GL_Color(y* 255.0),GL_Color(z * 255.0));
-           glVertex3f(x2 + 10, y2 + 10, z2 + 10);
-           glVertex3f(x3 + 10, y3 + 10, z3 + 10);
-       }
-              glEnd();
-   }
-  
-   glEndList();
-}
- void Sphere::Render()
-{
-    
-glPushMatrix();
-
- //glScalef(Scale.x,Scale.y,Scale.z);
- //glRotatef(Rotation.x, 1.0, 0.0, 0.0);
- //glRotatef(Rotation.y, 0.0, 1.0, 0.0);
- //glRotatef(Rotation.z, 0.0, 0.0, 1.0);
- //
-    glTranslatef(Position.x, 0.0f, 0.0f);
-    glTranslatef(0.0f, Position.y, 0.0f);
-    glTranslatef(0.0f, 0.0f, Position.z);
-    glCallList(List);
-glPopMatrix();
-}
  void Mesh::Render(){
 
 _GL(glPushMatrix());
@@ -289,8 +233,6 @@ _GL(    glTranslatef(0.0f, Position.y, 0.0f));
 _GL(glPopMatrix());
 
 }
-
-
  Cube::Cube(Vec3 pos, float size)
 {
     List = glGenLists(1);

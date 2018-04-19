@@ -1,13 +1,3 @@
-//                                                                                                                          
-//                          OPENGL 2.0 Abstraction API
-//                               January 24 2018
-//                              -----------------                                                                           
-//                                                                                                                          
-//                         OPEN_GL WINDOW MANAGEMENT LIB                                                                    
-//==========================================================================================================================
-//
-// THIS FILE IS JUST USED TO TEST THE SYSTEM AND IS SUBJECT TO CHANGE ON A DAILY BASIS.
-
 #include"Collision.h"
 #include"window.h"
 #include"3d_primitive.h"
@@ -15,11 +5,26 @@
 #include"Renderer.h"
 #include"Camera.h"
 #include"Lights.h"
+#include<thread>
+ 
+
+bool TERMINATE = false;
+vector<Sphere> SphereList;
+
+ void Physics_Thread();
+
+
+ int MousePicker(float x, float y)
+ {
+     return 1;
+ }
+
 
 void RenderGrid(){
             glPushMatrix();
    for(int i = -500; i <= 500; i+=5)
    {
+ 
        glBegin(GL_LINES);
        glVertex3f(-500, 0, i);
        glVertex3f( 500, 0, i);
@@ -37,55 +42,50 @@ void RenderGrid(){
 
 int main( int argc, char* args[] )
 {
+
     int FRAME = 0;
 
     Camera Cam;
-
+    Cam.Position = Vec3(200,200,200);
     float MOVEX = 0,  MOVEY = 0, 
           OLDMX = 0,  OLDMY = 0,
           POSX  = 0,  POSY  = 0;
 
-    const int NumObjects = 6;
-    vector<Mesh> ObjectList;
-    vector<Ball> BallList;
-
     Window MainWindow(0,0,SCREENWIDTH, SCREENHEIGHT, "OpenGL 2.0");
 
+    {
     const GLubyte *extensions = glGetString( GL_EXTENSIONS );
     Print(extensions);
-
     Print( "OpenGL Version: "  ; Print(glGetString(GL_VERSION)));
     Print( "Renderer: "        ; Print(    glGetString(GL_RENDERER)));
     Print( "Current Context: " ; Print(wglGetCurrentContext()));
+    } // Just Information Scope
 
-    for_loop(count,400){
-                                 Ball *temp = new Ball(Vec3(rand()%30,
-                                               -rand()%30,
-                                               rand()%30),
-                                               10, 20);
-        BallList.push_back(*temp);
-           
-                 Mesh Temps =  Sphere(Vec3((float)-(rand()%100),
-                                           (float)-(rand()%100),
-                                           (float)-(rand()%100)),
-                                                             10);
-                 ObjectList.push_back(Temps);
-    }
+ for_loop(count,  10){
+             Sphere *temp = new Sphere(Vec3(rand()%30,
+                                           -rand()%30,
+                                           rand()%30),
+                                         2 + RANDOM(10), 20);
+     SphereList.push_back(*temp);
+  }
 
     LightSource Light = LightSource(Vec3(0, 0, 0),
                                     RGBf(.2,.2,.2),
                                     RGBf(.8,.8,.8),
                                     RGBf(1.,1.,1.));
 
+ 
+//  FUTRE USE, TESTED POSITIVELY other Then User controlled Ball Glitches on its position
+//    std::thread Phythread(Physics_Thread);
+ 
+
     while (GAME_LOOP())
     {
     CLS(); 
-        
 // --------------------- Handle Input ---------------------------------------------
         if(SCREEN->KEY_BOARD.Key == GLFW_KEY_SPACE)
         {
-                    for(Ball &List:BallList)List.Update();
-                 //    BallList[rand()%100].Set_Position( Vec3(0,0,0));
+                    for(Sphere &List:SphereList)List.Update();
         }
 
 
@@ -107,50 +107,94 @@ int main( int argc, char* args[] )
                 Cam.MoveBack(2);
         }
 
-
-  //   Light.SetPosition(Cam.Position,Cam.Position);//  <---- LIGHTS
- //--------------------- Get the MouseMovement ------------------------------------
+//   Light.SetPosition(Cam.Position,Cam.Position);//  <---- LIGHTS
+//--------------------- Get the MouseMovement ------------------------------------
         MOVEX = SCREEN->MOUSE.X - OLDMX;     OLDMX = SCREEN->MOUSE.X; // MOUSE.MouseMove.X only works when the callback is being activated
         MOVEY = SCREEN->MOUSE.Y - OLDMY;     OLDMY = SCREEN->MOUSE.Y; // Must gather the true mousemovement here in this function 
 
-        Cam.Rotate(MOVEX,MOVEY);
-        Cam.Update();                                // <---- CAMERA
+        Cam.Rotate(-MOVEX,MOVEY);
+        Cam.Update();                          // <---- CAMERA
 //---------------------------------------------------------------------------------
 
+        Vec3 npos = Cam.Position;
+        npos.y -= 20;
+        npos =   Vec3::RayCast(npos, Cam.Rotation, 100);
+        
 
-        BallList[0].Set_Position( Vec3::RayCast(Cam.Position, Cam.Rotation, 100));
-        Collider[BallList[0].CollisionID]->SetPosition(BallList[0].Position);
-
-        RenderGrid();
-
-        for(Ball &List:BallList){
+    //  glPushMatrix();
+    //  glMatrix
+    //  glPopMatrix();
+    //
 
 
+      RenderGrid();
 
-           Collider[List.CollisionID]->Force.y = 4.82;
+        for(Sphere &List:SphereList){
+
+          Collider[List.CollisionID]->Velocity.y += 4.82; // Cheep gravity
            List.Update();
            List.Render();                            // <---- ACTION
         }
 
-        if(SCREEN->MOUSE.IsButtonPressed(0) == true)
+        if(SCREEN->MOUSE.IsButtonPressed(1) == true)
         {
-            Print("MOUSE");
-
-             for(Ball &List: BallList){
-              //  Collider[List.CollisionID]->SetPosition(Vec3(0,0,0));
-             Collider[List.CollisionID]->SetPosition(Vec3((float)-(rand()%4),
-                                                          (float)-(rand()%6000),
-                                                          (float)-(rand()%4)));
+             
+             for(Sphere &List: SphereList){
+             Collider[List.CollisionID]->SetPosition(Vec3((float)-(rand()%10),
+                                                          (float)-(rand()%10),
+                                                          (float)-(rand()%10)));
              }
         }
+        
+        if(SCREEN->MOUSE.IsButtonPressed(0) == true)
+        {
+                Sphere *temp = new Sphere(Cam.Position, 2.f + (float)RANDOM(10), 20);
+            SphereList.push_back(*temp);
 
 
+           SphereList[Sphere::SphereCount - 1].Set_Position( npos);
+           Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->SetPosition(SphereList[Sphere::SphereCount - 1].Position);
 
-      Print(SCREEN->FPS);
+            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Force.x = cos(RADIANS(Cam.Rotation.y + 90)) * 200;   
+            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Force.z = sin(RADIANS(Cam.Rotation.y + 90)) * 200;  
+            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Force.y = cos(RADIANS(Cam.Rotation.x + 90)) * 20;
+        Sleep(150);
+        }
+
+ 
+
+   
+      //  Print(SCREEN->MOUSE.X);
+     // Print(SCREEN->FPS);
+     //   world.update(.01);
       SYNC();
     }
 
-}
+    TERMINATE = true;
+    
+    //Phythread.join();
+ }
+
+
+
+
+
+
+
+
+
+
+ // Tested, Worked well other then Glitching on the User Control
+ 
+ void Physics_Thread()
+ {
+     while(TERMINATE == false){
+         for(Sphere &List:SphereList){
+            Collider[List.CollisionID]->Force.y = 4.82;
+            List.Update();
+         }
+     }
+ }
 
 
 

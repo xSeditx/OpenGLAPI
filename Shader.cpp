@@ -179,11 +179,11 @@ void Load_Shader(GLenum t,const char* code, GLuint *id)
 {
 	GLint  compiled_status =0;
 
-	//*id= glCreateShader(t);
-	*id = GLEW_GET_FUN(
-		__glewCreateShader
-		)
-		(t);
+	*id= glCreateShader(t);
+	//*id = GLEW_GET_FUN(
+	//	__glewCreateShader
+	//	)
+	//	(t);
 	_GL(glShaderSource(*id, 1, &code,NULL));
 
 	_GL(glCompileShader(*id));

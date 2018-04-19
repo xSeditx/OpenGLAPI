@@ -22,7 +22,7 @@ public:
      Vec3   Position,
             Force,
             Acceleration,
-            Velocity;
+            Velocity, OldPos;
 
      float  Mass;
 
@@ -40,9 +40,10 @@ public:
 
      float  Is_Collision(int other);
      void   CollisionDetection();
-     void   Update();
+     void   Update(float TimeStep);
 // Static object list
 public:
      static std::vector<CollisionSphere*> Collision_ObjectList;
      static unsigned int  Collision_ObjectCount;
+
  };

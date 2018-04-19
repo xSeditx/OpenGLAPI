@@ -2,7 +2,7 @@
 #ifndef _VERTEX_H_
 
 #include <iostream>
-
+#include"C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glm-0.9.2.7\glm\glm.hpp"
 
 
 #define DEG2RAD(x) ((x * M_PI) / 180.0)
@@ -78,6 +78,7 @@ struct Vec3{
              const float& y,
              const float& z);
 
+        Vec3(glm::vec3 other);
         //float magnitude;
 
         Vec3& add(const Vec3& other);
@@ -128,8 +129,39 @@ static float RayY(float y, float angle, float distance);
 static float RayZ(float z, float angle, float distance);
 
 
+ operator glm::vec3(); 
+
+ 
+static float Get_Angle(Vec3 a, Vec3 b){
+
+    float fA =  sqrt(a.x * a.x + a.y * a.y + a.z + a.z);
+    float fB =  sqrt(b.x * b.x + b.y * b.y + b.z + b.z);
+    float fDot = a.x * b.x + a.y * b.y + a.z + b.z;
+    return acosf(fDot / (fA * fB));
+}
+
+
+
+static float Get_Angle2(Vec3 a, Vec3 b){
+   
+    float  fCrossX, fCrossY, fCrossZ,
+fCross, fDot;
+
+    fCrossX = a.y * b.z - a.z * b.y;
+    fCrossY = a.z * b.x - a.x * b.z;
+    fCrossZ = a.x * b.y - a.y * b.x;
+    fCross =  sqrt(fCrossX * fCrossX + fCrossY * fCrossY + fCrossZ * fCrossZ);
+    fDot = a.x * b.x + a.y * b.y + a.z + b.z;
+    return atan2(fCross, fDot);
+}
+
+
+
 
 };
+
+
+
 
 //Vec3 GlmtoVec3(glm::vec3  vec);
 //glm::vec3  Vec3ToGlm(Vec3 vec);

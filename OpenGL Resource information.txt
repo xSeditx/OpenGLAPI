@@ -3353,3 +3353,299 @@ Primative.CPP
                  //Position.x -=Displacement * (Position.x - List->Position.x) / CollisionDist;
                  //Position.y -=Displacement * (Position.y - List->Position.y) / CollisionDist;
                  //Position.z -=Displacement * (Position.z - List->Position.z) / CollisionDist;
+
+
+
+
+
+
+
+				 
+ float dpTan1 = (Velocity.x * Tangent.x) + 
+               (Velocity.y * Tangent.y) + 
+               (Velocity.z * Tangent.z);
+ float dpTan2 = (List->Velocity.x * Tangent.x) + 
+               (List->Velocity.y * Tangent.y) +
+               (List->Velocity.z * Tangent.z);
+			     (Velocity.y * Normals.y) + 
+                  (Velocity.z * Normals.z);
+
+				  float dbNormal2 = (List->Velocity.x * Normals.x) +
+                  (List->Velocity.y * Normals.y) +
+                  (List->Velocity.z * Normals.z);
+  
+Velocity.x = Tangent.x  * dpTan1  + Normals.x  * M1;
+Velocity.y = Tangent.y  * dpTan1  + Normals.y  * M1;
+Velocity.z = Tangent.z  * dpTan1  + Normals.z  * M1;
+
+List->Velocity.x = Tangent.x  * dpTan2  + Normals.x  * M2;
+List->Velocity.y = Tangent.y  * dpTan2  + Normals.y  * M2;
+List->Velocity.z = Tangent.z  * dpTan2  + Normals.z  * M2;                     
+
+
+
+
+
+
+
+//
+
+//
+// 
+//               float Angle = Vec3::Get_Angle2(List->Position, Position);
+//
+//  //   return Vec3((-pos.x) - (cos(RADIANS(angle.y - Offset)) * SIN_X) * distance,
+//  //              (-pos.y) -  cos(RADIANS(angle.x - Offset)) * distance,
+//  //              (-pos.z) - (sin(RADIANS(angle.y - Offset)) * SIN_X) * distance);
+//          float SINX = sin(Angle);
+//     //Force.x = cos(Angle) * Mass;
+//     Force.y = cos(Angle)* Mass;
+//     Force.z = -sin(Angle)* Mass;   
+//     
+//   //  List->Force.x += cos(angle2)* List->Mass;
+   //  List->Force.y += cos(angle2)* List->Mass;
+   //  List->Force.z += sin(angle2)* List->Mass;
+   //
+ //          //   RADIANS(360) - Vec3::DotProduct(Position, List->Position); //////c
+//             //RADIANS(360) -  Vec3::DotProduct(List->Position, Position); //////
+//        float angle1 = acosf( ( Position.x *  List->Position.x + Position.y *  List->Position.y + Position.z *  List->Position.z) /
+//                                  ( sqrt(  Position.x *  Position.x +  Position.y *  Position.y +  Position.z *  Position.z ) *
+//                                   sqrt(  List->Position.x *  List->Position.x +  List->Position.y *  List->Position.y +  List->Position.z *  List->Position.z )) );
+//                          
+//        float angle2  = acosf( (List-> Position.x *  Position.x + List-> Position.y * Position.y +  List->Position.z *   Position.z) /
+//                                  (sqrt(  List->Position.x *  List->Position.x +  List->Position.y *  List->Position.y +  List->Position.z *  List->Position.z )*
+//                                  sqrt(  Position.x *  Position.x +  Position.y *  Position.y +  Position.z *  Position.z )));
+
+
+
+ //
+
+ //
+ // Vec3 Tangent;
+ //
+ // Tangent.x = -Normal.y;
+ // Tangent.y =  Normal.z;
+ // Tangent.z =  Normal.x;
+ //
+ // float dpTan1 = (Velocity.x * Tangent.x) + 
+ //                (Velocity.y * Tangent.y) + 
+ //                (Velocity.z * Tangent.z);
+ //
+ // float dpTan2 = (List->Velocity.x * Tangent.x) + 
+ //                (List->Velocity.y * Tangent.y) +
+ //                (List->Velocity.z * Tangent.z);
+ //
+ //
+ // float dbNormal1 = ( Velocity.x * Normal.x) + 
+ //                   ( Velocity.y * Normal.y) + 
+ //                   ( Velocity.z * Normal.z);
+ //
+ // float dbNormal2 = (List->Velocity.x * Normal.x) + 
+ //                   (List->Velocity.y * Normal.y) + 
+ //                   (List->Velocity.z * Normal.z);
+ //     
+ //
+ // float M1 = (dbNormal1 * (Mass - List->Mass) + 2.0f * List->Mass * dbNormal2) / (Mass + List->Mass);
+ // float M2 = (dbNormal2 * (List->Mass-  Mass) + 2.0f * Mass * dbNormal1) / (Mass + List->Mass) ;
+ //
+ //
+ //  Force.x += Tangent.x  * dpTan1  + Normal.x  * M1;
+ //  Force.y += Tangent.y * dpTan1  + Normal.y  * M1;
+ //  Force.z += Tangent.z * dpTan1  + Normal.z  * M1;
+ //
+ //
+ //  List->Force.x += Tangent.x *  dpTan2  + Normal.x *  M2;
+ //  List->Force.y += Tangent.y  * dpTan2  + Normal.y  * M2;
+ //  List->Force.z += Tangent.z  * dpTan2  + Normal.z  * M2;
+ //
+ // /////     REMINDER: Vec3  -=  (Vec3- Vec3) * Float / Float
+ //             } 
+ //     }
+ //     if (Position.y + Radius >= 0)  Position.y  = -Radius; /// CHEEP GROUND COLLISION DETECTION, Just dont let it go below 0;
+ // }
+ // 
+
+  //
+  //   float    angle1 = Vec3::DotProduct(Position, List->Position); //////cosf( ( Position.x *  List->Position.x + Position.y *  List->Position.y + Position.z *  List->Position.z) /
+  //                     //////        ( sqrt(  Position.x *  Position.x +  Position.y *  Position.y +  Position.z *  Position.z ) *
+  //                     //////         sqrt(  List->Position.x *  List->Position.x +  List->Position.y *  List->Position.y +  List->Position.z *  List->Position.z )) );
+  //                     //////
+  //   float    angle2  = Vec3::DotProduct(List->Position, Position); //////cosf( (List-> Position.x *  Position.x + List-> Position.y * Position.y +  List->Position.z *   Position.z) /
+  //                     //////        (sqrt(  List->Position.x *  List->Position.x +  List->Position.y *  List->Position.y +  List->Position.z *  List->Position.z )*
+  //                     //////        sqrt(  Position.x *  Position.x +  Position.y *  Position.y +  Position.z *  Position.z )));
+  //
+  //    // Print(angle * 57.9258);
+  //     Force.x += sin(RADIANS(360)-angle1)* Mass;
+  //     Force.y += cos(RADIANS(360)-angle1)* Mass;
+  //     Force.z += cos(RADIANS(360)-angle1)* Mass;
+  //
+  //     List->Force.x += sin(RADIANS(360)-angle2)* Mass;
+  //     List->Force.y += cos(RADIANS(360)-angle2)* Mass;
+  //     List->Force.z += cos(RADIANS(360)-angle2)* Mass;
+  //
+
+
+
+
+//
+//
+//
+//              
+//              Vec3 x = Position- List->Position;
+//              x.Normalize();
+//
+//              Vec3 v1 = Velocity;
+//              float x1 = x.DotProduct(v1);
+//              Vec3 v1x = x * x1;
+//              Vec3 v1y = v1 -v1x;
+//
+//              float Mass1 = Mass;
+//              
+//               x = x *-1;
+//
+//Vec3 v2 = List->Velocity;
+//float x2 = x.DotProduct(v2);
+//
+//Vec3 v2x = x * x2;
+//Vec3 v2y = v2 - v2x;
+//
+//float Mass2 = List->Mass;
+//
+//Velocity = v1x* (Mass1 - Mass2)/(Mass1+Mass2) + v2x* (2*Mass2)/(Mass1 - Mass2) + v1y;
+//List->Velocity = v1x*(2*Mass1)/(Mass1+Mass2) + v2x*(Mass2-Mass1)/(Mass1+Mass2) + v2y;  
+
+
+
+
+
+
+
+
+
+
+
+
+
+    float vx = Radius * (sin(angle1) * cos(angle1));
+    float vy = Radius * (sin(angle1) * sin(angle1));
+    float vz = Radius *  cos(angle1);
+
+    float vx2 = Radius * (sin(angle2) * cos(angle2));
+    float vy2 = Radius * (sin(angle2) * sin(angle2));
+    float vz2 = Radius *  cos(angle2);
+
+
+     Velocity.x += vx;//(cos(angle1)* Mass);
+     Velocity.y += vy;//(cos(angle1)* Mass);
+     Velocity.z += vz;//(sin(angle1)* Mass);
+ 
+     List->Velocity.x +=vx2; //(cos(angle2)* Mass);
+     List->Velocity.y +=vy2; // (cos(angle2)* Mass);
+     List->Velocity.z +=vz2; //(sin(angle2)* Mass);
+
+//         Tangent.x = -Normals.y;
+//         Tangent.y =  Normals.x;
+//         Tangent.z =  (2 * Normals.x) + (Normals.y - 1); // 2 * x + y -1)
+//            
+//         Tangent = 0;// Vec3::CrossProduct(Position , List->Position);
+//         
+//         float dpTan1 = Vec3::DotProduct(      Velocity, Tangent);
+//         float dpTan2 = Vec3::DotProduct(List->Velocity, Tangent);
+//         
+//         float dbNormal1 = Vec3::DotProduct(List->Velocity, Normals);
+//         float dbNormal2 = Vec3::DotProduct(List->Velocity, Normals);
+//         
+//         
+//         float M1 = (dbNormal1 * (Mass - List->Mass) + 2.0f * List->Mass * dbNormal2) / (Mass + List->Mass);
+//         float M2 = (dbNormal2 * (List->Mass - Mass) + 2.0f *       Mass * dbNormal1) / (Mass + List->Mass) ;
+//         
+//               Velocity = (Tangent * dpTan1) + (Normals  * M1);
+//         List->Velocity = (Tangent * dpTan2) + (Normals  * M2);
+//      
+
+       
+//      //     
+//    float Magnitude = Vec3::GetDistance(Position, List->Position); // Maybe not needed
+//     Vec3 Normals = (List->Position - Position) / Magnitude,
+//          Tangent;
+//
+//        
+//         Vec3 Normals, Tangent;
+//             Normals.x = (List->Position.x - Position.x) / Magnitude;
+//             Normals.y = (List->Position.y - Position.y) / Magnitude;
+//             Normals.z = (List->Position.z - Position.z) / Magnitude;
+//         
+//     
+         float    angle1 =  cosf( ( Position.x *  List->Position.x + Position.y *  List->Position.y + Position.z *  List->Position.z) /
+                                           (sqrt( Position.x *  Position.x +  Position.y *  Position.y +  Position.z *  Position.z ) *
+                                            sqrt( List->Position.x *  List->Position.x +  List->Position.y *  List->Position.y +  List->Position.z *  List->Position.z )) );
+                                   
+         float    angle2  =  cosf( (List-> Position.x *  Position.x + List-> Position.y * Position.y +  List->Position.z *   Position.z) /
+                                           (sqrt(  List->Position.x *  List->Position.x +  List->Position.y *  List->Position.y +  List->Position.z *  List->Position.z )*
+                                           sqrt(  Position.x *  Position.x +  Position.y *  Position.y +  Position.z *  Position.z )));
+
+       float Displacement = .5f * (CollisionDist - Radius - List->Radius);
+
+
+
+	          //  Position -= (Position - List->Position) * Displacement  / CollisionDist;
+     //    List->Position += (Position - List->Position) * Displacement  / CollisionDist;
+	 
+// DisplacementX = (Child->Offset.X -  Parent->Offset.X)  - Spring.Childrest.X;
+//   ^ Rest should not matter, just how far it went into the other object on each axis
+// How far it moved should be realitive to its Velocity 
+// (Might have to alter it because this is for Static Object)
+
+             //   Radius - List->Radius; 
+           //  CollisionDist
+
+    
+
+
+ 
+//
+//Vec3 Disp =(Position - List->Position);
+//Disp.Normalize();
+//Vec3 Vdot1, Vdot2;
+//
+//Vdot1 = Velocity.DotProduct(Disp);
+//Vdot2 = Velocity.DotProduct(Disp);
+//
+//      Velocity +=  Disp * 1* Vdot1;
+//List->Velocity +=  Disp * 1 * Vdot2;
+//
+     
+//
+//        
+//    Vec3 Disp = OldPos - Position;
+//  
+//    float k =.2;
+//  
+//    Force +=  ((Disp) * -k) * Mass;
+//    List->Force -=  ((Disp) * -k) * Mass;
+//  
+//  
+//   OldPos = Position;
+
+// SurfaceNormal = (radius + mindist),
+
+// Vec3 SurfaceNormal = NearestPoint - SphereCenter
+ //    
+  ///   Vector3.Cross(SurfaceNormal, Vector3.UnitY)
+
+// Well the surface normal can be calulated using:
+//
+//Surface Normal = Nearest Point - Sphere Center
+//
+//Then to find the tangent just take the cross product of the surface normal and a unit vector:
+//
+//Vector3.Cross(SurfaceNormal, Vector3.UnitX)
+//
+//If the surface normal is equal to Vector.UnitX, then use Vector3.UnitY
+//
+//Vector3.Cross(SurfaceNormal, Vector3.UnitY)
+//
+//I believe that should work?
+
+
+

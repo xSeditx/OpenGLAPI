@@ -13,11 +13,17 @@
 #include"Window.h"
 #include"Renderer.h"
 #include"Collision.h"
-
-
+#include"Shader.h"
+ 
 //Buffer VBO(Vertex, sizeof(Vec3) * count, 3)
 
-class Ball{
+
+//===============================================================================================================================================
+//_______________________________________________ SPHERE CLASS _____________________________________________________________________________________________
+//==============================================================================================================================================================
+ 
+
+class Sphere{
 public:
      Vec3 Position;
      Vec3 Rotation;
@@ -29,10 +35,8 @@ public:
 
 public:// OpenGL Stuff
 
-     Ball(){}  
-     Ball(Vec3 pos, float radius, int sectors);
-
-     GLuint BUFFER_ID[2];
+     Sphere(){}  
+     Sphere(Vec3 pos, float radius, int sectors);
 
      Vec3  Vertices[648];
      RGBf  Colors  [648];
@@ -42,8 +46,10 @@ public:// OpenGL Stuff
 
      Buffer Vbo;
 
+    // Shader SHADER;
+
      void Set_Position(float x, float y, float z)    {Position = Vec3(x,y,z);}
-     void Set_Position(Vec3 pos)                          {Position = pos;}
+     void Set_Position(Vec3 pos)                     {Position = pos;}
      void Set_Rotation(float x, float y, float z)    {Rotation = Vec3(x,y,z);}
      void SetRotation(Vec3 rot)                      {Rotation = rot;}
 
@@ -62,15 +68,31 @@ private:
 
 // Static object list
 public:
-     static std::vector<Ball*> s_BallList;
-     static unsigned int BallCount;
-
+     static std::vector<Sphere*> s_SphereList;
+     static unsigned int SphereCount;
      static int MakeCollisionSphere(Vec3 pos, float rad, int p);
 };
 
 
 
 
+//===============================================================================================================================================
+//__________________________________________ TERRAIN CLASS _____________________________________________________________________________________________________
+//==============================================================================================================================================================
+ 
+
+class Terrain{
+public:
+    Terrain(float x,float y,float height,float width);
+};
+
+
+
+
+//===============================================================================================================================================
+//_______________________________________________________________________________________________________________________________________________________________
+//==============================================================================================================================================================
+ 
 
 
 
@@ -91,20 +113,33 @@ public:
     Vec3 Rotation;
     Vec3 Position;
     Vec3 Scale;
-    GLuint List;
+
+    GLint List;
+    Vec3  *Vertices;
+    RGBf  *Colors  ;
+
+    GLuint VertexCount;
+    GLuint ColorCount;
+
+    Buffer Vbo;
+
+    void Set_Position(float x, float y, float z)    {Position = Vec3(x,y,z);}
+    void Set_Position(Vec3 pos)                     {Position = pos;}    void Rotate(float x, float y, float z);
+    void Set_Rotation(float x, float y, float z)    {Rotation = Vec3(x,y,z);}    void Render();
+    void SetRotation(Vec3 rot)                      {Rotation = rot;}    void RenderVBO();
+
+    Vec3 Get_Position(){return Position;}
+    Vec3 Get_Rotation(){return Rotation;}
+
+    Vec3 GetVert(int index){return Vertices[index];}
+
+
 
     enum objecttype{
         Torus_t,
         Sphere_t,
         Cube_t
     }ObjectType;
-
-    void Set_Position(float x, float y, float z);
-    void Set_Rotation(float x, float y, float z);
-
-    void Rotate(float x, float y, float z);
-    void Render();
-    void RenderVBO();
 };
 class Torus: public Mesh{
 public:
@@ -119,17 +154,6 @@ public:
     void Rotate(float x, float y, float z);
     void Render();
     void RenderVBO();
-};
-class Sphere : public Mesh{
-public:
-    
-    Sphere(Vec3 pos, float radius);
-
-    void Set_Position(float x, float y, float z);
-    void Set_Rotation(float x, float y, float z);
-
-    void Rotate(float x, float y, float z);
-    void Render();
 };
 class Cube : public Mesh{
 public:

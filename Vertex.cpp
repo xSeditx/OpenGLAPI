@@ -3,11 +3,11 @@
 
 #include "Vertex.h"
 #include "Window.h"
+
 //=====================================================================================================================================
 //_____________________________________________________________________________________________________________________________________
 
-
-
+//C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glm-0.9.2.7\glm;
 //glm::vec3  Vec3ToGlm(Vec3 vec){
 //    return glm::vec3(vec.x,vec.y,vec.z);
 //}
@@ -103,9 +103,16 @@ Vec3::Vec3(const float& X,const float& Y,const float& Z)
      z(Z)
 {}
 
+Vec3::Vec3(glm::vec3 other)
+{
+          x  = other.x;
+          y  = other.y;
+          z  = other.z;
+}
+
 Vec3& Vec3::add(const Vec3& other)
 {
-	x += other.x; y += other.y;x += other.z;
+	x += other.x; y += other.y; z += other.z;
 	return *this;
 }
 Vec3& Vec3::subtract(const Vec3& other)
@@ -187,6 +194,13 @@ Vec3& Vec3::operator /(const float& value){
     this->z /= value;
     return *this;
 }
+Vec3::operator glm::vec3() {
+    glm::vec3 v;
+    v.x = x;
+    v.y = y;
+    v.z = z;
+  return v;
+}
 
 //_____________________________________________________________________________________________________________________________________
 
@@ -225,7 +239,7 @@ float Vec3::GetDistance   (const Vec3 &other){
     float dy = other.y - y;
     float dz = other.z - z;
     
-    return sqrt(dx * dx + dy * dy + dz * dz);
+    return sqrt((dx * dx) + (dy * dy) + (dz * dz));
 }
 float Vec3::GetDistance   (const Vec3 &v1, const Vec3 &v2)
 {
@@ -233,15 +247,15 @@ float Vec3::GetDistance   (const Vec3 &v1, const Vec3 &v2)
     float dy = v2.y - v1.y;
     float dz = v2.z - v1.z;
     
-    return sqrt(dx * dx + dy * dy + dz * dz);
+    return sqrt((dx * dx) + (dy * dy) + (dz * dz));
 }
                           
 float Vec3::DotProduct    (const Vec3 &vec) const
 {
-            return x * vec.x + y * vec.y + z * vec.z;
+            return (x * vec.x) + (y * vec.y) + (z * vec.z);
 }     
 float Vec3::DotProduct    (const Vec3 &vec, const Vec3 &vec2){
-     return vec.x * vec2.x + vec.y * vec2.y + vec.z * vec2.z;
+     return (vec.x * vec2.x) + (vec.y * vec2.y) + (vec.z * vec2.z);
 }
                           
 //Vec3  Vec3::CrossProduct  (const Vec3 &first, const Vec3 &other)

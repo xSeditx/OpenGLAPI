@@ -128,13 +128,13 @@ public:
 
     struct MouseProperties{
         bool Button[5];      
-         int Action,
+        int  Action,
              Modifications;
         int  X,
              Y;
-        int OldX,Oldy;
-        int MouseMoveX, 
-            MouseMoveY;
+        int  OldX,Oldy;
+        int  MouseMoveX, 
+             MouseMoveY;
         inline bool IsButtonPressed (int button){return Button[button];}
         inline void HIDE(){glfwSetInputMode(SCREEN->glCONTEXT, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);}
         inline void SHOW(){glfwSetInputMode(SCREEN->glCONTEXT, GLFW_CURSOR, GLFW_CURSOR_NORMAL);} 

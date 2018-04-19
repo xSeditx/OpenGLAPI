@@ -66,8 +66,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glm-0.9.2.7\glm;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glew-2.1.0\include;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glfw-3.2.1.bin.WIN32\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Curt\Documents\Visual Studio 2012\Libraries\OpenGL\Libs;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\OpenGL;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\OpenGL;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\OpenGL\Libs;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glfw-3.2.1.bin.WIN32\lib-vc2012;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Curt\Documents\Visual Studio 2012\Libraries\React3d\src;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glm-0.9.2.7\glm;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glew-2.1.0\include;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glfw-3.2.1.bin.WIN32\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Curt\Documents\Visual Studio 2012\Libraries\React3d\Debug;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\OpenGL;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glfw-3.2.1.bin.WIN32\lib-vc2012;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glew-2.1.0\lib\Release\Win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\Users\Curt\Documents\Visual Studio 2012\Libraries\freeglut\include;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\OpenGL\Includes;$(IncludePath)</IncludePath>
@@ -88,7 +88,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib;GLU32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;user32.lib;gdi32.lib;shell32.lib;glew32s.lib;GLU32.lib;reactphysics3d.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -149,7 +149,6 @@
     <ClInclude Include="Lights.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
-    <ClInclude Include="Sprite.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>

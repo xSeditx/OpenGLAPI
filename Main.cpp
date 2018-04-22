@@ -10,7 +10,7 @@
 
 bool TERMINATE = false;
 vector<Sphere> SphereList;
-
+Terrain  *GLOBALGROUND;
  void Physics_Thread();
 
 
@@ -46,7 +46,7 @@ int main( int argc, char* args[] )
     int FRAME = 0;
 
     Camera Cam;
-    Cam.Position = Vec3(200,200,200);
+    Cam.Position = Vec3(0,200,0);
     float MOVEX = 0,  MOVEY = 0, 
           OLDMX = 0,  OLDMY = 0,
           POSX  = 0,  POSY  = 0;
@@ -60,24 +60,26 @@ int main( int argc, char* args[] )
     Print( "Renderer: "        ; Print(    glGetString(GL_RENDERER)));
     Print( "Current Context: " ; Print(wglGetCurrentContext()));
     } // Just Information Scope
-
+         Terrain *Ground = new Terrain(30,30,30,30);
+         GLOBALGROUND = Ground;
  for_loop(count,  10){
              Sphere *temp = new Sphere(Vec3(rand()%30,
                                            -rand()%30,
-                                           rand()%30),
-                                         2 + RANDOM(10), 20);
+                                            rand()%30),
+                                   2 + RANDOM(10), 20);
      SphereList.push_back(*temp);
   }
 
-    LightSource Light = LightSource(Vec3(0, 0, 0),
-                                    RGBf(.2,.2,.2),
-                                    RGBf(.8,.8,.8),
-                                    RGBf(1.,1.,1.));
+ //   LightSource Light = LightSource(Vec3(0, 0, 0),
+ //                                   RGBf(.2,.2,.2),
+ //                                   RGBf(.8,.8,.8),
+ //                                   RGBf(1.,1.,1.));
+ //
 
  
 //  FUTRE USE, TESTED POSITIVELY other Then User controlled Ball Glitches on its position
 //    std::thread Phythread(Physics_Thread);
- 
+
 
     while (GAME_LOOP())
     {
@@ -117,8 +119,8 @@ int main( int argc, char* args[] )
 //---------------------------------------------------------------------------------
 
         Vec3 npos = Cam.Position;
-        npos.y -= 20;
-        npos =   Vec3::RayCast(npos, Cam.Rotation, 100);
+        npos.y += 50;
+        npos =   Vec3::RayCast(npos, Cam.Rotation, 10);
         
 
     //  glPushMatrix();
@@ -127,8 +129,8 @@ int main( int argc, char* args[] )
     //
 
 
-      RenderGrid();
-
+ //     RenderGrid();
+      Ground->Render();
         for(Sphere &List:SphereList){
 
           Collider[List.CollisionID]->Velocity.y += 4.82; // Cheep gravity
@@ -148,17 +150,17 @@ int main( int argc, char* args[] )
         
         if(SCREEN->MOUSE.IsButtonPressed(0) == true)
         {
-                Sphere *temp = new Sphere(Cam.Position, 2.f + (float)RANDOM(10), 20);
+                Sphere *temp = new Sphere(npos, 2.f + (float)(1), 20);
             SphereList.push_back(*temp);
 
 
            SphereList[Sphere::SphereCount - 1].Set_Position( npos);
            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->SetPosition(SphereList[Sphere::SphereCount - 1].Position);
 
-            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Force.x = cos(RADIANS(Cam.Rotation.y + 90)) * 200;   
-            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Force.z = sin(RADIANS(Cam.Rotation.y + 90)) * 200;  
-            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Force.y = cos(RADIANS(Cam.Rotation.x + 90)) * 20;
-        Sleep(150);
+            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Force.x = cos(RADIANS(Cam.Rotation.y + 90)) * 100;   
+            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Force.z = sin(RADIANS(Cam.Rotation.y + 90)) * 100;  
+            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Force.y = cos(RADIANS(Cam.Rotation.x + 90)) * 100;
+        //Sleep(150);
         }
 
  
@@ -170,9 +172,8 @@ int main( int argc, char* args[] )
       SYNC();
     }
 
-    TERMINATE = true;
-    
-    //Phythread.join();
+    delete(Ground);
+
  }
 
 

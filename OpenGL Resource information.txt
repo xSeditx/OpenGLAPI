@@ -3584,12 +3584,7 @@ List->Velocity.z = Tangent.z  * dpTan2  + Normals.z  * M2;
                                            (sqrt(  List->Position.x *  List->Position.x +  List->Position.y *  List->Position.y +  List->Position.z *  List->Position.z )*
                                            sqrt(  Position.x *  Position.x +  Position.y *  Position.y +  Position.z *  Position.z )));
 
-       float Displacement = .5f * (CollisionDist - Radius - List->Radius);
 
-
-
-	          //  Position -= (Position - List->Position) * Displacement  / CollisionDist;
-     //    List->Position += (Position - List->Position) * Displacement  / CollisionDist;
 	 
 // DisplacementX = (Child->Offset.X -  Parent->Offset.X)  - Spring.Childrest.X;
 //   ^ Rest should not matter, just how far it went into the other object on each axis

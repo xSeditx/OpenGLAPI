@@ -10,8 +10,9 @@
 #include"Collision.h"
 
 std::vector<CollisionSphere*> Collider;
-unsigned int CollisionSphere::Collision_ObjectCount =0;;
+unsigned int CollisionSphere::Collision_ObjectCount =0;
 
+extern  Terrain *GLOBALGROUND;
 
  CollisionSphere::CollisionSphere(Vec3 pos, float radius, int parent)
     : 
@@ -21,7 +22,7 @@ unsigned int CollisionSphere::Collision_ObjectCount =0;;
       Force(0,0,0),
       Acceleration(0,0,0),
       Velocity(0,0,0),
-      Mass(radius / 2)
+      Mass(radius * 2)
 
 {
     Position = pos;
@@ -45,7 +46,7 @@ unsigned int CollisionSphere::Collision_ObjectCount =0;;
 
  void  CollisionSphere::CollisionDetection()
  {
-     Force = 0;
+   //  Force = 0;
      float DamperCoefficient = .1; // Dampening Factor
      float K = 1;
      for(CollisionSphere *List: Collider)
@@ -54,13 +55,21 @@ unsigned int CollisionSphere::Collision_ObjectCount =0;;
 
          if(CollisionDist != 0 ){                  // Returns Distance from Colliding object or FALSE for no Collision
 //                         Axis Displacement   * Spring Factor - Damping Factor
-            Force -= ((Position - List->Position) * (-K) - (Velocity * DamperCoefficient)) * .5;   // - DamperX;   
-            List->Force += ((Position - List->Position) * (-K) - (Velocity * DamperCoefficient)) * .5;        
+        float Displacement = .5f * (CollisionDist - Radius - List->Radius);
+	    Position -= (Position - List->Position) * Displacement  / CollisionDist;
+        List->Position += (Position - List->Position) * Displacement  / CollisionDist;
+             
+             
+             
+             Force -= (((Position - List->Position) * (-K) - (Velocity * DamperCoefficient)) / (List->Mass / 2));   // - DamperX;   
+            List->Force += (((Position - List->Position) * (-K) - (Velocity * DamperCoefficient)) /( Mass / 2));        
          }
-     if (Position.y + Radius >= 0)  Position.y  = -Radius; /// CHEEP GROUND COLLISION DETECTION, Just dont let it go below 0;
+    
+         //Terrain::SampleTerrain(const Terrain& terrain, float x, float z); 
+        float GroundHeight = GLOBALGROUND->SampleTerrain(Position.x,  Position.z) ;
+     if (Position.y + Radius >=  GroundHeight) Position.y = GroundHeight - Radius;
      }
  }
-
 
 
  void CollisionSphere::Update(float TimeStep)
@@ -73,9 +82,5 @@ unsigned int CollisionSphere::Collision_ObjectCount =0;;
            Velocity += Avg_Acceleration * TimeStep;
 
            CollisionDetection();  
-           Velocity = Velocity * .95f ;  
+           Velocity = Velocity * .99f ;  
  }
-
-
-
- 

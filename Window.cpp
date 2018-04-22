@@ -290,7 +290,7 @@ bool GLLogCall(const char *function, const char *file, int line){
             std::cout << "LINE NUMBER: " << line << std::endl;
             std::cout << "FUNCTION: " << function << std::endl;
             return false;
-            system("PAUSE");
+           // system("PAUSE");
         }
   return true;
 }
@@ -303,7 +303,7 @@ void GLCheckError(){
 
 }
 void GLClearError(){
-     while((glGetError()) != GL_NO_ERROR);
+//     while((glGetError()) != GL_NO_ERROR);
 }
 
 //=================================================================================================================================================================== */

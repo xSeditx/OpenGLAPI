@@ -79,29 +79,39 @@ public:
 //===============================================================================================================================================
 //__________________________________________ TERRAIN CLASS _____________________________________________________________________________________________________
 //==============================================================================================================================================================
- 
 
-class Terrain{
-public:
-    Terrain(float x,float y,float height,float width);
-};
+ class Terrain{
+ public:
+     Terrain(){}
+     Terrain(int w, int d, int gw, int gd);
+      
+      int width; // x-axis
+      int depth; // z-axis, y is up
+      int gridw; // distance between heights on x-axis
+      int gridd; // distance between heights on z-axis
+      float *Heights;
+      
+int   VertexCount,
+      ColorsCount;
+      
+      Buffer Vbo;
+      IndexBuffer Ibo;
+
+      Vec3 Position; 
+      Vec3  *Vertices;
+      RGBf  *Colors;
+      GLushort *Indices;
+      int IndexCount;
+float Terrain::Lerp(float a, float b, float c);
+float Terrain::SampleTerrain(float x, float z);
 
 
-
-
+void Render();
+ };
 //===============================================================================================================================================
 //_______________________________________________________________________________________________________________________________________________________________
 //==============================================================================================================================================================
  
-
-
-
-
-
-
-
-
-
 
 
 extern Vec3 GetNormal(Vec3 v1, Vec3 v2, Vec3 v3);
@@ -165,3 +175,15 @@ public:
     void Rotate(float x, float y, float z);
     void Render();
 };
+
+
+
+
+
+//
+//
+//
+//class RawMesh{
+//RawMesh(f32 w, f32 h, f32 d, u32 rings, u32 verticesPerRing)
+//
+//};

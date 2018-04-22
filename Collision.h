@@ -6,8 +6,7 @@
 
 #define Collider       CollisionSphere::Collision_ObjectList 
 
-
-
+//
 class CollisionSphere{
 
 public:

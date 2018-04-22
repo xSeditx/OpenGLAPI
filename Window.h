@@ -32,7 +32,7 @@
 #define LOG_CALLBACK(x)            std::cout << (x) << std::endl
 
 /*************** DEBUG MACROS FOR DISPLAYING OPEN_GL ERRORS *****************************/
-#define ASSERT(x) if(!(x)){system ("PAUSE");  exit(EXIT_FAILURE);}
+#define ASSERT(x) if(!(x)){  exit(EXIT_FAILURE);}
 //system("PAUSE");
 
 #ifdef TRACE

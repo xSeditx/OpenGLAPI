@@ -3644,3 +3644,210 @@ List->Velocity.z = Tangent.z  * dpTan2  + Normals.z  * M2;
 
 
 
+
+//           Colors[ColorsCount].r = GL_Color((X * gridw) * 255);
+//           Colors[ColorsCount].g = GL_Color(Heights[X + w * Y] * 255);
+//           Colors[ColorsCount].b = GL_Color((Y * gridd) * 255);
+
+
+  //    
+
+
+
+
+  
+            vB.x = Vertices[NormalCount + 1].x - Vertices[NormalCount * w].x;
+            vB.y = Vertices[NormalCount + 1].y - Vertices[NormalCount * w].y;
+            vB.z = Vertices[NormalCount + 1].z - Vertices[NormalCount * w].z;
+            Vec3 vC;
+            vC.x = Vertices[NormalCount * w].x - Vertices[NormalCount * w].x;
+            vC.y = Vertices[NormalCount * w].y - Vertices[NormalCount * w].y;
+            vC.z = Vertices[NormalCount * w].z - Vertices[NormalCount * w].z;
+            
+			
+//  d1 = ( x2 - x1,   y2 - y1,   z2 - z1 ) 
+//  d2 = ( x3 - x2,   y3 - y2,   z3 - z2 )  
+
+//cross[x] = d1[y] * d2[z]   -   d1[z] * d2[y]
+//cross[y] = d1[z] * d2[x]   -   d1[x] * d2[z]
+//cross[z] = d1[x] * d2[y]   -   d1[y] * d2[x]
+
+//dist = SQRT( cross[x]2 + cross[y]2 + cross[z]2)
+//
+//norm[x] = cross[x] / dist
+//norm[y] = cross[y] / dist
+//norm[z] = cross[z] / dist
+//
+
+
+
+
+
+//
+//
+//float m1, m2, x1, x2;
+//Vec3 v1temp, v1, v2, v1x, v2x, v1y, v2y, x(Position - List->Position);
+//
+//x.Normalize();
+//v1 = Velocity;
+//x1 = x.DotProduct(v1);
+//v1x = x * x1;
+//v1y = v1 - v1x;
+//m1 = Mass;
+//
+//x = x*-1;
+//v2 = List->Velocity;
+//x2 = x.DotProduct(v2);
+//v2x = x * x2;
+//v2y = v2 - v2x;
+//m2 = List->Mass;
+//
+//Velocity = Vec3( v1x*(m1-m2)/(m1+m2) + v2x*(2*m2)/(m1+m2) + v1y );
+//List->Velocity = Vec3( v1x*(2*m1)/(m1+m2) + v2x*(m2-m1)/(m1+m2) + v2y );
+//
+
+
+
+ void RenderGrid(){
+            glPushMatrix();
+   for(int i = -500; i <= 500; i+=5)
+   {
+ 
+       glBegin(GL_LINES);
+       glVertex3f(-500, 0, i);
+       glVertex3f( 500, 0, i);
+       glVertex3f(i, 0, -500);
+       glVertex3f(i, 0,  500);
+       glEnd();
+   }
+           glPopMatrix();
+}
+
+
+
+
+
+//
+//
+// struct Terrain {
+//    int width; // x-axis
+//    int depth; // z-axis, y is up
+//    int gridw; // distance between heights on x-axis
+//    int gridd; // distance between heights on z-axis
+//    float* heights;
+//};
+//
+//float Lerp(float a, float b, float c) {
+//    return (1.0 - c) * a + b * c;
+//}
+//
+//
+//float SampleTerrain(const Terrain& terain, float x, float z) {
+//    
+//    x += terrain.width * 0.5f; //Assume that grid's center is at the origin. 
+//    z += terrain.depth * 0.5f;
+//    
+//    if(x < 0.0f || x > terrain.width * terrain.gridw || y < 0.0f || y > terrain.depth * terrain.gridd)  
+//        return -FLT_MAX;
+//    
+//    float sx = x / (float)terrain.gridw;
+//    float sy = y / (float)terrain.gridh;
+//    
+//    int ax = (int)sx;
+//    int ay = (int)sy;
+//    
+//    int bx = min(ax+1, terrain.width);
+//    int by = min(ay+1, terrain.height);
+//    
+//    float fracX = sx - ax;
+//    float fracY = sy - ay; 
+//    
+//    //We're going to need these for linearily interpolate over a square
+//    
+//    float tl = terrain.heights[ax + ay*terrain.width];
+//    float tr = terrain.heights[bx + ay*terrain.width];
+//
+//    float bl = terrain.heights[ax + by*terrain.width];
+//    float br = terrain.heights[bx + by*terrain.width];
+//
+//    // tl ---- tr
+//    //  |      |
+//    //  |      |
+//    // bl ---- br
+//    
+//    
+//    float lrt = Lerp(tl, tr, fracX); // Lerp between square top values
+//    float lrb = Lerp(bl, br, fracX); // Lerp between square low values
+//        
+//    return Lerp(lrt, lrb, fracY); // Lerp between the left .. right values  
+//    
+//
+//
+//
+ //// MAGETS Sphere
+//
+//
+//
+//
+//RawMesh::RawMesh(f32 w, f32 h, f32 d, u32 rings, u32 verticesPerRing) {
+//
+//    RawMesh mesh;
+//
+//    Math::vec3 position = {0.0f, h*0.5f, 0.0f};
+//    Math::vec2 texCoord = {0.5f, 1.0f};
+//    Math::vec3 normal = position.normalized();
+//
+//    auto addVertex = [&]() {
+//        mesh.mVertices.push_back(position);
+//        mesh.mTextureCoordinates.push_back(texCoord);
+//        mesh.mNormals.push_back(normal);
+//    };
+//
+//    addVertex();
+//
+//    for(s32 i = 1; i < rings; i++) {
+//        f32 irad = Math::Sin((f32)i / (f32)(rings - 1) * 180.0f);
+//        f32 v = -(f32)i / (f32)(rings - 1);
+//        for(s32 j = 0; j < verticesPerRing; j++) {
+//            f32 u = (f32)j / (f32)verticesPerRing - 1;
+//            f32 vx = Math::Cos((f32)j / (f32)(verticesPerRing - 1) * 360.0f) * irad* w * 0.5f;
+//            f32 vy = Math::Cos((f32)i / (f32)(rings - 1) * 180.0f) * h * 0.5f;
+//            f32 vz = Math::Sin((f32)j / (f32)(verticesPerRing - 1) * 360.0f) * irad * d * 0.5f;
+//
+//            position = {vx, vy, vz};
+//            texCoord = {u, v};
+//            normal = position.normalized();
+//            addVertex();
+//        }
+//    }
+//
+//    position = {0.0f, -h*0.5f, 0.0f};
+//    texCoord = {0.5f, 0.0f};
+//    normal = position.normalized();
+//    addVertex();
+//
+//    for(s32 j = 0; j < verticesPerRing - 1; j++) {
+//        mesh.mTriangles.emplace_back(0, 1 + j, 1 + j + 1);
+//    }
+//
+//    for(s32 i = 0; i < rings - 2; i++) {
+//        for(s32 j = 0; j < verticesPerRing - 1; j++) {
+//
+//            u32 a = i * verticesPerRing + 1 + j;
+//            u32 b = i * verticesPerRing + 1 + j + 1;
+//            u32 c = (i + 1) * verticesPerRing + 1 + j + 1;
+//            u32 d = (i + 1) * verticesPerRing + 1 + j;
+//            
+//            //a --- b
+//            //|     |
+//            //|     |
+//            //d --- c
+//
+//            mesh.mTriangles.emplace_back(d, c, b);
+//            mesh.mTriangles.emplace_back(d, b, a);
+//        }
+//    }
+//
+//    mesh.estimateTangentspace();
+//    return mesh;
+//}

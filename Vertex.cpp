@@ -164,42 +164,33 @@ bool Vec3::operator !=(const Vec3& other)
 return !(*this == other);
 }
 
-Vec3& Vec3::operator =(const float& value){
+Vec3& Vec3::operator =(const float& value) {
     this->x = value;
     this->y = value;
     this->z = value;
     return *this;
 } // My work needs Testing
-Vec3& Vec3::operator +(const float& value){
-    this->x += value;
-    this->y += value;
-    this->z += value;
-    return *this;
+
+Vec3 Vec3::operator +(const float& value) const{
+    return Vec3(x + value, y + value, z + value);
 }
-Vec3& Vec3::operator -(const float& value){
-    this->x -= value;
-    this->y -= value;
-    this->z -= value;
-    return *this;
+Vec3 Vec3::operator -(const float& value) const{
+    return Vec3(x - value, y - value, z - value);
 }
-Vec3& Vec3::operator *(const float& value){
-    this->x *= value;
-    this->y *= value;
-    this->z *= value;
-    return *this;
+Vec3 Vec3::operator *(const float& value) const{
+    return Vec3(x * value, y * value, z * value);
 }
-Vec3& Vec3::operator /(const float& value){
-    this->x /= value;
-    this->y /= value;
-    this->z /= value;
-    return *this;
+Vec3 Vec3::operator /(const float& value) const{
+    return Vec3(x / value, y / value, z / value);
 }
-Vec3::operator glm::vec3() {
+
+Vec3::operator glm::vec3()
+{
     glm::vec3 v;
     v.x = x;
     v.y = y;
     v.z = z;
-  return v;
+   return v;
 }
 
 //_____________________________________________________________________________________________________________________________________

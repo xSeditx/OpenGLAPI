@@ -90,6 +90,7 @@
 #define M_SQRT1_2     0.707106781186547524401
 
 #define RADIANS(x)   ((x) * (M_PI / 180)) 
+#define DEGREES(x)   ((x) * (180  / M_PI))
 #define for_loop(itr, count)          for(int(itr) = 0; itr < (count); itr++)
 
 class  Window;

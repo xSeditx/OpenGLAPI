@@ -1,13 +1,14 @@
-#include "window.h"
-#include "3D_Primitive.h"
-
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
-#define SphereList   Sphere::s_SphereList
-std::vector<Sphere*> Sphere::s_SphereList;
-unsigned int Sphere::SphereCount = 0;
-
-
+#include "window.h"                                                                                                                 
+#include "3D_Primitive.h"                                                                                                           
+                                                                                                                                    
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))                                                                                       
+                                                                                                                                    
+#define SphereList   Sphere::s_SphereList                                                                                           
+std::vector<Sphere*> Sphere::s_SphereList;                                                                                          
+Terrain *Terrain::GROUND;                                                                                                                                  
+unsigned int Sphere::SphereCount = 0;                                                                                               
+                                                                                                                                    
+                                                                                                                                    
  Sphere::Sphere(Vec3 pos, float radius, int sectors) 
     : Position (pos),
       VertexCount(0),
@@ -79,84 +80,96 @@ unsigned int Sphere::SphereCount = 0;
    CollisionID = MakeCollisionSphere(Position, Radius, Mesh_ID);
 
    SphereList.push_back(this);
-}
-
- void Sphere::Update ()
- {
-
-   Collider[CollisionID]->Update(1.f);
-   Set_Position(Collider[CollisionID]->Position);
-   //Submit(Vertices);
-}
- void Sphere::Render ()
- {
-
+}                                                                       
+                                                                                                                                    
+void Sphere::Update ()                                                                                                              
+ {                                                                                                                                  
+                                                                                                                                    
+   Collider[CollisionID]->Update();                                                                                                 
+   Set_Position(Collider[CollisionID]->Body.Position);                                                                              
+}                                                                                                                                   
+                                                                                                                                    
+void Sphere::Render ()
+{
    glPushMatrix();
-
       glTranslatef(Position.x,  Position.y, Position.z);
-
       Vbo.Bind();
           glDrawArrays(GL_TRIANGLE_STRIP, 0, VertexCount);
       Vbo.Unbind();
-
   glPopMatrix();
-}
- void Sphere::ChangeVert (int index, Vec3 newpos){
+}                                                                                                     
+                                                                                                                                    
+void Sphere::ChangeVert (int index, Vec3 newpos)
+{
     Vertices[index] = newpos;
-}
- void Sphere::Submit (Vec3 *data)
+}                                                                           
+                                                                                                                                    
+void Sphere::Submit (Vec3 *data)
 {
 // In DirectX MapBuffer Moves the Vertex Buffer to the CPU
  // DX CODE: Vbo->Map(Buffer_ID, 0 , Map Write Discoard, 0 , &MappedResource<- returns the buffer);
 // So I need OpenGL Map Buffer code;
    Vbo = Buffer(data, Colors, VertexCount, ColorCount);
-}
- int  Sphere::MakeCollisionSphere (Vec3 pos, float rad, int p)
+}                                                                                           
+                                                                                                                                    
+int  Sphere::MakeCollisionSphere (Vec3 pos, float rad, int p)
 {
     CollisionSphere *Bounds = new CollisionSphere(pos, rad, p);
 
-    Bounds->Position = pos;
+    Bounds->Body.Position = pos;
     Bounds->Radius   = rad;
     Bounds->ParentID = p;
 
     return Bounds->ID;
-}
-      
-//===============================================================================================================================================
-//______________________________________ TERRAIN _____________________________________________________________________________________________________________
-//==============================================================================================================================================================
- 
+}                                                              
+                                                                                                                                    
+//================================================================================================================================= 
+//______________________________________ TERRAIN __________________________________________________________________________________ 
+//================================================================================================================================= 
+                                                                                                                                    
+Terrain::~Terrain(){
+       delete( Vertices); 
+       delete( Colors  ); 
+       delete( Normals ); 
+}                                                                                                        
+                                                                                                                                    
+                                                                                                                                    
 Terrain::Terrain(int w, int d, int gw, int gd)
-       :Position( 0 ,0 ,0),
-        width   (w), 
-        depth   (d), 
-        gridw   (gw), 
-        gridd   (gd), 
-        VertexCount(0), 
-        ColorsCount(0)
-{
+       : Position(-(w * .5) ,0 ,-(d * .5)),
+         width   (w), 
+         depth   (d), 
+         gridw   (gw), 
+         gridd   (gd), 
+         VertexCount(0.0f), 
+         ColorsCount(0.0f),
+         NormalCount(0.0f)
+{        
+    Vertices = new Vec3[ (w + 1) * (d + 1)];
+    Colors   = new Vec3[ (w + 1) * (d + 1)];
+    Normals  = new Vec3[ (w + 1) * (d + 1) * 2];
 
-   // Heights  = new float[w * d];
-    Vertices = new Vec3[(w + 1) * (d + 1)];
-    Colors   = new Vec3[(w + 1) * (d + 1)];
-    float H1 = 0, H2 = 0, H3 = 0;
+    Vec3 Origin;
+    Origin.x = Position.x / 2;
+    Origin.y = Position.y;
+    Origin.z = Position.z / 2;
+
+
     float FinalHeight =0;
+//--------------------------------------------- CALCULATE VERTICES -------------------------------------------------------------------------
+  float H1 = 1, H2 = 1, H3 = 1, H4 = 1;
+    
+    for_loop(Z, d )
+    {
+           
+        for_loop(X , w)
+        {
+            if(X % 10 > 5 && Z % 10 > 5) H1  = -20; else H1 = 0; //-= RANDOM(5) - 2.5;
+            if(X % 10 > 2 && Z % 10 > 2) H2  =  -5; else H2 = 0;   
+            if(X % 10 > 3 && Z % 10 > 3) H3 =  -10; else H3 = 0;
 
-    for_loop(Y, d ){
-        for_loop(X , w){
-            if(X % 2 == 0) H1 = (30); else H1 = 0;
-           // if(X % 5 == 0) H2 = RANDOM(10);    
-           // if(X % 2 == 0) H3 = RANDOM(10);
-
-
-            //Heights[X + w * Y] = H1 + H2 + H3;//RANDOM(10);
             Vertices[VertexCount].x = X * gw;
-            Vertices[VertexCount].y =H1 ;//* H2 * H3 / 10;//X * Y / 2; //<-- Just debug so I know what Vertex it is
-            Vertices[VertexCount].z = Y * gd;
-
-//           Colors[ColorsCount].r = GL_Color((X * gridw) * 255);
-//           Colors[ColorsCount].g = GL_Color(Heights[X + w * Y] * 255);
-//           Colors[ColorsCount].b = GL_Color((Y * gridd) * 255);
+            Vertices[VertexCount].y = H1 + H2 + H3 + H4 ;//X * Y / 2; //<-- Just debug so I know what Vertex it is
+            Vertices[VertexCount].z = Z * gd;
 
             Colors[ColorsCount].r = GL_Color((ColorsCount % 4) * 64);
             Colors[ColorsCount].g = GL_Color(((ColorsCount +1) % 4)* 64);
@@ -167,138 +180,196 @@ Terrain::Terrain(int w, int d, int gw, int gd)
         }
     }
 
+// --------------------------------------------- CALCULATE INDICES ------------------------------------------------------------------------
     IndexCount =0;
-    Indices = new GLushort[w * d * 4];
+    Indices = new GLushort[(w * d * 3) * 2];
+    for_loop(Y, w - 1){
+        for_loop(X , d - 1){
+            Indices[IndexCount    ] =    X      + w *  Y ;     // 1
+            Indices[IndexCount + 1] =   (X + 1) + w *  Y;      // 2
+            Indices[IndexCount + 2] =    X      + w * (Y + 1); // 4
+                                                               
+            Indices[IndexCount + 3] =   (X + 1) + w * (Y + 1); // 3
+            Indices[IndexCount + 4] =    X      + w * (Y + 1); // 4
+            Indices[IndexCount + 5] =   (X + 1) + w * Y;       // 2
 
-    for_loop(Y, gd - 1){
-        for_loop(X , gw - 1){
-            Indices[IndexCount+2] =    X + w * Y ;
-            Indices[IndexCount+3] =   (X + 1) + w * Y;
-            Indices[IndexCount+1] =    X  + w * (Y + 1);
-            Indices[IndexCount]   =   (X + 1) + w * (Y + 1);
-           IndexCount+=4;
+            IndexCount+=6;
         }
     }
 
-   Vbo = Buffer(Vertices, Colors, VertexCount, ColorsCount);
-   Ibo = IndexBuffer(Indices,IndexCount);
-}
+// --------------------------------------------- CALCULATE NORMALS ---------------------------------------------------------------------   
 
+    for_loop(Y, d  - 1){
+        for_loop(X , w - 1){
+            Normals[NormalCount]     = GetNormal(Vertices[NormalCount],          // 1 
+                                                 Vertices[NormalCount+ 1],       // 2 
+                                                 Vertices[NormalCount + w]);     // 4 
+                                     
+            Normals[NormalCount + 1] = GetNormal(Vertices[NormalCount  + w + 1], // 3
+                                                 Vertices[NormalCount  + w],     // 4
+                                                 Vertices[NormalCount  + 1]);    // 2
+            NormalCount += 2;
+        }
+    }      
+
+// ---------------------------------------------- Allocate Buffers ----------------------------------------------------------------------------   
+
+   Vbo = Buffer(Vertices, Colors, Normals,  VertexCount, ColorsCount, NormalCount);
+   Ibo = IndexBuffer(Indices,IndexCount);
+}                                                                             
+                                                                                                                                    
+                                                                                                                                    
+                                                                                                                                    
+                                                                                                                                    
 float Terrain::Lerp(float a, float b, float c)
 {
     return (1.0 - c) * a + b * c;
-}
-
+}                                                                             
+                                                                                                                                    
 void Terrain::Render()
 {
 
    glPushMatrix();
-      glTranslatef(Position.x,  Position.y, Position.z);
+      glTranslatef(Position.x ,  Position.y , Position.z );
 
       Vbo.Bind();
-        //  glDrawArrays(GL_QUADS, 0, VertexCount);
-      Ibo.Bind();
-   glDrawElements(GL_QUADS , IndexCount , GL_UNSIGNED_SHORT, nullptr);
-      Ibo.Unbind();
-         Vbo.Unbind();
+          glBindBuffer(GL_ARRAY_BUFFER, Vbo.ID[2]);
+          glNormalPointer(GL_FLOAT,0,(char *) NULL);
+          glEnableClientState(GL_NORMAL_ARRAY);
+          Ibo.Bind();
+              glDrawElements(GL_TRIANGLES , IndexCount , GL_UNSIGNED_SHORT, nullptr);
+          Ibo.Unbind();
+      Vbo.Unbind();
   glPopMatrix();
-}
-
-
-
-float Terrain::SampleTerrain(float x, float z) 
+}                                                                                                     
+                                                                                                                                    
+class CollisionSphere;                                                                                                              
+                                                                                                                                    
+float Terrain::SampleTerrain(float x, float z, CollisionSphere *ball) 
 {
     
-    x += width * 0.5f; //Assume that grid's center is at the origin. 
-    z += depth * 0.5f;
+    x += (width * .5f); //Assume that grid's center is at the origin. 
+    z += (depth * .5f);
     
     if(x < 0.0f || x > width * gridw ||  z < 0.0f ||  z > depth * gridd)  
         return -FLT_MAX;
     
     float sx = x / (float)gridw; // NOTES:Translates Position to Grid Space.
-    float sy = z / (float)gridd; //
+    float sz = z / (float)gridd; //
     
-    int ax = (int)sx;
-    int ay = (int)sy;
-    
-    int bx = min(ax+1, gridw);
-    int by = min(ay+1, gridd);
+    int ax = (int)sx  ;
+    int az = (int)sz  ;
+
+    int bx =  min(ax+1, width);
+    int bz =  min(az+1, depth);
     
     float fracX = sx - ax;
-    float fracY = sy - ay; 
+    float fracY = sz - az; 
     
-    //We're going to need these for linearily interpolate over a square
-    
-    float tl = Vertices[ax + ay*width].y;
-    float tr = Vertices[bx + ay*width].y;
 
-    float bl = Vertices[ax + by*width].y;
-    float br = Vertices[bx + by*width].y;
+//We're going to need these for linearily interpolate over a square
 
-    float lrt = Lerp(tl, tr, fracX); // Lerp between square top values
-    float lrb = Lerp(bl, br, fracX); // Lerp between square low values
-        
-    return Lerp(lrt, lrb, fracY); // Lerp between the left .. right values  
+    float tl = Vertices[ax + az*width].y;
+    float tr = Vertices[bx + az*width].y;
+
+    float bl = Vertices[ax + bz*width].y;
+    float br = Vertices[bx + bz*width].y;
+
+  //  ball->Force.x *=  -Normals[ax + az*width].x / 2.0;   // Vec3(-Normals[ax + az*width].x,-Normals[ax + az*width].y,-Normals[ax + az*width].z);
+  //  ball->Force.y *= -Normals[ax + az*width].y / 2.0;   // Vec3(-Normals[ax + az*width].x,-Normals[ax + az*width].y,-Normals[ax + az*width].z);
+ //   ball->Force.z *=  -Normals[ax + az*width].z / 2.0;   // Vec3(-Normals[ax + az*width].x,-Normals[ax + az*width].y,-Normals[ax + az*width].z);
+
+    //ball->Force *=  Normals[ax + az*width];   // Vec3(-Normals[ax + az*width].x,-Normals[ax + az*width].y,-Normals[ax + az*width].z);
+
+
+    return Lerp(Lerp(tl, tr, fracX), Lerp(bl, br, fracX), fracY); // Lerp between the left .. right values  
   
     // tl ---- tr
     //  |      |
     //  |      |
     // bl ---- br
 
-}
-
-
-
-
-//===============================================================================================================================================
-//_______________________________________________________________________________________________________________________________________________________________
-//==============================================================================================================================================================
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- Torus::Torus(int numc, int numt, float X, float Y, float Z, float scale)
+}                                                      
+                                                                                                                                    
+                                                                                                                                    
+                                                                                                                                    
+Vec3 Terrain::CollisionDetection(CollisionSphere ball)
 {
-    Scale.x = scale;
-    Scale.y = scale;
-    Scale.z = scale; 
-    Position.x = X;
-    Position.y = Y;
-    Position.z = Z;
-        ObjectType = Torus_t;
-    List = glGenLists(1);
-   glNewList(List, GL_COMPILE);
+    Vec3 Pos = ball.Body.Position;
+    Pos.x += (width * .5f); //Assume that grid's center is at the origin. 
+    Pos.z += (depth * .5f);
+    
+    if(Pos.x < 0.0f || Pos.x > width * gridw ||  Pos.z < 0.0f ||  Pos.z > depth * gridd) return Vec3(-FLT_MAX,-FLT_MAX,-FLT_MAX);
 
-   int i, j, k;
-   double s, t, x, y, z, twopi;
+    float sx = Pos.x / (float)gridw; // NOTES:Translates Position to Grid Space.
+    float sz = Pos.z / (float)gridd; //
+    
+    int ax = (int)sx  ;
+    int az = (int)sz  ;
 
-   twopi = 2 * (double)M_PI;
+    int bx = min(ax + 1, gridw);
+    int bz = min(az + 1, gridd);
 
-   for (i = 0; i < numc; i++) {
-      glBegin(GL_QUAD_STRIP);
-      for (j = 0; j <= numt; j++) {
-         for (k = 1; k >= 0; k--) {
-            s = (i + k) % numc + 0.5;
+}                                                                     
+                                                                                                                                    
+                                                                                                                                    
+                                                                                                                                    
+                                                                                                                                    
+                                                                                                                                    
+                                                                                                                                    
+             
+
+
+
+
+                                                                                                                                    
+Vec3 GetNormal(Vec3 v1, Vec3 v2, Vec3 v3)
+{
+            Vec3 D1 = v2 - v1; 
+            Vec3 D2 = v3 - v2;
+
+            Vec3 Cross = Vec3::CrossProduct  (D1, D2);
+
+            float Distance = sqrt( Squared(Cross.x) +  Squared(Cross.y) +  Squared(Cross.z));
+
+           return Vec3(Cross.x / Distance, 
+                       Cross.y / Distance, 
+                       Cross.z / Distance);
+}                                                                                  
+                                                                                                                                    
+                                                                                                        
+//================================================================================================================================= 
+//_________________________________________________________________________________________________________________________________ 
+//================================================================================================================================= 
+                                                                                                                                    
+                                                                                                                                    
+                                                                                                                                    
+                                                                                                                                    
+                                                                                                                                    
+                                                                                                                                    
+                                                                                                                                    
+ Torus::Torus(int numc, int numt, float X, float Y, float Z, float scale)                                                           
+{                                                                                                                                   
+    Scale.x = scale;                                                                                                                
+    Scale.y = scale;                                                                                                                
+    Scale.z = scale;                                                                                                                
+    Position.x = X;                                                                                                                 
+    Position.y = Y;                                                                                                                 
+    Position.z = Z;                                                                                                                 
+        ObjectType = Torus_t;                                                                                                       
+    List = glGenLists(1);                                                                                                           
+   glNewList(List, GL_COMPILE);                                                                                                     
+                                                                                                                                    
+   int i, j, k;                                                                                                                     
+   double s, t, x, y, z, twopi;                                                                                                     
+                                                                                                                                    
+   twopi = 2 * (double)M_PI;                                                                                                        
+                                                                                                                                    
+   for (i = 0; i < numc; i++) {                                                                                                     
+      glBegin(GL_QUAD_STRIP);                                                                                                       
+      for (j = 0; j <= numt; j++) {                                                                                                 
+         for (k = 1; k >= 0; k--) {                                                                                                 
+            s = (i + k) % numc + 0.5;                                                                                               
             t = j % numt;
 
             x = (1+.1*cos(s*twopi/numc))*cos(t*twopi/numt);
@@ -414,81 +485,3 @@ _GL(glPopMatrix());
 
 
 
-
-
-
-
-
-
-
-
-
-
-
- //// MAGETS Sphere
-//
-//
-//
-//
-//RawMesh::RawMesh(f32 w, f32 h, f32 d, u32 rings, u32 verticesPerRing) {
-//
-//    RawMesh mesh;
-//
-//    Math::vec3 position = {0.0f, h*0.5f, 0.0f};
-//    Math::vec2 texCoord = {0.5f, 1.0f};
-//    Math::vec3 normal = position.normalized();
-//
-//    auto addVertex = [&]() {
-//        mesh.mVertices.push_back(position);
-//        mesh.mTextureCoordinates.push_back(texCoord);
-//        mesh.mNormals.push_back(normal);
-//    };
-//
-//    addVertex();
-//
-//    for(s32 i = 1; i < rings; i++) {
-//        f32 irad = Math::Sin((f32)i / (f32)(rings - 1) * 180.0f);
-//        f32 v = -(f32)i / (f32)(rings - 1);
-//        for(s32 j = 0; j < verticesPerRing; j++) {
-//            f32 u = (f32)j / (f32)verticesPerRing - 1;
-//            f32 vx = Math::Cos((f32)j / (f32)(verticesPerRing - 1) * 360.0f) * irad* w * 0.5f;
-//            f32 vy = Math::Cos((f32)i / (f32)(rings - 1) * 180.0f) * h * 0.5f;
-//            f32 vz = Math::Sin((f32)j / (f32)(verticesPerRing - 1) * 360.0f) * irad * d * 0.5f;
-//
-//            position = {vx, vy, vz};
-//            texCoord = {u, v};
-//            normal = position.normalized();
-//            addVertex();
-//        }
-//    }
-//
-//    position = {0.0f, -h*0.5f, 0.0f};
-//    texCoord = {0.5f, 0.0f};
-//    normal = position.normalized();
-//    addVertex();
-//
-//    for(s32 j = 0; j < verticesPerRing - 1; j++) {
-//        mesh.mTriangles.emplace_back(0, 1 + j, 1 + j + 1);
-//    }
-//
-//    for(s32 i = 0; i < rings - 2; i++) {
-//        for(s32 j = 0; j < verticesPerRing - 1; j++) {
-//
-//            u32 a = i * verticesPerRing + 1 + j;
-//            u32 b = i * verticesPerRing + 1 + j + 1;
-//            u32 c = (i + 1) * verticesPerRing + 1 + j + 1;
-//            u32 d = (i + 1) * verticesPerRing + 1 + j;
-//            
-//            //a --- b
-//            //|     |
-//            //|     |
-//            //d --- c
-//
-//            mesh.mTriangles.emplace_back(d, c, b);
-//            mesh.mTriangles.emplace_back(d, b, a);
-//        }
-//    }
-//
-//    mesh.estimateTangentspace();
-//    return mesh;
-//}

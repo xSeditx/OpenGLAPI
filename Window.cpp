@@ -289,8 +289,9 @@ bool GLLogCall(const char *function, const char *file, int line){
             std::cout << "FILE: " << file << std::endl;
             std::cout << "LINE NUMBER: " << line << std::endl;
             std::cout << "FUNCTION: " << function << std::endl;
+
+            system("PAUSE");
             return false;
-           // system("PAUSE");
         }
   return true;
 }

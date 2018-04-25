@@ -13,11 +13,13 @@ class Buffer{
 public:
         Buffer(){}
         Buffer(Vec3 *Vertexdata, Vec3 *Colordata, GLsizei count, GLint colorcount);
-        
-        GLuint ID[2];
+        Buffer(Vec3 *Vertexdata, Vec3 *Colordata ,Vec3 *Normals ,GLsizei vcount, GLint colorcount, GLint normalCount);
+
+        GLuint ID[3];
 
         GLint  VertexCount;
         GLint  ColorCount;
+        GLint  NormalCount;
 
       void Bind();
       void Unbind();

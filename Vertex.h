@@ -98,10 +98,10 @@ struct Vec3{
 
         Vec3& operator =(const float& value); // Test these
 
-        Vec3& operator +(const float& value);
-        Vec3& operator -(const float& value);
-        Vec3& operator *(const float& value);
-        Vec3& operator /(const float& value);
+        Vec3 operator +(const float& value) const;
+        Vec3 operator -(const float& value) const;
+        Vec3 operator *(const float& value) const;
+        Vec3 operator /(const float& value) const;
 
         bool operator ==(const Vec3& other);
         bool operator !=(const Vec3& other);

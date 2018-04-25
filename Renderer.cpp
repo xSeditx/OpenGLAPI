@@ -24,6 +24,47 @@ Buffer::Buffer(Vec3 *Vertexdata,Vec3 *Colordata ,GLsizei vcount, GLint colorcoun
      } 
 }
 
+/// Hmmmmm Cant KEEP THIS UP,. MUST FIND A BETTER WAY TO HANDLE THE BUFFERING AND MANAGEMENT OF THE MESH DATA
+Buffer::Buffer(Vec3 *Vertexdata,Vec3 *Colordata ,Vec3 *Normals ,GLsizei vcount, GLint colorcount, GLint normalCount)
+    :VertexCount(vcount), 
+     ColorCount(colorcount),
+     NormalCount(normalCount)
+{
+    if(Colordata != nullptr){
+            glGenBuffers(3 , &ID[0]);
+            glBindBuffer(GL_ARRAY_BUFFER, ID[0]);
+                glBufferData(GL_ARRAY_BUFFER,VertexCount * sizeof(Vec3), Vertexdata, GL_STATIC_DRAW) ; 
+            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;
+    }
+
+     if(Vertexdata != nullptr){
+            glBindBuffer(GL_ARRAY_BUFFER, ID[1]); // Bind our second Vertex Buffer Object  
+                glBufferData(GL_ARRAY_BUFFER, ColorCount * sizeof(RGBf), Colordata, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
+                glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
+                    glEnableVertexAttribArray(1); 
+            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;}
+     } 
+     if(Normals != nullptr){
+            glBindBuffer(GL_ARRAY_BUFFER, ID[2]); // Bind our second Vertex Buffer Object  
+                glBufferData(GL_ARRAY_BUFFER, NormalCount * sizeof(Vec3), Normals, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
+                glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
+                    glEnableVertexAttribArray(2); 
+            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;}
+     }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 void Buffer::Bind()
 {
     glBindBuffer(GL_ARRAY_BUFFER, ID[1]);

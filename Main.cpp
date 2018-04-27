@@ -15,7 +15,7 @@ vector<Sphere> SphereList;
 Terrain  *GROUND;
 
 
-
+bool View = false;
 
 //==========================================================================================================================
 //                                                    MAIN 
@@ -30,27 +30,24 @@ int main( int argc, char* args[] )
 
     Camera Cam;
     Cam.Position = Vec3(0,200,0);
-    float MOVEX = 0,  MOVEY = 0, 
-          OLDMX = 0,  OLDMY = 0,
-          POSX  = 0,  POSY  = 0;
-
-
+    float OLDMX = 0,  OLDMY = 0;
 
 
     Window MainWindow(0,0,SCREENWIDTH, SCREENHEIGHT, "OpenGL 2.0");
 
-    {
+    {//-----------------------------------------------------------------------
     const GLubyte *extensions = glGetString( GL_EXTENSIONS );
     Print(extensions);
     Print( "OpenGL Version: "  ; Print(glGetString(GL_VERSION)));
     Print( "Renderer: "        ; Print(    glGetString(GL_RENDERER)));
     Print( "Current Context: " ; Print(wglGetCurrentContext()));
-    } // Just Information Scope
+    } //-- Just Information Scope --------------------------------------------
 
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL );
-    Mass::Set_Timestep(1.0f);
-    Mass::Set_Gravity(4.5);
+
+    Mass::Set_Timestep(2.0f);
+    Mass::Set_Gravity(.1);
 
    //   LightSource Light = LightSource(Vec3(10, 10, 10),
    //                               RGBf(.2,.2,.2),
@@ -58,7 +55,7 @@ int main( int argc, char* args[] )
    //                               RGBf(1.,1.,1.));
    //
 
-         Terrain *Ground = new Terrain(100,100,5, 5);
+         Terrain *Ground = new Terrain(50,50,30,30);
          Terrain::GROUND = Ground;
 
     for_loop(count,  10){
@@ -68,17 +65,22 @@ int main( int argc, char* args[] )
                                       2 + RANDOM(10), 20);
         SphereList.push_back(*temp);
     }
- 
+   
 
+    Vec3 A(10,20,30);
+    Print(A * .10);
 
-
+ //   system("PAUSE");
     while (GAME_LOOP())
     {
     CLS(); 
 // --------------------- Handle Input ---------------------------------------------
         if(SCREEN->KEY_BOARD.Key == GLFW_KEY_SPACE)
         {
-            for(Sphere &List:SphereList)List.Update();
+             View = !View;
+             if (View == true)glPolygonMode(GL_FRONT_AND_BACK, GL_LINE );
+             if (View == false)    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL );
+             Sleep(200);
         }
 
 
@@ -92,26 +94,28 @@ int main( int argc, char* args[] )
         }
         if(SCREEN->KEY_BOARD.Key == GLFW_KEY_DOWN)
         { 
-              Cam.MoveForward(2);
+              Cam.MoveForward(5);
         }
         
         if(SCREEN->KEY_BOARD.Key == GLFW_KEY_UP) 
         {
-                Cam.MoveBack(2);
+                Cam.MoveBack(5);
         }
 
  //  Light.SetPosition(Cam.Position,Cam.Position);//  <---- LIGHTS
 //--------------------- Get the MouseMovement ------------------------------------
-        MOVEX = SCREEN->MOUSE.X - OLDMX;     OLDMX = SCREEN->MOUSE.X; // MOUSE.MouseMove.X only works when the callback is being activated
-        MOVEY = SCREEN->MOUSE.Y - OLDMY;     OLDMY = SCREEN->MOUSE.Y; // Must gather the true mousemovement here in this function 
+        Cam.Rotate(-(SCREEN->MOUSE.X - OLDMX), 
+                     SCREEN->MOUSE.Y - OLDMY);
 
-        Cam.Rotate(-MOVEX,MOVEY);
+        OLDMX = SCREEN->MOUSE.X; // MOUSE.MouseMove.X only works when the callback is being activated
+        OLDMY = SCREEN->MOUSE.Y; // Must gather the true mousemovement here in this function 
+
         Cam.Update();                          // <---- CAMERA
 //---------------------------------------------------------------------------------
 
         Vec3 npos = Cam.Position;
-        npos.y += 50;
-        npos =   Vec3::RayCast(npos, Cam.Rotation, 10);
+        npos.y += 0;
+        npos =   Vec3::RayCast(npos, Cam.Rotation, 80);
         
         
 
@@ -128,12 +132,11 @@ int main( int argc, char* args[] )
         {
              
              for(Sphere &List: SphereList){
-             Collider[List.CollisionID]->SetPosition(Vec3((float)-(rand()%10),
+             Collider[List.CollisionID]->SetPosition(Vec3((float)-(rand()%10 - 500),
                                                           (float)-(rand()%10),
-                                                          (float)-(rand()%10)));
+                                                          (float)-(rand()%10 - 500)));
              }
         }
-        
         if(SCREEN->MOUSE.IsButtonPressed(0) == true)
         {
             Sphere *temp = new Sphere(npos, 2.f + RANDOM(10)  , 20);
@@ -142,30 +145,69 @@ int main( int argc, char* args[] )
             SphereList[Sphere::SphereCount - 1].Set_Position( npos);
 
             Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->SetPosition(SphereList[Sphere::SphereCount - 1].Position);
-            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Body.Force.x = cos(RADIANS(Cam.Rotation.y + 90)) * 10;   
-            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Body.Force.z = sin(RADIANS(Cam.Rotation.y + 90)) * 10;  
-            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Body.Force.y = cos(RADIANS(Cam.Rotation.x + 90)) * 10;
+            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Body.Force.x = cos(RADIANS(Cam.Rotation.y + 90)) * 20;   
+            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Body.Force.z = sin(RADIANS(Cam.Rotation.y + 90)) * 20;  
+            Collider[SphereList[Sphere::SphereCount - 1].CollisionID]->Body.Force.y = cos(RADIANS(Cam.Rotation.x + 90)) * 20;
+            Sleep(200);
         }
 
-        for(int count = 0; count < Ground->VertexCount ; count +=2)
-        {
-            glBegin(GL_LINES);
 
-            glVertex3f(Ground->Position.x + Ground->Vertices[count].x,
-                       Ground->Position.y + Ground->Vertices[count].y,
-                       Ground->Position.z + Ground->Vertices[count].z);
-            glVertex3f(Ground->Position.x + Ground->Vertices[count].x + Ground->Normals[count].x * 10,
-                       Ground->Position.y + Ground->Vertices[count].y + Ground->Normals[count].y * 10,
-                       Ground->Position.z + Ground->Vertices[count].z + Ground->Normals[count].z * 10);
-           glEnd();
+
+
+
+        int NormalCount = 0, VertexCount=0;
+        int count = 0;
+        Vec3 pos,pos2;
+
+        float t = 5;
+    for_loop(Y, Ground->depth  - 1){
+        for_loop(X , Ground->width - 1){
+        //===================================================================
+            pos = Ground->Vertices[Ground->Get_Vertex(X,Y)]     +                    // 1 
+                  Ground->Vertices[Ground->Get_Vertex(X + 1,Y)] +                    // 2 
+                  Ground->Vertices[Ground->Get_Vertex(X,Y + 1)];         // 4 
+            pos = pos / 3;                                               
+
+        //====================================================================   
+            pos2 = Ground->Vertices[Ground->Get_Vertex(X + 1,Y + 1)] +   // 3
+                   Ground->Vertices[Ground->Get_Vertex(X  ,Y + 1)]     +   // 4
+                   Ground->Vertices[Ground->Get_Vertex(X + 1,Y)];                    // 2
+            pos2 = pos2 / 3;
+
+
+         //===========================================================================================
+                glBegin(GL_LINES);
+                    glColor3f(GL_Color(255),GL_Color(0),GL_Color(0));
+                    glVertex3f(Ground->Position.x + pos.x,
+                               Ground->Position.y + pos.y,
+                               Ground->Position.z + pos.z);
+                    glVertex3f(Ground->Position.x + pos.x + Ground->Normals[NormalCount].x * (t),
+                               Ground->Position.y + pos.y + Ground->Normals[NormalCount].y * (t),
+                               Ground->Position.z + pos.z + Ground->Normals[NormalCount].z * (t));
+                 
+                  glColor3f(GL_Color(0),GL_Color(255),GL_Color(0));
+                   glVertex3f(Ground->Position.x + pos2.x,
+                              Ground->Position.y + pos2.y,
+                              Ground->Position.z + pos2.z);
+                   glVertex3f(Ground->Position.x + pos2.x + Ground->Normals[NormalCount + 1].x * (t),
+                              Ground->Position.y + pos2.y + Ground->Normals[NormalCount + 1].y * (t),
+                              Ground->Position.z + pos2.z + Ground->Normals[NormalCount + 1].z * (t));
+                 glEnd();
+          //===========================================================================================
+           
+            VertexCount++;
+            NormalCount = VertexCount * 2;
+
         }
+    }      
+
  
         Vec3 VectorA = Collider[0]->Body.Position, VectorB = Collider[1]->Body.Position;
         VectorA.Normalize();
         VectorB.Normalize();
 
-        Print( DEGREES(acos(Vec3::DotProduct(VectorA, VectorB))));
-
+     //   Print( DEGREES(acos(Vec3::DotProduct(VectorA, VectorB))));
+        Print(SCREEN->FPS; Print(" : " << Sphere::SphereCount));
       SYNC();
     }
 
@@ -179,7 +221,17 @@ int main( int argc, char* args[] )
 
 
 
-
+        //            for(int count = 0; count < Ground->VertexCount ; count +=1)
+           
+       //  glBegin(GL_LINES);
+       //
+       //  glVertex3f(Ground->Position.x + Ground->Vertices[count].x,
+       //             Ground->Position.y + Ground->Vertices[count].y,
+       //             Ground->Position.z + Ground->Vertices[count].z);
+       //  glVertex3f(Ground->Position.x + Ground->Vertices[count].x + Ground->Normals[count].x * 10,
+       //             Ground->Position.y + Ground->Vertices[count].y + Ground->Normals[count].y * 10,
+       //             Ground->Position.z + Ground->Vertices[count].z + Ground->Normals[count].z * 10);
+       // glEnd();
 
 //cx,cy,cz,
 // 0, 0, 0

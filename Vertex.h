@@ -129,7 +129,7 @@ static float RayY(float y, float angle, float distance);
 static float RayZ(float z, float angle, float distance);
 
 
- operator glm::vec3(); 
+operator glm::vec3(); 
 
  
 static float Get_Angle(Vec3 a, Vec3 b){
@@ -144,8 +144,7 @@ static float Get_Angle(Vec3 a, Vec3 b){
 
 static float Get_Angle2(Vec3 a, Vec3 b){
    
-    float  fCrossX, fCrossY, fCrossZ,
-fCross, fDot;
+    float  fCrossX, fCrossY, fCrossZ, fCross, fDot;
 
     fCrossX = a.y * b.z - a.z * b.y;
     fCrossY = a.z * b.x - a.x * b.z;
@@ -156,7 +155,7 @@ fCross, fDot;
 }
 
 
-
+                                                        
 
 };
 

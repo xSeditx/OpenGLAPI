@@ -296,6 +296,23 @@ Vec3 Vec3::GetNormal(Vec3 v1, Vec3 v2, Vec3 v3)
     return Normal;
  }
 
+//static Vec3 GetNormal(Vec3 v1, Vec3 v2, Vec3 v3)
+//{
+//            Vec3 D1 = v2 - v1; 
+//            Vec3 D2 = v3 - v2;
+//
+//            Vec3 Cross = Vec3::CrossProduct  (D1, D2);
+//
+//            float Distance = sqrt( Squared(Cross.x) +  Squared(Cross.y) +  Squared(Cross.z));
+//
+//           return Vec3(Cross.x / Distance, 
+//                       Cross.y / Distance, 
+//                       Cross.z / Distance);
+//}                                                                                  
+//          
+
+
+
 
 
 //TODO:
@@ -330,11 +347,17 @@ float Vec3::RayZ(float z, float angle, float distance)
      return (z - (sin(RADIANS(angle - 90)) * sin(RADIANS(angle - 90))) * distance);
 }
 
+
 //--------------------------------------------------------------------------------------------------------------
 //
 
 
-
+// angle_deg = RADIANS(acos(Vec3::DotProduct(VectorA.Normalize(), VectorB.Normalize() ))
+//float Vec3::Get_Angle(Vec3 A, Vec3 B)
+//{
+//    return acos(Vec3::DotProduct(Vec3::Normalize(A), Vec3::Normalize(B))); 
+//}
+//
 //=====================================================================================================================================
 //_____________________________________________________________________________________________________________________________________
 

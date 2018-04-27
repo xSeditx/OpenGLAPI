@@ -3,11 +3,14 @@
                                                                                                                                     
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))                                                                                       
                                                                                                                                     
-#define SphereList   Sphere::s_SphereList                                                                                           
+#define SphereList   Sphere::s_SphereList  
+
 std::vector<Sphere*> Sphere::s_SphereList;                                                                                          
 Terrain *Terrain::GROUND;                                                                                                                                  
 unsigned int Sphere::SphereCount = 0;                                                                                               
-                                                                                                                                    
+  
+class CollisionSphere;          
+
                                                                                                                                     
  Sphere::Sphere(Vec3 pos, float radius, int sectors) 
     : Position (pos),
@@ -84,16 +87,39 @@ unsigned int Sphere::SphereCount = 0;
                                                                                                                                     
 void Sphere::Update ()                                                                                                              
  {                                                                                                                                  
-                                                                                                                                    
-   Collider[CollisionID]->Update();                                                                                                 
-   Set_Position(Collider[CollisionID]->Body.Position);                                                                              
+   Collider[CollisionID]->Update();   
+   Set_Position(  Collider[CollisionID]->Body.Position);        
+ //  float Unit = Collider[CollisionID]->Body.Velocity.z  / (2 * M_PI * Radius)
+       // (Collider[CollisionID]->Body.Velocity.z  / (2 * M_PI * Radius)) * M_PI /180;
+
+    
+
+
+   Rotation.x -=  (Collider[CollisionID]->Body.Velocity.z / (2 * M_PI * Radius)) * 360.0f;//(Collider[CollisionID]->Body.Velocity.z  / (2 * M_PI * Radius)) * M_PI /180; ;   //(Squared(Radius) * M_PI );              //atan2f(Position.z - (Position.z +  Collider[CollisionID]->Body.Velocity.z), 
+   Rotation.z -=  (Collider[CollisionID]->Body.Velocity.x / (2 * M_PI * Radius)) * 360.0f;//(Collider[CollisionID]->Body.Velocity.x  / (2 * M_PI * Radius)) * M_PI /180; ;   //(Squared(Radius) * M_PI );                                    //       Position.x + (Position.x +  Collider[CollisionID]->Body.Velocity.x));                                                                                                                            
+
+//   1 full rotation is 3 * radius
 }                                                                                                                                   
-                                                                                                                                    
+// x = x + dist * cos(angle) 
+
+//  circumference = 2 * M_PI * Radius
+//  roll_in_degrees = (distance / circumference) * 360 degrees;
+//  roll_in_radians = (distance / circumference) * pi/180; 
+//glRotated(roll_in_degrees, forward_roll_percent, sideways_roll_percent, 0);
+
+
+
+
 void Sphere::Render ()
 {
-   glPushMatrix();
-      glTranslatef(Position.x,  Position.y, Position.z);
-      Vbo.Bind();
+
+  glPushMatrix();
+     glTranslatef(Position.x,  Position.y, Position.z);
+     glRotatef(Rotation.x, 1,0,0);
+     glRotatef(Rotation.z, 0,0,1);
+     glRotatef(Rotation.y, 0,1,0);
+ 
+     Vbo.Bind();
           glDrawArrays(GL_TRIANGLE_STRIP, 0, VertexCount);
       Vbo.Unbind();
   glPopMatrix();
@@ -107,7 +133,7 @@ void Sphere::ChangeVert (int index, Vec3 newpos)
 void Sphere::Submit (Vec3 *data)
 {
 // In DirectX MapBuffer Moves the Vertex Buffer to the CPU
- // DX CODE: Vbo->Map(Buffer_ID, 0 , Map Write Discoard, 0 , &MappedResource<- returns the buffer);
+// DX CODE: Vbo->Map(Buffer_ID, 0 , Map Write Discoard, 0 , &MappedResource<- returns the buffer);
 // So I need OpenGL Map Buffer code;
    Vbo = Buffer(data, Colors, VertexCount, ColorCount);
 }                                                                                           
@@ -122,15 +148,28 @@ int  Sphere::MakeCollisionSphere (Vec3 pos, float rad, int p)
 
     return Bounds->ID;
 }                                                              
-                                                                                                                                    
+
+void Sphere::Rotate(float x, float y, float z)
+{
+    Rotation.x += x;
+    Rotation.y += y;
+    Rotation.z += z;
+}
+
+
+
+
 //================================================================================================================================= 
 //______________________________________ TERRAIN __________________________________________________________________________________ 
 //================================================================================================================================= 
-                                                                                                                                    
+                      
+
+
+
 Terrain::~Terrain(){
        delete( Vertices); 
        delete( Colors  ); 
-       delete( Normals ); 
+//       delete( Normals ); 
 }                                                                                                        
                                                                                                                                     
                                                                                                                                     
@@ -144,9 +183,12 @@ Terrain::Terrain(int w, int d, int gw, int gd)
          ColorsCount(0.0f),
          NormalCount(0.0f)
 {        
-    Vertices = new Vec3[ (w + 1) * (d + 1)];
-    Colors   = new Vec3[ (w + 1) * (d + 1)];
-    Normals  = new Vec3[ (w + 1) * (d + 1) * 2];
+    Vertices = new Vec3[ (w) * (d)];
+    Colors   = new Vec3[ (w) * (d)];
+    Normals  = new Vec3[ (w - 1) * (d - 1) * 2];
+    Indices  = new GLushort[(w * d * 3) * 2];
+    Data     = new MetaData[(w) * (d)];
+
 
     Vec3 Origin;
     Origin.x = Position.x / 2;
@@ -163,9 +205,9 @@ Terrain::Terrain(int w, int d, int gw, int gd)
            
         for_loop(X , w)
         {
-            if(X % 10 > 5 && Z % 10 > 5) H1  = -20; else H1 = 0; //-= RANDOM(5) - 2.5;
-            if(X % 10 > 2 && Z % 10 > 2) H2  =  -5; else H2 = 0;   
-            if(X % 10 > 3 && Z % 10 > 3) H3 =  -10; else H3 = 0;
+            if(X % 10 > 5 && Z % 10 > 5) H1  = (-20); else H1 = 0;//RANDOM(-20); else H1 = 0; //-= RANDOM(5) - 2.5;
+            if(X % 10 > 2 && Z % 10 > 2) H2  = ( -5); else H2 = 0;//RANDOM( -5); else H2 = 0;   
+            if(X % 10 > 3 && Z % 10 > 3) H3 =  (-10); else H3 = 0;//RANDOM(-10); else H3 = 0;
 
             Vertices[VertexCount].x = X * gw;
             Vertices[VertexCount].y = H1 + H2 + H3 + H4 ;//X * Y / 2; //<-- Just debug so I know what Vertex it is
@@ -179,10 +221,14 @@ Terrain::Terrain(int w, int d, int gw, int gd)
           ColorsCount++;
         }
     }
+    Vertices[Get_Vertex(0,0)] = (0.,0.,0.);
+    Vertices[Get_Vertex(1,0)] = (1.,0.,0.);
+    Vertices[Get_Vertex(0,1)] = (0.,1.,0.);
+    Vertices[Get_Vertex(1,1)] = (1.,1.,0.);
 
 // --------------------------------------------- CALCULATE INDICES ------------------------------------------------------------------------
     IndexCount =0;
-    Indices = new GLushort[(w * d * 3) * 2];
+
     for_loop(Y, w - 1){
         for_loop(X , d - 1){
             Indices[IndexCount    ] =    X      + w *  Y ;     // 1
@@ -201,14 +247,16 @@ Terrain::Terrain(int w, int d, int gw, int gd)
 
     for_loop(Y, d  - 1){
         for_loop(X , w - 1){
-            Normals[NormalCount]     = GetNormal(Vertices[NormalCount],          // 1 
-                                                 Vertices[NormalCount+ 1],       // 2 
-                                                 Vertices[NormalCount + w]);     // 4 
+            Normals[NormalCount]   = Vec3::GetNormal(Vertices[Get_Vertex(X,Y)],           // 1 
+                                                     Vertices[Get_Vertex(X + 1,Y)],       // 2 
+                                                     Vertices[Get_Vertex(X,Y + 1)]);      // 4 
                                      
-            Normals[NormalCount + 1] = GetNormal(Vertices[NormalCount  + w + 1], // 3
-                                                 Vertices[NormalCount  + w],     // 4
-                                                 Vertices[NormalCount  + 1]);    // 2
-            NormalCount += 2;
+            Normals[NormalCount + 1] = Vec3::GetNormal(Vertices[Get_Vertex(X + 1,Y + 1)], // 3
+                                                       Vertices[Get_Vertex(X,Y + 1)],     // 4
+                                                       Vertices[Get_Vertex(X + 1,Y)]);    // 2
+            NormalCount += 2;   
+//            Data[NormalCount].Normals     = Normals[NormalCount] ;
+ //           Data[NormalCount + 1].Normals = Normals[NormalCount + 1];
         }
     }      
 
@@ -242,47 +290,83 @@ void Terrain::Render()
       Vbo.Unbind();
   glPopMatrix();
 }                                                                                                     
-                                                                                                                                    
-class CollisionSphere;                                                                                                              
-                                                                                                                                    
-float Terrain::SampleTerrain(float x, float z, CollisionSphere *ball) 
+                                                                                                                          
+float Terrain::SampleTerrain(float x, float z, Sphere *ball) 
 {
     
+    int ax = 0;
+    int az = 0;
+
+    int bx = 0;
+    int bz = 0;
+
+    float fracX = 0;
+    float fracY = 0;
+
+    float sx = 0;
+    float sz = 0;
+
+    float tl = 0;
+    float tr = 0;
+    Vec2 Top(0,0);
+
+
+    float bl = 0;
+    float br = 0;
+    Vec2 Bottom(0,0);
+
+    float Height = 0;
+
+
     x += (width * .5f); //Assume that grid's center is at the origin. 
     z += (depth * .5f);
     
     if(x < 0.0f || x > width * gridw ||  z < 0.0f ||  z > depth * gridd)  
         return -FLT_MAX;
-    
-    float sx = x / (float)gridw; // NOTES:Translates Position to Grid Space.
-    float sz = z / (float)gridd; //
-    
-    int ax = (int)sx  ;
-    int az = (int)sz  ;
 
-    int bx =  min(ax+1, width);
-    int bz =  min(az+1, depth);
-    
-    float fracX = sx - ax;
-    float fracY = sz - az; 
-    
+    sx = x / (float)gridw; // NOTES:Translates Position to Grid Space.
+    sz = z / (float)gridd; //
 
-//We're going to need these for linearily interpolate over a square
-
-    float tl = Vertices[ax + az*width].y;
-    float tr = Vertices[bx + az*width].y;
-
-    float bl = Vertices[ax + bz*width].y;
-    float br = Vertices[bx + bz*width].y;
-
-  //  ball->Force.x *=  -Normals[ax + az*width].x / 2.0;   // Vec3(-Normals[ax + az*width].x,-Normals[ax + az*width].y,-Normals[ax + az*width].z);
-  //  ball->Force.y *= -Normals[ax + az*width].y / 2.0;   // Vec3(-Normals[ax + az*width].x,-Normals[ax + az*width].y,-Normals[ax + az*width].z);
- //   ball->Force.z *=  -Normals[ax + az*width].z / 2.0;   // Vec3(-Normals[ax + az*width].x,-Normals[ax + az*width].y,-Normals[ax + az*width].z);
-
-    //ball->Force *=  Normals[ax + az*width];   // Vec3(-Normals[ax + az*width].x,-Normals[ax + az*width].y,-Normals[ax + az*width].z);
+        ax = (int)sx  ;
+        az = (int)sz  ;
+        
+        bx =  min(ax+1, width);
+        bz =  min(az+1, depth);
+        
+        fracX = sx - ax;
+        fracY = sz - az; 
+        
+        Top.x = Vertices[ax + az * width].y;   //tl  1    We're going to need these for linearily interpolate over a square
+        Top.y = Vertices[bx + az * width].y;   //tr  2    {
+                                               //      
+        Bottom.x = Vertices[ax + bz*width].y;  //bl  3     
+        Bottom.y = Vertices[bx + bz*width].y;  //br  4    }
+   
+    // 2 ---- 3
+    //  | \   |
+    //  |   \ |
+    // 1 ---- 4       
 
 
-    return Lerp(Lerp(tl, tr, fracX), Lerp(bl, br, fracX), fracY); // Lerp between the left .. right values  
+        Height = Lerp(Lerp(Top.x, Top.y, fracX),
+                 Lerp(Bottom.x, Bottom.y, fracX), fracY); // Lerp between the left .. right values  
+
+   // if(Collider[ball->CollisionID]->Body.Position.y - (Normals[ax + az*width].y * ball->Radius)  > 0.0)  
+   //     Collider[ball->CollisionID]->Body.Position +=  ((Normals[ax + az*width] * (ball->Radius))) ; 
+      
+    //   int px = (int)(x * 10000000) % (gridw* 10000000), pz = (int)(z* 10000000) % (gridd * 10000000) ;
+    //  
+    //  // if( x < z)
+    //  {
+    //     Normals[(ax + az) *width * 2].y = -20;
+    //  }
+    //  //else
+    //  {
+    //      Normals[(ax + az )* width * 2 + 1].y = 20;                                                                                                           //////////Normals[(((int)(x/ gridw)) + (width*2) * ((int)(z/ gridd)))+1] = 20;
+    //  }
+    //
+
+    return  Height ;
   
     // tl ---- tr
     //  |      |
@@ -290,9 +374,7 @@ float Terrain::SampleTerrain(float x, float z, CollisionSphere *ball)
     // bl ---- br
 
 }                                                      
-                                                                                                                                    
-                                                                                                                                    
-                                                                                                                                    
+                                                                                       
 Vec3 Terrain::CollisionDetection(CollisionSphere ball)
 {
     Vec3 Pos = ball.Body.Position;
@@ -311,32 +393,9 @@ Vec3 Terrain::CollisionDetection(CollisionSphere ball)
     int bz = min(az + 1, gridd);
 
 }                                                                     
-                                                                                                                                    
-                                                                                                                                    
-                                                                                                                                    
-                                                                                                                                    
-                                                                                                                                    
-                                                                                                                                    
-             
 
 
 
-
-                                                                                                                                    
-Vec3 GetNormal(Vec3 v1, Vec3 v2, Vec3 v3)
-{
-            Vec3 D1 = v2 - v1; 
-            Vec3 D2 = v3 - v2;
-
-            Vec3 Cross = Vec3::CrossProduct  (D1, D2);
-
-            float Distance = sqrt( Squared(Cross.x) +  Squared(Cross.y) +  Squared(Cross.z));
-
-           return Vec3(Cross.x / Distance, 
-                       Cross.y / Distance, 
-                       Cross.z / Distance);
-}                                                                                  
-                                                                                                                                    
                                                                                                         
 //================================================================================================================================= 
 //_________________________________________________________________________________________________________________________________ 

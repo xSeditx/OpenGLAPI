@@ -17,6 +17,22 @@
 #include"Shader.h"
  
 
+
+struct Vertex{
+    Vec3 Position;
+    Vec3 Normal;
+    Vec2 Texture;
+};
+
+
+struct MetaData
+{
+    Vec3 Normals;
+    Vec3 Color;
+    Vec2 Texture;
+}; // This should make the MetaData 32 Bit for easy compression
+
+
 class CollisionSphere;
 
 //============================================================================================================================================
@@ -51,6 +67,7 @@ public:// OpenGL Stuff
      void Set_Position(float x, float y, float z)    {Position = Vec3(x,y,z);}
      void Set_Position(Vec3 pos)                     {Position = pos;}
      void Set_Rotation(float x, float y, float z)    {Rotation = Vec3(x,y,z);}
+     void Rotate(float x, float y, float z); 
      void SetRotation(Vec3 rot)                      {Rotation = rot;}
 
      Vec3 Get_Position(){return Position;}
@@ -69,6 +86,7 @@ private:
 // Static object list
 public:
      static std::vector<Sphere*> s_SphereList;
+
      static unsigned int SphereCount;
      static int MakeCollisionSphere(Vec3 pos, float rad, int p);
 };
@@ -85,6 +103,8 @@ struct Poly{
 //__________________________________________ TERRAIN CLASS ___________________________________________________________________________________
 //============================================================================================================================================
 
+
+#include<memory>
 
 
 
@@ -110,16 +130,17 @@ int   VertexCount,
       RGBf  *Colors;
       Vec3  *Normals;
 
+      MetaData *Data;
+
       GLushort *Indices;
       int IndexCount;
       int NormalCount;
-
-
+              
       Poly Polygons;
 
-
+      int   Get_Vertex(int x, int z){return (x + width * z);}
 float Lerp(float a, float b, float c);
-float SampleTerrain(float x, float z, CollisionSphere *Ball);
+float SampleTerrain(float x, float z, Sphere *Ball);
 Vec3  CollisionDetection(CollisionSphere ball);
 
 void Render();

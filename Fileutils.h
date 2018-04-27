@@ -2,6 +2,9 @@
 #include<string>
 #include<fstream>
 #include<vector>
+#include<strstream>
+
+
 
 class  FileUtils{
 	public:
@@ -24,6 +27,38 @@ class  FileUtils{
 		          delete[] data;
                   return result;
 		}
+
+        static void Load_OBJ(){
+              std::ifstream f("SpaceShip.obj");
+              std::vector<Vec3> verts;
+              while (!f.eof())
+              {
+                  char line[128];
+                  f.getline(line, 128);
+              
+                  std::strstream s;
+                  s << line;
+                  char junk;
+              
+                  if (line[0] == 'v')
+                  {
+                      Vec3 v;
+                      s >> junk >> v.x >> v.y >> v.z;
+                      verts.push_back(v);
+                  }
+              
+                  if (line[0] == 'f')
+                  {
+                      int f[4];
+                      s >> junk >> f[0] >> f[1] >> f[2] >> f[3];
+                      
+                     // meshShip.tris.push_back({ verts[f[0]-1], verts[f[1]-1], verts[f[2]-1], 0.0f, 0.0f, 0.0f, FG_YELLOW });
+                    //  meshShip.tris.push_back({ verts[f[0]-1], verts[f[2]-1], verts[f[3]-1], 0.0f, 0.0f, 0.0f, FG_YELLOW });
+                  }
+              }
+        }
+
+        char *FileData;
 };
 
 

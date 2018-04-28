@@ -12,6 +12,8 @@
 
 #include"Collision.h"
 #include"3d_Primitive.h"
+#include "Camera.h"
+
 
 std::vector<CollisionSphere*> Collider;
 unsigned int CollisionSphere::Collision_ObjectCount =0;
@@ -98,6 +100,8 @@ CollisionSphere::CollisionSphere(Vec3 pos, float radius, int parent)
 
 #endif
          }
+
+     }
          float GroundHeight = Terrain::GROUND->SampleTerrain(Body.Position.x, 
                                                          Body.Position.z, Sphere::s_SphereList[ParentID]) ;
 
@@ -105,7 +109,7 @@ CollisionSphere::CollisionSphere(Vec3 pos, float radius, int parent)
          {
              Body.Position.y = GroundHeight - Radius;
          }
-     }
+
  }
  
  void  CollisionSphere::Update()
@@ -121,6 +125,29 @@ CollisionSphere::CollisionSphere(Vec3 pos, float radius, int parent)
    
        CollisionDetection();  
  }
+
+
+int MousePicker(Camera cam, int x, int y)
+{
+    Vec3 StartPosition = cam.Position;
+    Vec3 EndPosition = Vec3::RayCast(StartPosition, Vec3(0.,0.,0.), 100);
+    glLineWidth(10.0);
+    glBegin(GL_LINES);
+       /// glVertex3f(0.,0.,0.);
+         glVertex3f(100+EndPosition.x,100+EndPosition.y,100+EndPosition.z);
+         glVertex3f(100-StartPosition.x,100-StartPosition.y,100-StartPosition.z);
+       
+       // glVertex3f(10,10,10);
+       // glVertex3f(-100,-100,-100);
+    glEnd();
+    glFlush();
+    return 1;
+}
+
+
+
+
+
 
 //  Acceleration = Force / Mass;
 //  Velocity += Acceleration;

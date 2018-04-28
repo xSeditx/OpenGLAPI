@@ -16,7 +16,8 @@ class Mass{
 
     Vec3   Velocity,
            Position, 
-           Acceleration, 
+           Acceleration,
+           Angular,
            Force;
 
     float  Kg;
@@ -93,4 +94,5 @@ public:
      static unsigned int  Collision_ObjectCount;
 
  };
-
+#include"Camera.h"
+extern int MousePicker(Camera cam, int x, int y);

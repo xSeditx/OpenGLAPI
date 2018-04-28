@@ -142,6 +142,7 @@ int   VertexCount,
 float Lerp(float a, float b, float c);
 float SampleTerrain(float x, float z, Sphere *Ball);
 Vec3  CollisionDetection(CollisionSphere ball);
+Vec3 TerrainNormal(float x, float y);
 
 void Render();
 
@@ -180,6 +181,7 @@ public:
     Vec3 Get_Rotation(){return Rotation;}
 
     Vec3 GetVert(int index){return Vertices[index];}
+    
 
 
 
@@ -189,6 +191,8 @@ public:
         Cube_t
     }ObjectType;
 };
+
+
 class Torus: public Mesh{
 public:
     Torus(int numc, int numt, float x, float y, float z, float scale);

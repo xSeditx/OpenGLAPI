@@ -55,7 +55,7 @@ int main( int argc, char* args[] )
    //                               RGBf(1.,1.,1.));
    //
 
-         Terrain *Ground = new Terrain(50,50,30,30);
+         Terrain *Ground = new Terrain(50,50,10,10);
          Terrain::GROUND = Ground;
 
     for_loop(count,  10){
@@ -163,15 +163,15 @@ int main( int argc, char* args[] )
     for_loop(Y, Ground->depth  - 1){
         for_loop(X , Ground->width - 1){
         //===================================================================
-            pos = Ground->Vertices[Ground->Get_Vertex(X,Y)]     +                    // 1 
-                  Ground->Vertices[Ground->Get_Vertex(X + 1,Y)] +                    // 2 
-                  Ground->Vertices[Ground->Get_Vertex(X,Y + 1)];         // 4 
+            pos = Ground->Vertices[Ground->Get_Vertex(X, Y)]     +                     // 1 
+                  Ground->Vertices[Ground->Get_Vertex(X + 1, Y)] +                     // 2 
+                  Ground->Vertices[Ground->Get_Vertex(X,Y + 1)];                       // 4 
             pos = pos / 3;                                               
 
         //====================================================================   
-            pos2 = Ground->Vertices[Ground->Get_Vertex(X + 1,Y + 1)] +   // 3
-                   Ground->Vertices[Ground->Get_Vertex(X  ,Y + 1)]     +   // 4
-                   Ground->Vertices[Ground->Get_Vertex(X + 1,Y)];                    // 2
+            pos2 = Ground->Vertices[Ground->Get_Vertex(X + 1, Y + 1)] +                 // 3
+                   Ground->Vertices[Ground->Get_Vertex(X    , Y + 1)] +                 // 4
+                   Ground->Vertices[Ground->Get_Vertex(X + 1, Y)];                      // 2
             pos2 = pos2 / 3;
 
 
@@ -200,7 +200,7 @@ int main( int argc, char* args[] )
 
         }
     }      
-
+    int a =  MousePicker(Cam, 0,0);
  
         Vec3 VectorA = Collider[0]->Body.Position, VectorB = Collider[1]->Body.Position;
         VectorA.Normalize();

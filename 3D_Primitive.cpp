@@ -290,7 +290,14 @@ void Terrain::Render()
       Vbo.Unbind();
   glPopMatrix();
 }                                                                                                     
-                                                                                                                          
+
+
+
+Vec3 Terrain::TerrainNormal(float x, float y)
+{
+ return Normals[int(((int)(x / (float)gridw) + (width - 1)* (int)(y / (float)gridd)) * 2) ];     
+}
+
 float Terrain::SampleTerrain(float x, float z, Sphere *ball) 
 {
     
@@ -316,6 +323,16 @@ float Terrain::SampleTerrain(float x, float z, Sphere *ball)
     Vec2 Bottom(0,0);
 
     float Height = 0;
+
+
+    
+    float Nx=0,Ny =0;
+    Nx = x / (float)gridw;
+    Ny = z / (float)gridd;
+    int NX = 0, NY = 0;
+    NX = (int)Nx;
+    NY = (int)Ny;
+
 
 
     x += (width * .5f); //Assume that grid's center is at the origin. 
@@ -346,25 +363,17 @@ float Terrain::SampleTerrain(float x, float z, Sphere *ball)
     //  | \   |
     //  |   \ |
     // 1 ---- 4       
+        int modx = int(x * 100000) % (gridw * 100000) / 100000;
+        int modz = int(z * 100000) % (gridd * 100000) / 100000;
 
+        Height = Lerp(Lerp(Top.x, Top.y, fracX), Lerp(Bottom.x, Bottom.y, fracX), fracY); // Lerp between the left .. right values  
 
-        Height = Lerp(Lerp(Top.x, Top.y, fracX),
-                 Lerp(Bottom.x, Bottom.y, fracX), fracY); // Lerp between the left .. right values  
-
-   // if(Collider[ball->CollisionID]->Body.Position.y - (Normals[ax + az*width].y * ball->Radius)  > 0.0)  
-   //     Collider[ball->CollisionID]->Body.Position +=  ((Normals[ax + az*width] * (ball->Radius))) ; 
-      
-    //   int px = (int)(x * 10000000) % (gridw* 10000000), pz = (int)(z* 10000000) % (gridd * 10000000) ;
-    //  
-    //  // if( x < z)
-    //  {
-    //     Normals[(ax + az) *width * 2].y = -20;
-    //  }
-    //  //else
-    //  {
-    //      Normals[(ax + az )* width * 2 + 1].y = 20;                                                                                                           //////////Normals[(((int)(x/ gridw)) + (width*2) * ((int)(z/ gridd)))+1] = 20;
-    //  }
-    //
+       if((modz+ modx) <  gridw)
+       {
+               Normals[int((ax + (width - 1)* az) * 2) ].y = -20;       
+       }else{
+               Normals[int((ax + (width - 1)* az) * 2)+ 1].y = -20;     
+       }
 
     return  Height ;
   
@@ -373,7 +382,9 @@ float Terrain::SampleTerrain(float x, float z, Sphere *ball)
     //  |      |
     // bl ---- br
 
-}                                                      
+}    
+
+
                                                                                        
 Vec3 Terrain::CollisionDetection(CollisionSphere ball)
 {

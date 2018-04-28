@@ -6,7 +6,8 @@ void GenVertexArrays(GLsizei n, GLuint *arrays);
 
 Buffer::Buffer(Vec3 *Vertexdata,Vec3 *Colordata ,GLsizei vcount, GLint colorcount)
     :VertexCount(vcount), 
-     ColorCount(colorcount)
+     ColorCount(colorcount), 
+     NormalCount(0)
 {
     if(Colordata != nullptr){
             glGenBuffers(2 , &ID[0]);

@@ -90,8 +90,9 @@ void Shader::Disable() const
 }
 
 
+
 GLint GetUniformLocation(GLchar *name){
-    return 1;
+	return 0;
 }
 
 void Shader::SetUniform1f(GLchar *name, float value){
@@ -111,6 +112,7 @@ glUniform2f(GetUniformLocation(name), vector.x, vector.y);
 void Shader::SetUniform3f(GLchar *name,  Vec3 &vector) {
 glUniform3f(GetUniformLocation(name), vector.x, vector.y,vector.z);
 }
+ 
 
 void Shader::SetUniform4f(GLchar *name,  Vec4 &vector) {
 glUniform4f(GetUniformLocation(name), vector.x, vector.y,vector.z, vector.w);
@@ -119,6 +121,7 @@ glUniform4f(GetUniformLocation(name), vector.x, vector.y,vector.z, vector.w);
 void Shader::SetUniformMat4(GLchar *name,  Matrix4 &matrix) {
 glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, matrix.elements);
 }
+
 
 GLint Shader::GetUniformLocation(GLchar *name){
 return glGetUniformLocation(m_ShaderID, name);
@@ -164,6 +167,22 @@ const char *FRAGMENT_SHADER_1 =
            "}\n ";
            
 
+
+
+// Define the 8 vertices of a unit cube
+VertexXYZColor g_Vertices[8] = {
+    { float3(  1,  1,  1 ), float3( GL_Color(255),  GL_Color(0),  GL_Color(0) ) }, // 0
+    { float3( -1,  1,  1 ), float3( GL_Color(0),  GL_Color(0),  GL_Color(255)) }, // 1
+    { float3( -1, -1,  1 ), float3(GL_Color(0),  GL_Color(255),  GL_Color(0)) }, // 2
+
+    { float3(  1, -1,  1 ), float3(GL_Color(255),  GL_Color(0),  GL_Color(255)) }, // 3
+    { float3(  1, -1, -1 ), float3(GL_Color(255),  GL_Color(255),  GL_Color(0) ) }, // 4
+    { float3( -1, -1, -1 ), float3(GL_Color(0),  GL_Color(255),  GL_Color(255)) }, // 5
+
+    { float3( -1,  1, -1 ), float3( GL_Color(255),  GL_Color(255),  GL_Color(50) ) }, // 6
+    { float3(  1,  1, -1 ), float3( GL_Color(0),  GL_Color(50),  GL_Color(255) ) }, // 7
+};
+
 GLuint g_Indices[24] = {
     0, 1, 2, 3,                 // Front face
     7, 4, 5, 6,                 // Back face
@@ -173,25 +192,3 @@ GLuint g_Indices[24] = {
     3, 2, 5, 4,                 // Bottom face
 };
 
-
-
-void Load_Shader(GLenum t,const char* code, GLuint *id)
-{
-	GLint  compiled_status =0;
-
-	*id= glCreateShader(t);
-	//*id = GLEW_GET_FUN(
-	//	__glewCreateShader
-	//	)
-	//	(t);
-	_GL(glShaderSource(*id, 1, &code,NULL));
-
-	_GL(glCompileShader(*id));
-	_GL(glGetShaderiv(*id, GL_COMPILE_STATUS, &compiled_status));
-if(compiled_status!= GL_TRUE){
-	//Print_Shader_Log(*id);
-    _GL(glDeleteShader(*id));
-	*id = 0;
-}
-
-}

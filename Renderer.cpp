@@ -3,94 +3,31 @@ void GenVertexArrays(GLsizei n, GLuint *arrays);
 //===================================================================================================================================================
 //_______________________________________BUFFER CLASS _______________________________________________________________________________________________
 
+Buffer::Buffer(){} ; Buffer::~Buffer(){}
 
-Buffer::Buffer(Vec3 *Vertexdata,Vec3 *Colordata ,GLsizei vcount, GLint colorcount)
-    :VertexCount(vcount), 
-     ColorCount(colorcount), 
-     NormalCount(0)
+
+Buffer::Buffer(GLfloat *data,GLsizei count,GLint componentcount)
 {
-    if(Colordata != nullptr){
-            glGenBuffers(2 , &ID[0]);
-            glBindBuffer(GL_ARRAY_BUFFER, ID[0]);
-                glBufferData(GL_ARRAY_BUFFER,VertexCount * sizeof(Vec3), Vertexdata, GL_STATIC_DRAW) ; 
-            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;
-    }
-
-     if(Vertexdata != nullptr){
-            glBindBuffer(GL_ARRAY_BUFFER, ID[1]); // Bind our second Vertex Buffer Object  
-                glBufferData(GL_ARRAY_BUFFER, ColorCount * sizeof(RGBf), Colordata, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
-                glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
-                    glEnableVertexAttribArray(1); 
-            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;}
-     } 
-}
-
-/// Hmmmmm Cant KEEP THIS UP,. MUST FIND A BETTER WAY TO HANDLE THE BUFFERING AND MANAGEMENT OF THE MESH DATA
-Buffer::Buffer(Vec3 *Vertexdata,Vec3 *Colordata ,Vec3 *Normals ,GLsizei vcount, GLint colorcount, GLint normalCount)
-    :VertexCount(vcount), 
-     ColorCount(colorcount),
-     NormalCount(normalCount)
-{
-    if(Colordata != nullptr){
-            glGenBuffers(3 , &ID[0]);
-            glBindBuffer(GL_ARRAY_BUFFER, ID[0]);
-                glBufferData(GL_ARRAY_BUFFER,VertexCount * sizeof(Vec3), Vertexdata, GL_STATIC_DRAW) ; 
-            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;
-    }
-
-     if(Vertexdata != nullptr){
-            glBindBuffer(GL_ARRAY_BUFFER, ID[1]); // Bind our second Vertex Buffer Object  
-                glBufferData(GL_ARRAY_BUFFER, ColorCount * sizeof(RGBf), Colordata, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
-                glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
-                    glEnableVertexAttribArray(1); 
-            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;}
-     } 
-     if(Normals != nullptr){
-            glBindBuffer(GL_ARRAY_BUFFER, ID[2]); // Bind our second Vertex Buffer Object  
-                glBufferData(GL_ARRAY_BUFFER, NormalCount * sizeof(Vec3), Normals, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
-                glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
-                    glEnableVertexAttribArray(2); 
-            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;}
-     }
+        _GL(glGenBuffers(1,&BUFFER_ID));                                                //Allocate memory and Assign Pointer to BUFFER_ID
+        _GL(glBindBuffer(GL_ARRAY_BUFFER,BUFFER_ID));                                   //Bind the Data to the BUFFER ID so it points to it
+        _GL(glBufferData(GL_ARRAY_BUFFER,count * sizeof(GLfloat),data,GL_STATIC_DRAW)); //<------------------------------------------------
+        _GL(glBindBuffer(GL_ARRAY_BUFFER,0));                                           // DELETE BUFFER since its now bound to the ID;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-void Buffer::Bind()
-{
-    glBindBuffer(GL_ARRAY_BUFFER, ID[1]);
-        glColorPointer(3,GL_FLOAT,0,(char *) NULL);
-            glEnableClientState(GL_COLOR_ARRAY);
-
-    glBindBuffer(GL_ARRAY_BUFFER, ID[0]);
-        glVertexPointer( 3, GL_FLOAT, 0, (char *) NULL);
-            glEnableClientState(GL_VERTEX_ARRAY);
+        
+void Buffer::Bind(){
+        _GL(glBindBuffer(GL_ARRAY_BUFFER, BUFFER_ID));
 }
-
 void Buffer::Unbind(){
-                glDisableClientState(GL_VERTEX_ARRAY);
-            glDisableClientState(GL_COLOR_ARRAY);
-    glBindBuffer(GL_ARRAY_BUFFER,0);
+        _GL(glBindBuffer(GL_ARRAY_BUFFER,0));
 }
-
 
 //===================================================================================================================================================
 //__________________________________ INDEX BUFFER CLASS _____________________________________________________________________________________________
-
-
 IndexBuffer::IndexBuffer(){} ; IndexBuffer::~IndexBuffer(){}
-IndexBuffer::IndexBuffer(GLushort *data,GLsizei count)
-    : COUNT(count)
+
+
+IndexBuffer::IndexBuffer(GLushort *data,GLsizei count): COUNT(count)
 {
         _GL(glGenBuffers(1,&BUFFER_ID));
         _GL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,BUFFER_ID));
@@ -110,6 +47,32 @@ void IndexBuffer::Unbind()
 //===================================================================================================================================================
 //__________________________________ VERTEX BUFFER CLASS ____________________________________________________________________________________________
 
+VertexArray::VertexArray(){ 
+  //  GLuint ARRAY_ID = malloc;
+  _GL(glGenVertexArrays(1, &ARRAY_ID));  //<--- I hate you and your Children!
+          Print("SUCCESS");//<-LIAR!!!
+}
+VertexArray::~VertexArray()
+{
+        for (int i =0;i< BUFFERS.size(); i++)delete(BUFFERS[i]);
+}
+
+void VertexArray::Addbuffer (Buffer *buffer, GLuint index){
+        Bind();
+        buffer->Bind();
+       
+        glEnableVertexAttribArray(index);
+        glVertexAttribPointer(index, buffer->Get_Count(), GL_FLOAT, false, 0  , 0 );
+       
+        buffer->Unbind();
+}
+
+void VertexArray::Bind(){
+        glBindVertexArray(ARRAY_ID);
+}
+void VertexArray::Unbind(){
+        glBindVertexArray(0);
+}
 
 
 //===================================================================================================================================================

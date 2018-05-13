@@ -24,27 +24,21 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="3D_Primitive.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Vertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Collision.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Lights.cpp">
+    <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
@@ -59,17 +53,8 @@
     <ClInclude Include="Fileutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
+    <ClInclude Include="Mesh.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Lights.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Collision.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="3d_Primitive.h">
-      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

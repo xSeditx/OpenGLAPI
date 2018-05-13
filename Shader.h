@@ -5,6 +5,9 @@
 extern const char *vertex_shader_text;
 extern const char *fragment_shader_text;
 
+extern VertexXYZColor g_Vertices[8];
+extern GLuint g_Indices[24];
+
 extern const char *VERTEX_SHADER_1;
 extern const char *FRAGMENT_SHADER_1;
 
@@ -38,5 +41,3 @@ void SetUniformMat4( GLchar *name,  Matrix4 &matrix);
 private:
        GLuint Load();
 };
-
-extern void Load_Shader(GLenum t,const char* code, GLuint *id);

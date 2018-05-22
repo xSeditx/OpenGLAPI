@@ -111,16 +111,12 @@ bool LoadModel(const char* path){
         if (res == EOF) break; // EOF = End Of File. Quit the loop.
     }
 
-
-
     if ( strcmp( lineHeader, "v" ) == 0)
     {
         Vec3 vertex;
         fscanf(file, "%f %f %f\n", &vertex.x, &vertex.y, &vertex.z );
         temp_vertices.push_back(vertex);
     }
-
-
 
     else if ( strcmp( lineHeader, "vt" ) == 0 )
     {
@@ -161,12 +157,12 @@ bool LoadModel(const char* path){
         std::vector < Vec2 > out_uvs;
         std::vector < Vec3 > out_normals;
         
-    for( unsigned int i=0; i<vertexIndices.size(); i++ ){
+    for( unsigned int i=0; i<vertexIndices.size(); i++ )
+    {
         unsigned int vertexIndex = vertexIndices[i];
     
         Vec3 vertex = temp_vertices[ vertexIndex-1 ];
     
         out_vertices.push_back(vertex);
-    
 }
 }

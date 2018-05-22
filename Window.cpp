@@ -118,27 +118,97 @@ void Window::Window_close_callback (GLFWwindow* window)
         if (glfwWindowShouldClose(SCREEN->glCONTEXT))
             glfwSetWindowShouldClose(window, GL_TRUE);
 }
-void Window::KeyBoard_Callback     (GLFWwindow *window, int key, int scancode, int action, int mods){ //GLFW_PRESS, GLFW_RELEASE or GLFW_REPEAT.
-f_TRACE(Print("SETUP THE KEYBOARD ROUTINE"));
-       
 
-       switch (action){
-       case(GLFW_PRESS):
-               SCREEN->KEY_BOARD.Key = key; 
-           break;
-       case(GLFW_RELEASE):  
-               SCREEN->KEY_BOARD.Key = 0; 
-           break;
-       }
+void Window::KeyBoard_Callback     (GLFWwindow *window, int key, int scancode, int action, int mods) 
+{ 
+f_TRACE(Print("Keyboard Callback"));
+//GLFW_PRESS, GLFW_RELEASE or GLFW_REPEAT.       
 
+        SCREEN->KEY_BOARD.Key = key;
+        SCREEN->KEY_BOARD.Action = action;
         SCREEN->KEY_BOARD.Scancode = scancode;  
         SCREEN->KEY_BOARD.Modifications = mods;
-        SCREEN->KEY_BOARD.KEY_STATES[key] = glfwGetKey(SCREEN->glCONTEXT,key);	
+        SCREEN->KEY_BOARD.KEY_STATES[key] = glfwGetKey(SCREEN->glCONTEXT,key);	       
+  
+  
+       switch (action)
+       {
+       case(GLFW_PRESS):
+               SCREEN->KEY_BOARD.Key = key; 
+               if(SCREEN->Callbacks.CallBackOnKeyDown != nullptr)
+               {
+                   SCREEN->Callbacks.CallBackOnKeyDown(key, scancode, mods , NULL); // Check this Null its suppose to be a Repeat checker
+               }
+           break;
+       
+       case(GLFW_REPEAT):
+               SCREEN->KEY_BOARD.Key = key; 
+               if(SCREEN->Callbacks.CallBackOnKeyHold != nullptr)
+               {
+                   SCREEN->Callbacks.CallBackOnKeyHold(key, scancode, mods); // Check this Null its suppose to be a Repeat checker
+               }
+           break;
+          
+       case(GLFW_RELEASE):  
+               SCREEN->KEY_BOARD.Key = 0; 
+               if(SCREEN->Callbacks.CallBackOnKeyUp != nullptr)
+               {
+                   SCREEN->Callbacks.CallBackOnKeyUp(key, scancode, mods);
+               }
+           break;
+       }
 }
-void Window::Mouse_Callback        (GLFWwindow *window, int button, int action, int mod){
+
+void Window::Mouse_Callback        (GLFWwindow *window, int button, int action, int mod)
+{
+ // TODO: ADD THESE MIDDLE MOUSE AND WHEEL CALLBACKS
+
+// void (*CallBackOnMButtonDown)          (int mX, int mY);  
+// void (*CallBackOnMButtonUp   )         (int mX, int mY);
+    
     SCREEN->MOUSE.Action = action;
-        SCREEN->MOUSE.Button[button] = action != GLFW_RELEASE;
+    SCREEN->MOUSE.Button[button] = action != GLFW_RELEASE;
+
+
+    if(action == GLFW_PRESS)
+    {
+        if(button == MOUSE_LEFT)
+        {
+            if(SCREEN->Callbacks.CallBackOnLButtonDown != nullptr)
+            {
+                SCREEN->Callbacks.CallBackOnLButtonDown(SCREEN->MOUSE.X, SCREEN->MOUSE.Y);
+            }
+        }
+        if(button == MOUSE_RIGHT)
+        {
+            if(SCREEN->Callbacks.CallBackOnRButtonDown != nullptr)
+            {
+                SCREEN->Callbacks.CallBackOnRButtonDown(SCREEN->MOUSE.X, SCREEN->MOUSE.Y);
+            }
+        }
+    }
+    else
+    {
+        if(action == GLFW_RELEASE)
+        {
+            if(button == MOUSE_LEFT)
+            {
+                if(SCREEN->Callbacks.CallBackOnLButtonUp != nullptr)
+                {
+                    SCREEN->Callbacks.CallBackOnLButtonUp(SCREEN->MOUSE.X, SCREEN->MOUSE.Y);
+                }
+            }
+            if(button == MOUSE_RIGHT)
+            {
+                if(SCREEN->Callbacks.CallBackOnRButtonUp != nullptr)
+                {
+                    SCREEN->Callbacks.CallBackOnRButtonUp(SCREEN->MOUSE.X, SCREEN->MOUSE.Y);
+                }
+            }
+        }
+    }
 }
+
 void Window::DropFile_callback     (GLFWwindow *window, int count, const char** paths)
 {
         for (int i = 0;  i < count;  i++){
@@ -253,6 +323,49 @@ bool GAME_LOOP(){          /*----- May be overloaded -----*/
 
             glfwPollEvents();
             if (glfwWindowShouldClose(SCREEN->glCONTEXT))return false;
+
+       //  = key;
+       // 
+       // = scancode;  
+       // SCREEN->KEY_BOARD.Modifications = mods;
+       // SCREEN->KEY_BOARD.KEY_STATES[key] = glfwGetKey(SCREEN->glCONTEXT,key);	
+
+       switch (SCREEN->KEY_BOARD.Action)
+        {
+        case(GLFW_PRESS):
+ 
+                if(SCREEN->Callbacks.CallBackOnKeyDown != nullptr)
+                {
+                    SCREEN->Callbacks.CallBackOnKeyDown(SCREEN->KEY_BOARD.Key,  
+                                                        SCREEN->KEY_BOARD.Scancode, 
+                                                        SCREEN->KEY_BOARD.Modifications , NULL); // Check this Null its suppose to be a Repeat checker
+                }
+            break;
+        
+        case(GLFW_REPEAT):
+ 
+                if(SCREEN->Callbacks.CallBackOnKeyHold != nullptr)
+                {
+                    SCREEN->Callbacks.CallBackOnKeyHold(SCREEN->KEY_BOARD.Key,  
+                                                        SCREEN->KEY_BOARD.Scancode, 
+                                                        SCREEN->KEY_BOARD.Modifications); // Check this Null its suppose to be a Repeat checker
+                }
+            break;
+           
+        case(GLFW_RELEASE):  
+                SCREEN->KEY_BOARD.Key = 0; 
+                if(SCREEN->Callbacks.CallBackOnKeyUp != nullptr)
+                {
+                    SCREEN->Callbacks.CallBackOnKeyUp(SCREEN->KEY_BOARD.Key,  
+                                                      SCREEN->KEY_BOARD.Scancode, 
+                                                      SCREEN->KEY_BOARD.Modifications);
+                }
+            break;
+        }
+
+
+
+
     return true;
 }                               
             

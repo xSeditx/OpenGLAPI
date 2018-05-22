@@ -9,6 +9,8 @@ std::vector<Sphere*> Sphere::s_SphereList;
 Terrain *Terrain::GROUND;                                                                                                                                  
 unsigned int Sphere::SphereCount = 0;                                                                                               
   
+
+
 class CollisionSphere;          
 
                                                                                                                                     
@@ -89,37 +91,20 @@ void Sphere::Update ()
  {                                                                                                                                  
    Collider[CollisionID]->Update();   
    Set_Position(  Collider[CollisionID]->Body.Position);        
- //  float Unit = Collider[CollisionID]->Body.Velocity.z  / (2 * M_PI * Radius)
-       // (Collider[CollisionID]->Body.Velocity.z  / (2 * M_PI * Radius)) * M_PI /180;
-
-    
-
-
    Rotation.x -=  (Collider[CollisionID]->Body.Velocity.z / (2 * M_PI * Radius)) * 360.0f;//(Collider[CollisionID]->Body.Velocity.z  / (2 * M_PI * Radius)) * M_PI /180; ;   //(Squared(Radius) * M_PI );              //atan2f(Position.z - (Position.z +  Collider[CollisionID]->Body.Velocity.z), 
    Rotation.z -=  (Collider[CollisionID]->Body.Velocity.x / (2 * M_PI * Radius)) * 360.0f;//(Collider[CollisionID]->Body.Velocity.x  / (2 * M_PI * Radius)) * M_PI /180; ;   //(Squared(Radius) * M_PI );                                    //       Position.x + (Position.x +  Collider[CollisionID]->Body.Velocity.x));                                                                                                                            
-
-//   1 full rotation is 3 * radius
-}                                                                                                                                   
-// x = x + dist * cos(angle) 
-
-//  circumference = 2 * M_PI * Radius
-//  roll_in_degrees = (distance / circumference) * 360 degrees;
-//  roll_in_radians = (distance / circumference) * pi/180; 
-//glRotated(roll_in_degrees, forward_roll_percent, sideways_roll_percent, 0);
-
-
-
+}                                    
 
 void Sphere::Render ()
 {
 
   glPushMatrix();
-     glTranslatef(Position.x,  Position.y, Position.z);
-     glRotatef(Rotation.x, 1,0,0);
-     glRotatef(Rotation.z, 0,0,1);
-     glRotatef(Rotation.y, 0,1,0);
+      glTranslatef(Position.x,  Position.y, Position.z);
+      glRotatef(Rotation.x, 1,0,0);
+      glRotatef(Rotation.z, 0,0,1);
+      glRotatef(Rotation.y, 0,1,0);
  
-     Vbo.Bind();
+      Vbo.Bind();
           glDrawArrays(GL_TRIANGLE_STRIP, 0, VertexCount);
       Vbo.Unbind();
   glPopMatrix();
@@ -167,9 +152,9 @@ void Sphere::Rotate(float x, float y, float z)
 
 
 Terrain::~Terrain(){
-       delete( Vertices); 
-       delete( Colors  ); 
-//       delete( Normals ); 
+       delete[]( Vertices); 
+       delete[]( Colors  ); 
+       delete[]( Normals ); 
 }                                                                                                        
                                                                                                                                     
                                                                                                                                     
@@ -181,7 +166,8 @@ Terrain::Terrain(int w, int d, int gw, int gd)
          gridd   (gd), 
          VertexCount(0.0f), 
          ColorsCount(0.0f),
-         NormalCount(0.0f)
+         NormalCount(0.0f),
+         IndexCount (0.0f)
 {        
     Vertices = new Vec3[ (w) * (d)];
     Colors   = new Vec3[ (w) * (d)];
@@ -189,25 +175,23 @@ Terrain::Terrain(int w, int d, int gw, int gd)
     Indices  = new GLushort[(w * d * 3) * 2];
     Data     = new MetaData[(w) * (d)];
 
-
     Vec3 Origin;
     Origin.x = Position.x / 2;
     Origin.y = Position.y;
     Origin.z = Position.z / 2;
 
-
-    float FinalHeight =0;
+    float FinalHeight = 0;
 //--------------------------------------------- CALCULATE VERTICES -------------------------------------------------------------------------
-  float H1 = 1, H2 = 1, H3 = 1, H4 = 1;
+    float H1 = 1, H2 = 1, H3 = 1, H4 = 1;
     
     for_loop(Z, d )
     {
            
         for_loop(X , w)
         {
-            if(X % 10 > 5 && Z % 10 > 5) H1  = (-20); else H1 = 0;//RANDOM(-20); else H1 = 0; //-= RANDOM(5) - 2.5;
-            if(X % 10 > 2 && Z % 10 > 2) H2  = ( -5); else H2 = 0;//RANDOM( -5); else H2 = 0;   
-            if(X % 10 > 3 && Z % 10 > 3) H3 =  (-10); else H3 = 0;//RANDOM(-10); else H3 = 0;
+      //    if(X % 10 > 5 && Z % 10 > 5) H1  = (-20); else H1 = 0;//RANDOM(-20); else H1 = 0; //-= RANDOM(5) - 2.5;
+      //    if(X % 10 > 2 && Z % 10 > 2) H2  = ( -5); else H2 = 0;//RANDOM( -5); else H2 = 0;   
+      //    if(X % 10 > 3 && Z % 10 > 3) H3  = (-10); else H3 = 0;//RANDOM(-10); else H3 = 0;
 
             Vertices[VertexCount].x = X * gw;
             Vertices[VertexCount].y = H1 + H2 + H3 + H4 ;//X * Y / 2; //<-- Just debug so I know what Vertex it is
@@ -221,14 +205,7 @@ Terrain::Terrain(int w, int d, int gw, int gd)
           ColorsCount++;
         }
     }
-    Vertices[Get_Vertex(0,0)] = (0.,0.,0.);
-    Vertices[Get_Vertex(1,0)] = (1.,0.,0.);
-    Vertices[Get_Vertex(0,1)] = (0.,1.,0.);
-    Vertices[Get_Vertex(1,1)] = (1.,1.,0.);
-
 // --------------------------------------------- CALCULATE INDICES ------------------------------------------------------------------------
-    IndexCount =0;
-
     for_loop(Y, w - 1){
         for_loop(X , d - 1){
             Indices[IndexCount    ] =    X      + w *  Y ;     // 1
@@ -242,9 +219,7 @@ Terrain::Terrain(int w, int d, int gw, int gd)
             IndexCount+=6;
         }
     }
-
 // --------------------------------------------- CALCULATE NORMALS ---------------------------------------------------------------------   
-
     for_loop(Y, d  - 1){
         for_loop(X , w - 1){
             Normals[NormalCount]   = Vec3::GetNormal(Vertices[Get_Vertex(X,Y)],           // 1 
@@ -259,14 +234,11 @@ Terrain::Terrain(int w, int d, int gw, int gd)
  //           Data[NormalCount + 1].Normals = Normals[NormalCount + 1];
         }
     }      
-
 // ---------------------------------------------- Allocate Buffers ----------------------------------------------------------------------------   
-
    Vbo = Buffer(Vertices, Colors, Normals,  VertexCount, ColorsCount, NormalCount);
    Ibo = IndexBuffer(Indices,IndexCount);
 }                                                                             
-                                                                                                                                    
-                                                                                                                                    
+                                                                                                                                   
                                                                                                                                     
                                                                                                                                     
 float Terrain::Lerp(float a, float b, float c)
@@ -289,9 +261,50 @@ void Terrain::Render()
           Ibo.Unbind();
       Vbo.Unbind();
   glPopMatrix();
+
+    int NCount = 0, VCount=0;
+    int count = 0;
+    Vec3 pos,pos2;
+    float t = 5;
+    for_loop(Y, depth  - 1){
+        for_loop(X , width - 1){
+        //===================================================================
+            pos =  Vertices[ Get_Vertex(X, Y)]     +                     // 1 
+                   Vertices[ Get_Vertex(X + 1, Y)] +                     // 2 
+                   Vertices[ Get_Vertex(X,Y + 1)];                       // 4 
+            pos = pos / 3;                                               
+
+        //====================================================================   
+            pos2 =  Vertices[ Get_Vertex(X + 1, Y + 1)] +                 // 3
+                    Vertices[ Get_Vertex(X    , Y + 1)] +                 // 4
+                    Vertices[ Get_Vertex(X + 1, Y)];                      // 2
+            pos2 = pos2 / 3;
+
+        //===========================================================================================
+                glBegin(GL_LINES);
+                    glColor3f(GL_Color(255),GL_Color(0),GL_Color(0));
+                    glVertex3f( Position.x + pos.x,
+                                Position.y + pos.y,
+                                Position.z + pos.z);
+                    glVertex3f( Position.x + pos.x +  Normals[NCount].x * (t),
+                                Position.y + pos.y +  Normals[NCount].y * (t),
+                                Position.z + pos.z +  Normals[NCount].z * (t));
+                 
+                  glColor3f(GL_Color(0),GL_Color(255),GL_Color(0));
+                   glVertex3f( Position.x + pos2.x,
+                               Position.y + pos2.y,
+                               Position.z + pos2.z);
+                   glVertex3f( Position.x + pos2.x +  Normals[NCount + 1].x * (t),
+                               Position.y + pos2.y +  Normals[NCount + 1].y * (t),
+                               Position.z + pos2.z +  Normals[NCount + 1].z * (t));
+                 glEnd();
+//===========================================================================================
+         VCount++;
+         NCount = VCount * 2;
+
+        }
+    }      
 }                                                                                                     
-
-
 
 Vec3 Terrain::TerrainNormal(float x, float y)
 {
@@ -359,21 +372,37 @@ float Terrain::SampleTerrain(float x, float z, Sphere *ball)
         Bottom.x = Vertices[ax + bz*width].y;  //bl  3     
         Bottom.y = Vertices[bx + bz*width].y;  //br  4    }
    
-    // 2 ---- 3
-    //  | \   |
-    //  |   \ |
-    // 1 ---- 4       
+// 2 ---- 3
+//  | \   |
+//  |   \ |
+// 1 ---- 4       
+
+        Height = Lerp(Lerp(   Top.x,    Top.y, fracX), 
+                      Lerp(Bottom.x, Bottom.y, fracX),
+                                               fracY); // Lerp between the left .. right values  
+
         int modx = int(x * 100000) % (gridw * 100000) / 100000;
         int modz = int(z * 100000) % (gridd * 100000) / 100000;
 
-        Height = Lerp(Lerp(Top.x, Top.y, fracX), Lerp(Bottom.x, Bottom.y, fracX), fracY); // Lerp between the left .. right values  
-
-       if((modz+ modx) <  gridw)
-       {
-               Normals[int((ax + (width - 1)* az) * 2) ].y = -20;       
-       }else{
-               Normals[int((ax + (width - 1)* az) * 2)+ 1].y = -20;     
-       }
+        Vec3 Norms;
+        if((modz+ modx) <  gridw)
+        {
+               Norms = Normals[int((ax + (width - 1)* az) * 2) ];
+                      // Normals[int((ax + (width - 1)* az) * 2) ];
+        }else{
+               Norms = Normals[int((ax + (width - 1)* az) * 2)  + 1];
+               //    =   Normals[int((ax + (width - 1)* az) * 2)  + 1]; 
+        }
+ /// Preserve the Y Force, Find the Normal response Vector
+        float y = Collider[ball->CollisionID]->Body.Force.y;
+        if (Collider[ball->CollisionID]->Body.Position.y + Collider[ball->CollisionID]->Radius >=  Height)
+        {
+            Collider[ball->CollisionID]->Body.Force += Norms;
+            Collider[ball->CollisionID]->Body.Force.y = y;
+            Collider[ball->CollisionID]->Body.Position.y = Height - Collider[ball->CollisionID]->Radius;
+        }
+      
+ 
 
     return  Height ;
   
@@ -383,8 +412,6 @@ float Terrain::SampleTerrain(float x, float z, Sphere *ball)
     // bl ---- br
 
 }    
-
-
                                                                                        
 Vec3 Terrain::CollisionDetection(CollisionSphere ball)
 {
@@ -402,19 +429,13 @@ Vec3 Terrain::CollisionDetection(CollisionSphere ball)
 
     int bx = min(ax + 1, gridw);
     int bz = min(az + 1, gridd);
-
+    return Vec3(0,0,0);
 }                                                                     
-
-
 
                                                                                                         
 //================================================================================================================================= 
 //_________________________________________________________________________________________________________________________________ 
 //================================================================================================================================= 
-                                                                                                                                    
-                                                                                                                                    
-                                                                                                                                    
-                                                                                                                                    
                                                                                                                                     
                                                                                                                                     
                                                                                                                                     

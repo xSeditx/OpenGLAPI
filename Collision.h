@@ -3,9 +3,10 @@
 #include<vector>
 #include"Window.h"
 #include"3d_Primitive.h"
+#include"QuadTree.h"
 
 #define Collider       CollisionSphere::Collision_ObjectList 
-
+#define MaxObjects     1000
 class Mass{
     public:
         Mass(){}
@@ -20,6 +21,7 @@ class Mass{
            Angular,
            Force;
 
+ 
     float  Kg;
 
     void Apply_Gravity  ();
@@ -50,17 +52,20 @@ private:
     static float Gravity; 
 };
 
-
-
+class QuadTree;
+class Node;
 
 class CollisionSphere{
 
 public:
      CollisionSphere(){}
      CollisionSphere(Vec3 pos, float radius, int parent);
+     CollisionSphere(const CollisionSphere &other);
 
      int ID;
      int ParentID;
+
+     Node *QuadTreeIndex;
 
      float  Radius;
 
@@ -92,7 +97,7 @@ public:
 public:
      static std::vector<CollisionSphere*> Collision_ObjectList;
      static unsigned int  Collision_ObjectCount;
-
+//     static OctTree Tree;
  };
 #include"Camera.h"
 extern int MousePicker(Camera cam, int x, int y);

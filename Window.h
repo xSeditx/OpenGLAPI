@@ -103,6 +103,102 @@ typedef RECT Rect;
 //                                                            WINDOW CLASS                                                                                                                            
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class CallBack{
+    public:
+        CallBack(){
+                
+            CallBackOnInputFocus     = NULL;
+            CallBackOnInputBlur      = NULL;
+            CallBackOnKeyDown        = NULL;
+            CallBackOnKeyUp          = NULL;
+            CallBackOnMouseFocus     = NULL;
+            CallBackOnMouseBlur      = NULL;
+            CallBackOnMouseMove      = NULL;
+            CallBackOnMouseWheel     = NULL;
+                                     
+            CallBackOnLButtonDown    = NULL;
+            CallBackOnLButtonUp      = NULL;
+            CallBackOnRButtonDown    = NULL;
+            CallBackOnRButtonUp      = NULL;
+            CallBackOnMButtonDown    = NULL;
+            CallBackOnMButtonUp      = NULL;
+                                   
+            CallBackOnMinimize       = NULL;
+            CallBackOnRestore        = NULL;
+            CallBackOnResize         = NULL;
+            CallBackOnExpose         = NULL;
+            CallBackOnExit           = NULL;
+            CallBackOnUser           = NULL;
+
+        };
+        ~CallBack(){};
+
+       void (*CallBackOnInputFocus)           ();
+       void (*CallBackOnInputBlur)            ();
+
+       void (*CallBackOnKeyDown)              (GLushort Keycode, GLushort ScanCode, GLushort Modifier , GLubyte rep);                                                    //(SDL_Keysym sym, int mod, Uint16 unicode);
+       void (*CallBackOnKeyUp)                (GLushort Keycode, GLushort ScanCode, GLushort Modifier);   
+       void (*CallBackOnKeyHold)              (GLushort Keycode, GLushort ScanCode, GLushort Modifier);
+
+       void (*CallBackOnMouseFocus)           ();
+       void (*CallBackOnMouseBlur)            ();
+       void (*CallBackOnMouseMove)            (int mX, int mY, int relX, int relY, bool Left,bool Right,bool Middle);
+       void (*CallBackOnMouseWheel)           (bool Up, bool Down); 
+                                             
+       void (*CallBackOnLButtonDown )         (int mX, int mY);
+       void (*CallBackOnLButtonUp  )          (int mX, int mY);
+       void (*CallBackOnRButtonDown)          (int mX, int mY);
+       void (*CallBackOnRButtonUp )           (int mX, int mY);
+       void (*CallBackOnMButtonDown)          (int mX, int mY);
+       void (*CallBackOnMButtonUp   )         (int mX, int mY);
+
+       void (*CallBackOnMinimize)             ();
+       void (*CallBackOnRestore)              ();
+       void (*CallBackOnResize)               (int w,int h);
+       void (*CallBackOnExpose)               ();
+       void (*CallBackOnExit)                 ();
+       void (*CallBackOnUser)                 (GLubyte type, int code, void* data1, void* data2);
+
+   //    void SetOnEvent(SDL_Event* Event);
+
+       void SetOnInputFocus();
+       void SetOnInputBlur();
+       
+       void SetOnKeyDown(void (*f)   (GLushort Keycode, GLushort ScanCode, GLushort Modifier , GLubyte rep)) {CallBackOnKeyDown     = f;}
+       void SetOnKeyUp  (void (*f)   (GLushort Keycode, GLushort ScanCode, GLushort Modifier ))            {CallBackOnKeyUp       = f;}
+       void SetOnKeyHold(void (*f)   (GLushort Keycode, GLushort ScanCode, GLushort Modifier ))            {CallBackOnKeyHold       = f;}
+
+       void SetOnMouseFocus                   ();
+       void SetOnMouseBlur                    ();
+       void SetOnMouseMove(void (*f) (int mX, int mY, int relX, int relY, bool Left,bool Right,bool Middle))  {CallBackOnMouseMove = f;}
+       void SetOnMouseWheel                   (bool Up, bool Down);    
+       
+       void SetOnLButtonDown(void (*f)        (int, int))                                            {CallBackOnLButtonDown = f;}
+       void SetOnLButtonUp(void (*f)          (int, int))                                            {CallBackOnLButtonUp   = f;}
+       void SetOnRButtonDown(void (*f)        (int, int))                                            {CallBackOnRButtonDown = f;}
+       void SetOnRButtonUp(void (*f)          (int, int))                                            {CallBackOnRButtonUp   = f;}
+       void SetOnMButtonDown(void (*f)        (int, int))                                            {CallBackOnMButtonDown = f;}
+       void SetOnMButtonUp(void (*f)          (int, int))                                            {CallBackOnMButtonUp   = f;}
+       
+       void SetOnMinimize                     ();
+       void SetOnRestore                      ();
+       void SetOnResize                       (int w,int h);
+       void SetOnExpose                       ();
+       void SetOnExit                         ();
+       void SetOnUser                         (GLubyte type, int code, void* data1, void* data2);
+};
+
+
+
+
+
+
+
+
+
+
+
+
 class Window{
 public:
     Window(){}
@@ -151,6 +247,7 @@ public:
       inline bool IsKeyPressed        (int keycode)                              { return KEY_STATES[keycode];}		
     }KEY_BOARD;
 
+    CallBack Callbacks;
 private:
     unsigned short SyncRATE;
     int           FrameRate;
@@ -177,9 +274,6 @@ static void Mouse_Callback           (GLFWwindow *window,    int,    int, int);
 static void MouseMove_Callback       (GLFWwindow *window, double, double);
 static void DropFile_callback        (GLFWwindow *window,    int, const char**);
 static void Window_Size_Callback     (GLFWwindow *window,    int,    int);
-
-
-
 
 };
  

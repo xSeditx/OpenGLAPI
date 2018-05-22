@@ -10,18 +10,18 @@
 //==========================================================================================================================
 
 
-#include"Collision.h"
-#include"3d_Primitive.h"
+#include "Collision.h"
+#include "3d_Primitive.h"
 #include "Camera.h"
 
 
 std::vector<CollisionSphere*> Collider;
-unsigned int CollisionSphere::Collision_ObjectCount =0;
+unsigned int CollisionSphere::Collision_ObjectCount = 0;
 float Mass::Current_Timestep;
 float Mass::Gravity; 
- 
 
-Mass::Mass(float weight, Vec3 pos) 
+extern QT *Tree;
+Mass::Mass(float weight, Vec3 pos)
     : Force(0,0,0),
       Acceleration(0,0,0),
       Velocity(0,0,0),
@@ -53,7 +53,10 @@ CollisionSphere::CollisionSphere(Vec3 pos, float radius, int parent)
     return false;
 }
 
-
+CollisionSphere::CollisionSphere(const CollisionSphere &other)
+{
+     std::memcpy(this, &other, sizeof(other));
+}
 //  Young's modulus E = Stress / Strain
 //                  k = E * (Area / Length)
 // angle_deg = RADIANS(acos(Vec3::DotProduct(VectorA.Normalize(), VectorB.Normalize() ))
@@ -63,8 +66,15 @@ CollisionSphere::CollisionSphere(Vec3 pos, float radius, int parent)
  {  
      float DamperCoefficient = .1; // Dampening Factor
      float K = 1.;
-     for(CollisionSphere *List: Collider)
+
+     //for(CollisionSphere *List: CollisionLIST) //this->QuadTreeIndex->Entities)
+     std::vector<CollisionSphere*> results;
+     results = Tree->RootNode->QueryRange(Vec2(Body.Position.x, Body.Position.z),Vec2(10,10));
+
+for(CollisionSphere *List: results)
      {
+
+         if(List != this){
          float CollisionDist = Is_Collision(List->ID); // Returns False if Same Object or No Collision
 
          if(CollisionDist != 0 )
@@ -102,16 +112,11 @@ CollisionSphere::CollisionSphere(Vec3 pos, float radius, int parent)
          }
 
      }
-         float GroundHeight = Terrain::GROUND->SampleTerrain(Body.Position.x, 
-                                                         Body.Position.z, Sphere::s_SphereList[ParentID]) ;
-
-         if (Body.Position.y + Radius >=  GroundHeight)
-         {
-             Body.Position.y = GroundHeight - Radius;
-         }
-
+     }
+     Terrain::GROUND->SampleTerrain(Body.Position.x, 
+                                    Body.Position.z, 
+                                    Sphere::s_SphereList[ParentID]);
  }
- 
  void  CollisionSphere::Update()
  {
      Body.Velocity = Body.Velocity * .95f ;         
@@ -126,12 +131,11 @@ CollisionSphere::CollisionSphere(Vec3 pos, float radius, int parent)
        CollisionDetection();  
  }
 
-
 int MousePicker(Camera cam, int x, int y)
 {
     Vec3 StartPosition = cam.Position;
     Vec3 EndPosition = Vec3::RayCast(StartPosition, Vec3(0.,0.,0.), 100);
-    glLineWidth(10.0);
+  //  glLineWidth(5.);
     glBegin(GL_LINES);
        /// glVertex3f(0.,0.,0.);
          glVertex3f(100+EndPosition.x,100+EndPosition.y,100+EndPosition.z);
@@ -143,11 +147,6 @@ int MousePicker(Camera cam, int x, int y)
     glFlush();
     return 1;
 }
-
-
-
-
-
 
 //  Acceleration = Force / Mass;
 //  Velocity += Acceleration;

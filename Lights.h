@@ -7,7 +7,7 @@
 
 class LightSource{
 public:
-    LightSource(Vec3 pos, RGBf alight, RGBf dlight, RGBf slight);
+    LightSource(Vec4 pos, RGBf alight, RGBf dlight, RGBf slight);
     Vec3 Position;
     RGBf Color;
 

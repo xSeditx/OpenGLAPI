@@ -16,7 +16,12 @@
 #include"Collision.h"
 #include"Shader.h"
  
-
+#define   WorldSizeX   20
+#define   WorldSizeZ   20
+#define   GridSizeX    50
+#define   GridSizeZ    50
+#define WX (WorldSizeX * GridSizeX)
+#define WZ (WorldSizeZ * GridSizeZ)
 
 struct Vertex{
     Vec3 Position;

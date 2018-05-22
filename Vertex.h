@@ -4,6 +4,18 @@
 #include <iostream>
 #include"C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glm-0.9.2.7\glm\glm.hpp"
 
+/*
+
+X = X * Cos(Angle) + y * -Sin(Angle)
+Y = X * Sin(Angle) + y * Cos(Angle)
+
+
+
+X = X
+Y = Y + Cos(angle) +  Z * -Sin(Angle)
+Z = Y + Sin(angle) +  Z *  Cos(Angle)
+
+*/
 
 #define DEG2RAD(x) ((x * M_PI) / 180.0)
 
@@ -12,7 +24,9 @@ const double epsilon = 4.37114e-05;
 //======================================================================================================================================================================
 //_________________ VERTEX 2D X/Y ______________________________________________________________________________________________________________________________________
 //======================================================================================================================================================================
-
+#ifdef Vec2
+#  undef Vec2
+#endif 
 struct Vec2{
       //  float x;float y;
         Vec2();
@@ -79,7 +93,6 @@ struct Vec3{
              const float& z);
 
         Vec3(glm::vec3 other);
-        //float magnitude;
 
         Vec3& add(const Vec3& other);
         Vec3& subtract(const Vec3& other);
@@ -178,6 +191,9 @@ struct Vec4{
            struct{
                float r,g,b,a;
            };
+           struct{
+               float x,y,w,h;
+           };
            float Coords[4];
        };
 
@@ -259,6 +275,7 @@ inline float Squared(float x) { return x*x; }
 
 typedef Vec3 RGBf;
 typedef Vec4 RGBAf;
+typedef Vec4 Range;
 
 
 

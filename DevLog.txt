@@ -181,3 +181,16 @@ ________________________________________________________________________________
 
 Collision Sphere Bound by ID to a Mesh Object, Simple Physics is connected to this Collision Sphere as it moves, Test and Response to all other Collider
 Objects in the Vicinity. 
+
+
+
+
+
+======================================================================================================================================================
+______________________________________________________________________________________________________________________________________________________
+5/22:		QUAD-TREE ADDED  CALLBACK SYSTEM ADDED
+______________________________________________________________________________________________________________________________________________________
+
+  Its been a while so I touched base again with this and added the Quad tree I have been off working on. I also implemented the Callback system I used
+  On SDL2 programs to function here just as well to allow simpler user defined callback on keyboard and mouse input
+  There is a delay issue with glfw callbacks and a minor delay when mine is first being called

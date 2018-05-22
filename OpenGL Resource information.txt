@@ -3910,3 +3910,1095 @@ List->Velocity.z = Tangent.z  * dpTan2  + Normals.z  * M2;
      //      
      //      }
      //  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	             Node *Current;
+            float size = 1.0f;
+            size /= 2.0f;
+            *Current = Root->SubNodes[Index];
+                glBegin(GL_QUADS);
+                    glVertex3f( Current->Position.x -  size,  Current->Position.y -  size,  Current->Position.z + size);       // FRONT
+                    glVertex3f( Current->Position.x +  size,  Current->Position.y -  size,  Current->Position.z + size);
+                    glVertex3f( Current->Position.x +  size,  Current->Position.y +  size,  Current->Position.z + size);
+                    glVertex3f( Current->Position.x -  size,  Current->Position.y +  size,  Current->Position.z + size);
+                                                                                     
+                    glVertex3f( Current->Position.x +  size,  Current->Position.y +  size,  Current->Position.z - size); // BACK
+                    glVertex3f( Current->Position.x -  size,  Current->Position.y -  size,  Current->Position.z - size); // I BELIEVE THIS IS WRONG
+                    glVertex3f( Current->Position.x +  size,  Current->Position.y +  size,  Current->Position.z - size);
+                    glVertex3f( Current->Position.x -  size,  Current->Position.y +  size,  Current->Position.z - size);
+ 
+                    glVertex3f( Current->Position.x -  size,  Current->Position.y -  size,  Current->Position.z + size); // LEFT
+                    glVertex3f( Current->Position.x -  size,  Current->Position.y +  size,  Current->Position.z + size);
+                    glVertex3f( Current->Position.x -  size,  Current->Position.y +  size,  Current->Position.z - size);
+                    glVertex3f( Current->Position.x -  size,  Current->Position.y -  size,  Current->Position.z - size);
+                  
+                    glVertex3f( Current->Position.x +  size,  Current->Position.y -  size,  Current->Position.z - size); // RIGHT
+                    glVertex3f( Current->Position.x +  size,  Current->Position.y +  size,  Current->Position.z - size);
+                    glVertex3f( Current->Position.x +  size,  Current->Position.y +  size,  Current->Position.z + size);
+                    glVertex3f( Current->Position.x +  size,  Current->Position.y -  size,  Current->Position.z + size);
+
+                    glVertex3f( Current->Position.x +  size,  Current->Position.y -  size,  Current->Position.z - size); // TOP
+                    glVertex3f( Current->Position.x +  size,  Current->Position.y -  size,  Current->Position.z + size);
+                    glVertex3f( Current->Position.x -  size,  Current->Position.y -  size,  Current->Position.z + size);
+                    glVertex3f( Current->Position.x -  size,  Current->Position.y -  size,  Current->Position.z - size);
+ 
+                    glVertex3f( Current->Position.x +  size,  Current->Position.y +  size,  Current->Position.z - size);// BOTTOM
+                    glVertex3f( Current->Position.x +  size,  Current->Position.y +  size,  Current->Position.z + size);
+                    glVertex3f( Current->Position.x -  size,  Current->Position.y +  size,  Current->Position.z + size);
+                    glVertex3f( Current->Position.x -  size,  Current->Position.y +  size,  Current->Position.z - size);
+
+                glEnd();  
+                Index++;
+
+
+
+
+
+
+
+
+
+				#pragma once
+#include"Window.h"
+#include"Vertex.h"
+
+enum OctreeIndex{
+    bottomleftfront   = 0,
+    bottomrightfront  = 2,
+    bottomleftback    = 3,
+    bottomrightback   = 1,
+    toprightfront     = 4,
+    toprightback      = 6,
+    topleftfront      = 7,
+    topleftback       = 5
+};
+
+
+class OctTree {
+public:
+    OctTree(float size, Vec3 position, int depth);
+
+    class Node {
+    public:
+        Node::Node(float size, Vec3 position);
+        Node::Node();
+        Node::~Node();
+
+
+        Vec3 Position;
+        float Size;
+
+        int ID;
+        int Value; // List of Values idk
+
+        Node *SubNodes;
+
+        Vec3 GetNewPosition(int i, const Vec3 pos);
+
+        void  Subdivide(int depth);
+
+        void Prune(Node *node);
+        bool isLeaf();
+
+        static int NumberOfNodes;
+
+
+    }; //  End Node Class
+
+    void Render();
+
+    Node *GetRootNode();
+
+    Node *Nodes;
+
+    int NumberOfLeafs();
+
+    int Depth;
+
+    int GetPositionIndex(Vec3 Position, Vec3 NodePosition);
+
+    private:
+        int LeafNumber;
+};
+
+
+
+
+
+#include"OctTree.h"
+int OctTree::Node::NumberOfNodes = 0;
+
+
+OctTree::OctTree(float size, Vec3 position, int depth)
+{
+    Nodes = new Node(size, position);
+    Depth = depth;
+}
+
+
+int OctTree::NumberOfLeafs()
+{
+    return LeafNumber;
+}
+int OctTree::GetPositionIndex(Vec3 Position, Vec3 NodePosition)
+{
+    int index = 0;
+    index |= Position.y > NodePosition.y ? 4 : 0;
+    index |= Position.x > NodePosition.x ? 2 : 0;
+    index |= Position.z > NodePosition.z ? 1 : 0;
+    return index;
+}
+
+//STATIC
+void OctTree::Render()
+{
+    float size = 1.0f;
+    size /= 2.0f;
+    Node *Current = this;
+    for(int Index = 0; Index < 8; Index++)
+    {
+        for(int Deep = 0; Deep < Depth; Deep++)
+        {
+
+            Vec3 Quadrent;
+            Quadrent = Current->Position;
+            glBegin(GL_QUADS);
+                glVertex3f( Quadrent.x -  size,  Quadrent.y -  size,  Quadrent.z + size);// FRONT
+                glVertex3f( Quadrent.x +  size,  Quadrent.y -  size,  Quadrent.z + size);
+                glVertex3f( Quadrent.x +  size,  Quadrent.y +  size,  Quadrent.z + size);
+                glVertex3f( Quadrent.x -  size,  Quadrent.y +  size,  Quadrent.z + size);
+
+                glVertex3f( Quadrent.x +  size,  Quadrent.y +  size,  Quadrent.z - size); // BACK
+                glVertex3f( Quadrent.x +  size,  Quadrent.y -  size,  Quadrent.z - size); // I BELIEVE THIS IS WRONG
+                glVertex3f( Quadrent.x -  size,  Quadrent.y -  size,  Quadrent.z - size);
+                glVertex3f( Quadrent.x +  size,  Quadrent.y +  size,  Quadrent.z - size);
+                         
+                glVertex3f( Quadrent.x -  size,  Quadrent.y -  size,  Quadrent.z + size); // LEFT
+                glVertex3f( Quadrent.x -  size,  Quadrent.y +  size,  Quadrent.z + size);
+                glVertex3f( Quadrent.x -  size,  Quadrent.y +  size,  Quadrent.z - size);
+                glVertex3f( Quadrent.x -  size,  Quadrent.y -  size,  Quadrent.z - size);
+                   
+                glVertex3f( Quadrent.x +  size,  Quadrent.y -  size,  Quadrent.z - size); // RIGHT
+                glVertex3f( Quadrent.x +  size,  Quadrent.y +  size,  Quadrent.z - size);
+                glVertex3f( Quadrent.x +  size,  Quadrent.y +  size,  Quadrent.z + size);
+                glVertex3f( Quadrent.x +  size,  Quadrent.y -  size,  Quadrent.z + size);
+                           
+                glVertex3f( Quadrent.x +  size,  Quadrent.y -  size,  Quadrent.z - size); // TOP
+                glVertex3f( Quadrent.x +  size,  Quadrent.y -  size,  Quadrent.z + size);
+                glVertex3f( Quadrent.x -  size,  Quadrent.y -  size,  Quadrent.z + size);
+                glVertex3f( Quadrent.x -  size,  Quadrent.y -  size,  Quadrent.z - size);
+                  
+                glVertex3f( Quadrent.x +  size,  Quadrent.y +  size,  Quadrent.z - size);// BOTTOM
+                glVertex3f( Quadrent.x +  size,  Quadrent.y +  size,  Quadrent.z + size);
+                glVertex3f( Quadrent.x -  size,  Quadrent.y +  size,  Quadrent.z + size);
+                glVertex3f( Quadrent.x -  size,  Quadrent.y +  size,  Quadrent.z - size);
+        
+            glEnd();  
+        }
+    }
+}
+
+
+
+
+OctTree::Node *OctTree::GetRootNode()
+{ 
+    return Nodes; 
+}
+OctTree::Node::Node(float size, Vec3 position)
+    : Position(position),
+      Size(size),
+      ID(NumberOfNodes++)
+{}
+OctTree::Node::Node() 
+       : Position(0,0,0)
+{
+    Size  = 0;
+    Value = 0;
+    SubNodes = nullptr;
+}
+OctTree::Node::~Node() 
+{
+    delete[](SubNodes);
+}
+
+
+Vec3 OctTree::Node::GetNewPosition(int i, const Vec3 pos)
+{
+    Vec3 newPos = pos;
+    if ((i & 4) == 4)
+    {
+        newPos.y += Size * 25;
+    }
+    else
+    {
+        newPos.y -= Size * 25;
+    }
+    if ((i & 2) == 2)
+    {
+        newPos.x += Size * 25;
+    }
+    else
+    {
+        newPos.x -= Size * 25;
+    }
+    if ((i & 1) == 1)
+    {
+        newPos.z += Size * 25;
+    }
+    else
+    {
+        newPos.z -= Size * 25;
+    }
+    return newPos;
+}
+
+void  OctTree::Node::Subdivide(int depth)
+{
+    Vec3 newPos = Position;
+    SubNodes = new Node[8];
+
+    for_loop(i , 8)
+    {
+        newPos = GetNewPosition(i, Position);
+        SubNodes[i] = Node(Size * .5, newPos);
+    }
+    Subdivide(depth - 1);
+}
+
+void OctTree::Node::Prune(Node *node)
+{
+    delete[](node);
+}
+
+bool OctTree::Node::isLeaf()
+{ 
+    return(SubNodes == nullptr); 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+glVertex3f( Quadrent.x - size,  Quadrent.y - size, Quadrent.z - size);       // P1
+glVertex3f( Quadrent.x - size,  Quadrent.y + size, Quadrent.z - size);       // P2
+glVertex3f( Quadrent.x + size,  Quadrent.y + size, Quadrent.z - size);       // P3
+glVertex3f( Quadrent.x + size,  Quadrent.y - size, Quadrent.z - size);       // P4
+
+glVertex3f( Quadrent.x + size,  Quadrent.y - size, Quadrent.z - size );      // P1 is red
+glVertex3f( Quadrent.x + size,  Quadrent.y + size, Quadrent.z - size );      // P2 is green
+glVertex3f( Quadrent.x - size,  Quadrent.y + size, Quadrent.z - size );      // P3 is blue
+glVertex3f( Quadrent.x - size,  Quadrent.y - size, Quadrent.z - size );      // P4 is purple
+                        
+glVertex3f( Quadrent.x + size,  Quadrent.y - size, Quadrent.z + size );
+glVertex3f( Quadrent.x + size,  Quadrent.y + size, Quadrent.z + size );
+glVertex3f( Quadrent.x - size,  Quadrent.y + size, Quadrent.z + size );
+glVertex3f( Quadrent.x - size,  Quadrent.y - size, Quadrent.z + size );
+     
+glVertex3f( Quadrent.x + size,  Quadrent.y - size, Quadrent.z + size );
+glVertex3f( Quadrent.x + size,  Quadrent.y + size, Quadrent.z + size );
+glVertex3f( Quadrent.x - size,  Quadrent.y + size, Quadrent.z + size );
+glVertex3f( Quadrent.x - size,  Quadrent.y - size, Quadrent.z + size );
+                       
+glVertex3f( Quadrent.x + size,  Quadrent.y - size, Quadrent.z - size );
+glVertex3f( Quadrent.x + size,  Quadrent.y + size, Quadrent.z - size );
+glVertex3f( Quadrent.x + size,  Quadrent.y + size, Quadrent.z + size );
+glVertex3f( Quadrent.x + size,  Quadrent.y - size, Quadrent.z + size );
+              
+glVertex3f( Quadrent.x - size,  Quadrent.y - size, Quadrent.z + size );
+glVertex3f( Quadrent.x - size,  Quadrent.y + size, Quadrent.z + size );
+glVertex3f( Quadrent.x - size,  Quadrent.y + size, Quadrent.z - size );
+glVertex3f( Quadrent.x - size,  Quadrent.y - size, Quadrent.z - size );
+                      
+glVertex3f( Quadrent.x + size,  Quadrent.y + size, Quadrent.z + size );
+glVertex3f( Quadrent.x + size,  Quadrent.y + size, Quadrent.z - size );
+glVertex3f( Quadrent.x - size,  Quadrent.y + size, Quadrent.z - size );
+glVertex3f( Quadrent.x - size,  Quadrent.y + size, Quadrent.z + size );
+      
+glVertex3f( Quadrent.x + size,  Quadrent.y - size, Quadrent.z - size );
+glVertex3f( Quadrent.x + size,  Quadrent.y - size, Quadrent.z + size );
+glVertex3f( Quadrent.x - size,  Quadrent.y - size, Quadrent.z + size );
+glVertex3f( Quadrent.x - size,  Quadrent.y - size, Quadrent.z - size );
+
+
+
+
+
+
+
+
+//void QuadTree::Node::Insert(CollisionSphere *sphere)
+//{
+//    if(Entities.size() < Capacity)
+//    {
+//        Entities.push_back(sphere);
+//        return;
+//    }else{
+//        SubDivide();
+//    }
+//    QuadTree::Node *Test = QuadTree::FindLocation( this, sphere);
+//
+//}
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//======================================================================================================================
+//                                    QUADTREE CLASS                                      
+//======================================================================================================================
+
+
+QuadTree::QuadTree(Vec2 pos, float size)
+    :
+    Position(pos),
+    Size(size)
+{
+    RootNode = new Node(Position, size);
+    RootNode->IsRoot = true;
+}
+
+void  QuadTree::Update()
+{   
+    RootNode->Prune(RootNode);
+    for_loop(Index , CollisionSphere::Collision_ObjectCount)
+    {
+        if(RootNode->Insert(Collider[Index]) == false) Print("Failed");
+    }
+}
+bool  QuadTree::Init()
+{
+    for_loop(Index , CollisionSphere::Collision_ObjectCount)
+    {
+        RootNode->Insert(Collider[Index]);
+    }
+    return true;
+}
+
+
+void  QuadTree::Insert(Node *node, CollisionSphere *ball)
+{
+    node->Insert(ball);
+    ball->QuadTreeIndex = node;
+}
+void  QuadTree::Render (Node *CurrentNode)
+{
+    if(!CurrentNode->SubNode[0]) return; // TIS CAN PROB GO
+
+    float size = CurrentNode->Size;
+    size /= 2.0f;
+
+    for_loop(Count, 4)
+    {
+       Vec2 Quadrent = CurrentNode->Position;
+
+       glBegin( GL_LINES);
+
+            glVertex3f( Quadrent.x +  size, -1, Quadrent.y +  size); 
+            glVertex3f( Quadrent.x +  size, -1, Quadrent.y -  size); 
+
+            glVertex3f( Quadrent.x +  size, -1, Quadrent.y -  size);
+            glVertex3f( Quadrent.x -  size, -1, Quadrent.y -  size);
+
+            glVertex3f( Quadrent.x -  size, -1, Quadrent.y -  size);
+            glVertex3f( Quadrent.x -  size, -1, Quadrent.y +  size);
+
+            glVertex3f( Quadrent.x - size,  -1 ,Quadrent.y +  size);
+            glVertex3f( Quadrent.x + size,  -1 ,Quadrent.y +  size);
+
+        glEnd(); 
+        if(CurrentNode->IsLeaf == false) Render(CurrentNode->SubNode[Count]);
+    }
+}
+void  QuadTree::Prune (Node *node)
+{
+    if( node != nullptr )
+    {
+        for_loop( i, 4 )
+        {
+            if(node->IsLeaf == false)
+            {
+                Prune(node->SubNode[i]);
+            }
+            node->SubNode[i] = nullptr;
+        }
+            node->IsLeaf =true;
+            node->Entities.empty();
+    }
+}
+Node* QuadTree::FindLocation( Node *node, CollisionSphere *ball )
+{
+   for_loop(SubIndex,4)
+   {
+       if(node->SubNode[SubIndex]->IsLeaf == true)
+       {
+           if(node->SubNode[SubIndex]->IsContained(ball) == true)
+           {
+                return node;
+           }
+       }
+       else
+       {
+           FindLocation(node->SubNode[SubIndex], ball);
+       }
+   }
+   return nullptr;
+}
+
+
+//std::vector<CollisionSphere*> QuadTree::QueryRange(Range range)
+//{
+//
+//std::vector<CollisionSphere *> results;
+//
+//    if (!(Intersects(Range(Position.x, Position.y, Dimensions.x, Dimensions.y))))
+//    {
+//        return results; 
+//    }
+//    for_loop (p, Entities.size())
+//    {
+//        if (IsContained(Entities[p]))
+//        {
+//             results.push_back(Entities[p]);
+//        }
+//        if (IsLeaf == true)
+//        {
+//            return results;
+//        }
+//        for_loop(SubIndex, 4)
+//        {
+//           vector<CollisionSphere *> S; 
+//           S = SubNode[SubIndex]->QueryRange(range);
+//           if (S.size() > 0) 
+//           {
+//               S.insert(results.end(), S.begin(), S.end());
+//           }
+//        }
+//    }
+//return results;
+//}
+//
+
+
+//======================================================================================================================
+//                                    NODE CLASS                                      
+//======================================================================================================================
+
+Node::Node()
+{
+    SubNode[0] = 
+    SubNode[1] = 
+    SubNode[2] = 
+    SubNode[3] = nullptr;
+IsRoot=false;
+}
+Node::Node(Vec2 position, float size)
+    : Capacity( 1 ),
+      Size( size ), 
+      Position( position ),
+      ID( QuadTree::NumberOfNodes++ )
+{
+    IsRoot=false;
+    Dimensions = size;
+    IsLeaf = true;
+    IsRoot = true;
+    NumberOfEntities = 0;
+    NodeList.push_back( this );
+    SubNode[0] = SubNode[1] = SubNode[2] = SubNode[3] = nullptr;
+}
+
+
+
+void  Node::Prune (Node *node)
+{
+    if( node != nullptr )
+    {
+        for_loop( i, 4 )
+        {
+            if(node->IsLeaf == false)
+            {
+                Prune(node->SubNode[i]);
+            }
+            node->SubNode[i] = nullptr;
+        }
+            node->IsLeaf =true;
+            node->Entities.empty();
+    }
+}
+
+bool  Node::IsContained(CollisionSphere *sphere)
+{
+    return(sphere->Body.Position.x < (Position.x + (Size * .5)) && sphere->Body.Position.x > (Position.x - (Size * .5)) &&
+           sphere->Body.Position.z < (Position.y + (Size * .5)) && sphere->Body.Position.z > (Position.y - (Size * .5)));
+}
+bool  Node::Insert(CollisionSphere *ball)
+{
+  
+    if ( !IsContained (ball) )
+    {
+        return false; 
+    }
+
+    if (Entities.size() < Capacity)
+    {
+        ball->QuadTreeIndex = this;
+        Entities.push_back(ball);
+    return true;
+    }
+
+    if (IsLeaf == true) SubDivide();
+
+    if ( SubNode[(Direction)(NorthEast)]->Insert(ball) == true ) return true;
+
+    if ( SubNode[(Direction)(NorthWest)]->Insert(ball) == true ) return true;
+
+    if ( SubNode[(Direction)(SouthWest)]->Insert(ball) == true ) return true;
+
+    if ( SubNode[(Direction)(SouthEast)]->Insert(ball) == true ) return true;
+  
+    ball->QuadTreeIndex = this; // THIS NEEDS FIXED, THE SPHERES MUST RETURN SOMETHING
+
+    return false;
+}
+bool  Node::Intersects( Range range )
+{
+
+  return( range.x - range.w       < Position.x + Dimensions.x  ||
+          range.x + Dimensions.x  > Position.x - Dimensions.x  ||
+          range.y - range.h       < Position.y + Dimensions.y  ||
+          range.y + Dimensions.y  > Position.y - Dimensions.y);
+}// this is the error
+void  Node::SubDivide()
+{
+   *SubNode = new Node[4];
+    IsLeaf = false;
+
+    for_loop(SubCount, 4)
+    {
+        SubNode[SubCount] =  new Node(GetNewPosition((Direction)SubCount), Size * .5);
+        SubNode[SubCount]->Facing = (Direction)SubCount;
+        SubNode[SubCount]->RootNode = this;
+    }
+}
+
+Vec2  Node::GetNewPosition ( Direction facing )
+{
+ Vec2 Pos = Position;
+
+ 
+
+    if(facing == NorthEast)
+    {
+
+   
+    
+         Pos.x -= (Size *.25);
+        Pos.y -= (Size *.25);   
+    }
+    if(facing == SouthEast)
+    {
+
+        Pos.x += (Size *.25);
+        Pos.y -= (Size *.25);
+    }
+
+    if(facing == SouthWest)
+    {
+
+        Pos.x += (Size *.25);
+        Pos.y += (Size *.25);
+
+
+    }
+    if(facing ==  NorthWest)
+    {
+
+       Pos.x -= (Size *.25);
+        Pos.y += (Size *.25);
+
+    }
+    return Pos;
+}
+std::vector<CollisionSphere*> Node::QueryRange(Range range)
+{
+
+std::vector<CollisionSphere *> results;
+
+    if (!(Intersects(Range(Position.x, Position.y, Dimensions.x, Dimensions.y))))
+    {
+        return results; 
+    }
+    for_loop (p, Entities.size())
+    {
+        if (IsContained(Entities[p]))
+        {
+             results.push_back(Entities[p]);
+        }
+        if (IsLeaf == true)
+        {
+            return results;
+        }
+        for_loop(SubIndex, 4)
+        {
+           vector<CollisionSphere*> S; 
+           S = SubNode[SubIndex]->QueryRange(range);
+           if (S.size() > 0) 
+           {
+               S.insert(results.end(), S.begin(), S.end());
+           }
+        }
+    }
+return results;
+}
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ //======================================================================================================================
+ //                                    QUADTREE CLASS                                      
+ //======================================================================================================================
+ 
+ 
+ QuadTree::QuadTree(Vec2 pos, float size)
+     :
+     Position(pos),
+     Size(size)
+ {
+     RootNode = new Node(Position, size);
+     RootNode->IsRoot = true;
+ }
+ 
+ void  QuadTree::Update()
+ {   
+     RootNode->Prune(RootNode);
+     for_loop(Index , CollisionSphere::Collision_ObjectCount)
+     {
+         if(RootNode->Insert(Collider[Index]) == false) Print("Failed");
+     }
+ }
+ bool  QuadTree::Init()
+ {
+     for_loop(Index , CollisionSphere::Collision_ObjectCount)
+     {
+         RootNode->Insert(Collider[Index]);
+     }
+     return true;
+ }
+ 
+ 
+ void  QuadTree::Insert(Node *node, CollisionSphere *ball)
+ {
+     node->Insert(ball);
+     ball->QuadTreeIndex = node;
+ }
+ void  QuadTree::Render (Node *CurrentNode)
+ {
+     if(!CurrentNode->SubNode[0]) return; // TIS CAN PROB GO
+ 
+     float size = CurrentNode->Size;
+     size /= 2.0f;
+ 
+     for_loop(Count, 4)
+     {
+        Vec2 Quadrent = CurrentNode->Position;
+ 
+        glBegin( GL_LINES);
+ 
+             glVertex3f( Quadrent.x +  size, -1, Quadrent.y +  size); 
+             glVertex3f( Quadrent.x +  size, -1, Quadrent.y -  size); 
+ 
+             glVertex3f( Quadrent.x +  size, -1, Quadrent.y -  size);
+             glVertex3f( Quadrent.x -  size, -1, Quadrent.y -  size);
+ 
+             glVertex3f( Quadrent.x -  size, -1, Quadrent.y -  size);
+             glVertex3f( Quadrent.x -  size, -1, Quadrent.y +  size);
+ 
+             glVertex3f( Quadrent.x - size,  -1 ,Quadrent.y +  size);
+             glVertex3f( Quadrent.x + size,  -1 ,Quadrent.y +  size);
+ 
+         glEnd(); 
+         if(CurrentNode->IsLeaf == false) Render(CurrentNode->SubNode[Count]);
+     }
+ }
+ void  QuadTree::Prune (Node *node)
+ {
+     if( node != nullptr )
+     {
+         for_loop( i, 4 )
+         {
+             if(node->IsLeaf == false)
+             {
+                 Prune(node->SubNode[i]);
+             }
+             node->SubNode[i] = nullptr;
+         }
+             node->IsLeaf =true;
+             node->Entities.empty();
+     }
+ }
+ Node* QuadTree::FindLocation( Node *node, CollisionSphere *ball )
+ {
+    for_loop(SubIndex,4)
+    {
+        if(node->SubNode[SubIndex]->IsLeaf == true)
+        {
+            if(node->SubNode[SubIndex]->IsContained(ball) == true)
+            {
+                 return node;
+            }
+        }
+        else
+        {
+            FindLocation(node->SubNode[SubIndex], ball);
+        }
+    }
+    return nullptr;
+ }
+ 
+ 
+ //std::vector<CollisionSphere*> QuadTree::QueryRange(Range range)
+ //{
+ //
+ //std::vector<CollisionSphere *> results;
+ //
+ //    if (!(Intersects(Range(Position.x, Position.y, Dimensions.x, Dimensions.y))))
+ //    {
+ //        return results; 
+ //    }
+ //    for_loop (p, Entities.size())
+ //    {
+ //        if (IsContained(Entities[p]))
+ //        {
+ //             results.push_back(Entities[p]);
+ //        }
+ //        if (IsLeaf == true)
+ //        {
+ //            return results;
+ //        }
+ //        for_loop(SubIndex, 4)
+ //        {
+ //           vector<CollisionSphere *> S; 
+ //           S = SubNode[SubIndex]->QueryRange(range);
+ //           if (S.size() > 0) 
+ //           {
+ //               S.insert(results.end(), S.begin(), S.end());
+ //           }
+ //        }
+ //    }
+ //return results;
+ //}
+ //
+ 
+ 
+ //======================================================================================================================
+ //                                    NODE CLASS                                      
+ //======================================================================================================================
+ 
+ Node::Node()
+ {
+     SubNode[0] = 
+     SubNode[1] = 
+     SubNode[2] = 
+     SubNode[3] = nullptr;
+ IsRoot=false;
+ }
+ Node::Node(Vec2 position, float size)
+     : Capacity( 1 ),
+       Size( size ), 
+       Position( position ),
+       ID( QuadTree::NumberOfNodes++ )
+ {
+     IsRoot=false;
+     Dimensions = size;
+     IsLeaf = true;
+     IsRoot = true;
+     NumberOfEntities = 0;
+     NodeList.push_back( this );
+     SubNode[0] = SubNode[1] = SubNode[2] = SubNode[3] = nullptr;
+ }
+ 
+ 
+ 
+ void  Node::Prune (Node *node)
+ {
+     if( node != nullptr )
+     {
+         for_loop( i, 4 )
+         {
+             if(node->IsLeaf == false)
+             {
+                 Prune(node->SubNode[i]);
+             }
+             node->SubNode[i] = nullptr;
+         }
+             node->IsLeaf =true;
+             node->Entities.empty();
+     }
+ }
+ 
+ bool  Node::IsContained(CollisionSphere *sphere)
+ {
+     return(sphere->Body.Position.x < (Position.x + (Size * .5)) && sphere->Body.Position.x > (Position.x - (Size * .5)) &&
+            sphere->Body.Position.z < (Position.y + (Size * .5)) && sphere->Body.Position.z > (Position.y - (Size * .5)));
+ }
+ bool  Node::Insert(CollisionSphere *ball)
+ {
+   
+     if ( !IsContained (ball) )
+     {
+         return false; 
+     }
+ 
+     if (Entities.size() < Capacity)
+     {
+         ball->QuadTreeIndex = this;
+         Entities.push_back(ball);
+     return true;
+     }
+ 
+     if (IsLeaf == true) SubDivide();
+ 
+     if ( SubNode[(Direction)(NorthEast)]->Insert(ball) == true ) return true;
+ 
+     if ( SubNode[(Direction)(NorthWest)]->Insert(ball) == true ) return true;
+ 
+     if ( SubNode[(Direction)(SouthWest)]->Insert(ball) == true ) return true;
+ 
+     if ( SubNode[(Direction)(SouthEast)]->Insert(ball) == true ) return true;
+   
+     ball->QuadTreeIndex = this; // THIS NEEDS FIXED, THE SPHERES MUST RETURN SOMETHING
+ 
+     return false;
+ }
+ bool  Node::Intersects( Range range )
+ {
+ 
+   return( range.x - range.w       < Position.x + Dimensions.x  ||
+           range.x + Dimensions.x  > Position.x - Dimensions.x  ||
+           range.y - range.h       < Position.y + Dimensions.y  ||
+           range.y + Dimensions.y  > Position.y - Dimensions.y);
+ }// this is the error
+ void  Node::SubDivide()
+ {
+    *SubNode = new Node[4];
+     IsLeaf = false;
+ 
+     for_loop(SubCount, 4)
+     {
+         SubNode[SubCount] =  new Node(GetNewPosition((Direction)SubCount), Size * .5);
+         SubNode[SubCount]->Facing = (Direction)SubCount;
+         SubNode[SubCount]->RootNode = this;
+     }
+ }
+ 
+ Vec2  Node::GetNewPosition ( Direction facing )
+ {
+  Vec2 Pos = Position;
+ 
+  
+ 
+     if(facing == NorthEast)
+     {
+ 
+    
+     
+          Pos.x -= (Size *.25);
+         Pos.y -= (Size *.25);   
+     }
+     if(facing == SouthEast)
+     {
+ 
+         Pos.x += (Size *.25);
+         Pos.y -= (Size *.25);
+     }
+ 
+     if(facing == SouthWest)
+     {
+ 
+         Pos.x += (Size *.25);
+         Pos.y += (Size *.25);
+ 
+ 
+     }
+     if(facing ==  NorthWest)
+     {
+ 
+        Pos.x -= (Size *.25);
+         Pos.y += (Size *.25);
+ 
+     }
+     return Pos;
+ }
+ std::vector<CollisionSphere*> Node::QueryRange(Range range)
+ {
+ 
+ std::vector<CollisionSphere *> results;
+ 
+     if (!(Intersects(Range(Position.x, Position.y, Dimensions.x, Dimensions.y))))
+     {
+         return results; 
+     }
+     for_loop (p, Entities.size())
+     {
+         if (IsContained(Entities[p]))
+         {
+              results.push_back(Entities[p]);
+         }
+         if (IsLeaf == true)
+         {
+             return results;
+         }
+         for_loop(SubIndex, 4)
+         {
+            vector<CollisionSphere*> S; 
+            S = SubNode[SubIndex]->QueryRange(range);
+            if (S.size() > 0) 
+            {
+                S.insert(results.end(), S.begin(), S.end());
+            }
+         }
+     }
+ return results;
+ }
+ 
+  
+  
+enum Direction
+{
+    NorthWest  = 0,
+    NorthEast  = 1,
+    SouthEast  = 2,
+    SouthWest  = 3,
+};
+
+class CollisionSphere;
+
+
+class Node
+{
+public:
+    Node(Vec2 position, float size);
+    Node();
+
+        bool      IsLeaf;
+        Direction Facing;
+
+        float Size;
+        Vec2  Dimensions;
+        Vec2  Position;
+
+//        shared_ptr<Node> SubNodes[4];
+        Node *SubNode[4]; 
+
+        Node *RootNode;
+        bool  IsRoot;
+
+        int   ID;
+        int   Capacity;
+        int   NumberOfEntities;
+
+        void  Update                ();
+        void  SubDivide             ();
+        bool  IsDivided             ()                              {return !(IsLeaf);}
+        bool  Insert                (CollisionSphere *sphere);
+        bool  IsContained           (CollisionSphere *sphere);
+        bool  Intersects            (Range a);
+        void  Prune                 (Node *node);
+        Vec2  GetNewPosition        (Direction facing);
+
+        std::vector < CollisionSphere*> QueryRange(Range range);            
+        std::vector < CollisionSphere* > Entities;
+};
+
+
+
+class QuadTree
+{
+public:
+
+    QuadTree(Vec2 position, float size);
+
+        Vec2 Position;
+        float Size;
+        Node *RootNode;
+
+        bool Init();
+        void Insert(Node *node, CollisionSphere *sphere);
+        void Render(Node *CurrentNode);
+        void Update();
+void    Prune (Node *node);
+
+static  std::vector < CollisionSphere*> QueryRange(Range range);      
+static  Node* FindLocation( Node *node, CollisionSphere *ball);
+
+static  int NumberOfNodes;
+static  std::vector < Node* > NodeList;
+};
+
+
+
+
+
+LightSource Light = LightSource(Vec4( 1.0, 1.0, 1.0,1),
+                            RGBf(.2,.2,.2),
+                            RGBf(.8,.8,.8),
+                            RGBf(1.,1.,1.));
+

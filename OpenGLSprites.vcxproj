@@ -132,10 +132,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="3D_Primitive.cpp" />
+    <ClCompile Include="BatchRenderer.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Lights.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="QuadTree.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Vertex.cpp" />
@@ -143,10 +145,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3d_Primitive.h" />
+    <ClInclude Include="BatchRenderer.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Fileutils.h" />
     <ClInclude Include="Lights.h" />
+    <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Vertex.h" />

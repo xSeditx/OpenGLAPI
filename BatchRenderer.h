@@ -1,6 +1,12 @@
 #pragma once
 
 #include"Vertex.h"
+// #include"glm.hpp"
+// typedef glm::vec2 Vec2;
+// typedef glm::vec3 Vec3;
+// typedef glm::vec4 Vec4;
+// typedef glm::mat4 Matrix;
+
 #include"Renderer.h"
 #include"3d_Primitive.h"
 
@@ -27,6 +33,7 @@ struct VertexData{
          Normals,
          Color;
 };
+
 class BatchRenderer{
 public:
        BatchRenderer(){}

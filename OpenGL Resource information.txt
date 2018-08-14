@@ -5002,3 +5002,228 @@ LightSource Light = LightSource(Vec4( 1.0, 1.0, 1.0,1),
                             RGBf(.8,.8,.8),
                             RGBf(1.,1.,1.));
 
+
+
+
+
+
+
+
+
+
+
+
+							//glPushMatrix();
+//     glMatrixMode(GL_MODELVIEW);
+//     glLoadIdentity();
+    Vec3 StartPosition = cam.Position;
+     StartPosition.x = -cam.Position.x;
+     StartPosition.y = cam.Position.y;
+     StartPosition.z = -cam.Position.z;
+
+    float dist = 100;
+    float CX = cos(RADIANS(cam.Rotation.x)) * dist,
+          CY = cos(RADIANS(cam.Rotation.y)) * dist,
+          CZ = cos(RADIANS(cam.Rotation.z)) * dist;
+                                      
+    float SX = sin(RADIANS(cam.Rotation.x)) * dist,
+          SY = sin(RADIANS(cam.Rotation.y)) * dist,
+          SZ = sin(RADIANS(cam.Rotation.z)) * dist;
+
+    float   x = cam.Position.x,
+            y = cam.Position.y,
+            z = cam.Position.z;
+
+//Z ROTATION
+float newx = x * CZ - y * SZ ,
+      newy = x * SZ + y * CZ ,
+      newz = z;
+      x = newx;
+      y = newy;
+      z = newz;
+// X ROTATION
+     newy = y * CX - z * SX,
+     newz = y * SX + z * CX,
+     newx = x;
+     x = newx;
+     y = newy;
+     z = newz;
+
+// Y ROTATION
+
+     newz = z * CY - x * SY,
+     newx = z * SY + x * CY,
+     newy = y;
+     x = newx;
+     y = newy;
+     z = newz;
+
+
+	 //StartPosition.x  =  StartPosition.x+ 100;
+//StartPosition.y  =  StartPosition.y+ 100;
+//StartPosition.z  =  StartPosition.z+ 100;
+// //
+  //  Vec3 EndPosition = Vec3(x,y,z);
+ //Vec3 EndPosition = Vec3::RayCast(StartPosition, Vec3(cam.Rotation.x, cam.Rotation.y, cam.Rotation.z), 1000);//Vec3::RayCast(Vec3(cam.Rotation.x,cam.Rotation.z,cam.Rotation.y), Vec3(x,y,z), 1000);
+             //glBegin(GL_LINES);
+            //
+            //     glColor3f(GL_Color(255),GL_Color(0),GL_Color(0));
+            //     glVertex3f(StartPosition.x,StartPosition.y,StartPosition.z);
+            //    // glVertex3f(StartPosition.x+ EndPosition.x / 2,StartPosition.y+EndPosition.y / 2,StartPosition.z+EndPosition.z / 2);
+            //
+            //     
+            //     glColor3f(GL_Color(0),GL_Color(255),GL_Color(0)); 
+            //     glVertex3f(EndPosition.x,EndPosition.y ,EndPosition.z );
+            //     //glVertex3f(StartPosition.x+ EndPosition.x / 2,StartPosition.y+EndPosition.y / 2,StartPosition.z+EndPosition.z / 2);
+            //
+            //glEnd();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OLD RELATIVELY WORTHLESS BUFFER CLASS FOR FIRST ATTEMPT AT MANAGING THE BUFFERING SYSTEM
+IT SUCKED AND IS OBSOLETE NOW.
+
+//class Buffer{
+//public:
+//        Buffer(){}
+//        Buffer(Vec3 *Vertexdata, Vec3 *Colordata, GLsizei count, GLint colorcount);
+//        Buffer(Vec3 *Vertexdata, Vec3 *Colordata ,Vec3 *Normals ,GLsizei vcount, GLint colorcount, GLint normalCount);
+//
+//        GLuint ID[3];
+//
+//        GLint  VertexCount;
+//        GLint  ColorCount;
+//        GLint  NormalCount;
+//
+//      void Bind();
+//      void Unbind();
+//};  
+//
+
+			//===================================================================================================================================================
+//_______________________________________BUFFER CLASS _______________________________________________________________________________________________
+//
+//
+//Buffer::Buffer(Vec3 *Vertexdata,Vec3 *Colordata ,GLsizei vcount, GLint colorcount)
+//    :VertexCount(vcount), 
+//     ColorCount(colorcount), 
+//     NormalCount(0)
+//{
+//    if(Colordata != nullptr){
+//            _GL(glGenBuffers(2 , &ID[0]));
+//            glBindBuffer(GL_ARRAY_BUFFER, ID[0]);
+//                glBufferData(GL_ARRAY_BUFFER,VertexCount * sizeof(Vec3), Vertexdata, GL_STATIC_DRAW) ; 
+//            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;
+//    }
+//
+//     if(Vertexdata != nullptr){
+//           _GL(glBindBuffer(GL_ARRAY_BUFFER, ID[1])); // Bind our second Vertex Buffer Object  
+//                glBufferData(GL_ARRAY_BUFFER, ColorCount * sizeof(RGBf), Colordata, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
+//                glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
+//                    glEnableVertexAttribArray(1); 
+//            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;}
+//     } 
+//}
+////
+/////// Hmmmmm Cant KEEP THIS UP,. MUST FIND A BETTER WAY TO HANDLE THE BUFFERING AND MANAGEMENT OF THE MESH DATA
+////Buffer::Buffer(Vec3 *Vertexdata,Vec3 *Colordata ,Vec3 *Normals ,GLsizei vcount, GLint colorcount, GLint normalCount)
+//    :VertexCount(vcount), 
+//     ColorCount(colorcount),
+//     NormalCount(normalCount)
+//{
+//    if(Colordata != nullptr){
+//            _GL(glGenBuffers(3 , &ID[0]));
+//            glBindBuffer(GL_ARRAY_BUFFER, ID[0]);
+//                glBufferData(GL_ARRAY_BUFFER,VertexCount * sizeof(Vec3), Vertexdata, GL_STATIC_DRAW) ; 
+//            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;
+//    }
+//
+//     if(Vertexdata != nullptr){
+//            _GL(glBindBuffer(GL_ARRAY_BUFFER, ID[1])); // Bind our second Vertex Buffer Object  
+//                glBufferData(GL_ARRAY_BUFFER, ColorCount * sizeof(RGBf), Colordata, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
+//                glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
+//                    glEnableVertexAttribArray(1); 
+//            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;}
+//     } 
+//     if(Normals != nullptr){
+//            _GL(glBindBuffer(GL_ARRAY_BUFFER, ID[2])); // Bind our second Vertex Buffer Object  
+//                glBufferData(GL_ARRAY_BUFFER, NormalCount * sizeof(Vec3), Normals, GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
+//                glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0); // Set up our vertex attributes pointer  
+//                    glEnableVertexAttribArray(2); 
+//            glBindBuffer(GL_ARRAY_BUFFER,0);         // Unbind BUFFER_ID since its now bound to the ID;}
+//     }
+//
+//}
+////
+////
+////void Buffer::Bind()
+////{
+////    glBindBuffer(GL_ARRAY_BUFFER, ID[1]);
+////        glColorPointer(3,GL_FLOAT,0,(char *) NULL);
+////            glEnableClientState(GL_COLOR_ARRAY);
+////
+////    glBindBuffer(GL_ARRAY_BUFFER, ID[0]);
+////        glVertexPointer( 3, GL_FLOAT, 0, (char *) NULL);
+////            glEnableClientState(GL_VERTEX_ARRAY);
+////}
+////
+////void Buffer::Unbind(){
+//                glDisableClientState(GL_VERTEX_ARRAY);
+//            glDisableClientState(GL_COLOR_ARRAY);
+//    glBindBuffer(GL_ARRAY_BUFFER,0);
+//}
+////
+
+
+
+
+#if 0
+IndexBuffer::~IndexBuffer()
+{
+    glDeleteBuffers(1, &ID);
+}
+IndexBuffer::IndexBuffer(GLuint *data, GLsizei count)
+           : ElementCount(count),
+             ID(0)
+{
+        Data = new GLuint[count];
+        Data = data;
+
+        glGenBuffers(1,&ID);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ID);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(GLuint), data, GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+}
+void IndexBuffer::Bind()
+{
+  //  glEnableVertexAttribArray();
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ID);
+        glIndexPointer(GL_FLOAT, 0, (void *) NULL);
+        glEnableClientState(GL_INDEX_ARRAY);
+}
+void IndexBuffer::Unbind()
+{
+        glDisableClientState(GL_COLOR_ARRAY);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+}
+
+#else

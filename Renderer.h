@@ -3,57 +3,217 @@
 #include"Vertex.h"
 #include"Window.h"
 
+#define VERTEX_ATTRIB     0
+#define NORMAL_ATTRIB     1
+#define TEXTURE_ATTRIB    2
+#define COLOR_ATTRIB      3
+
 #define BUFFER_OFFSET(i)   ((char *)NULL + (i))
 
-
-using namespace std;
-
-
-class Buffer{
-public:
-        Buffer(){}
-        Buffer(Vec3 *Vertexdata, Vec3 *Colordata, GLsizei count, GLint colorcount);
-        Buffer(Vec3 *Vertexdata, Vec3 *Colordata ,Vec3 *Normals ,GLsizei vcount, GLint colorcount, GLint normalCount);
-
-        GLuint ID[3];
-
-        GLint  VertexCount;
-        GLint  ColorCount;
-        GLint  NormalCount;
-
-      void Bind();
-      void Unbind();
-};  
+#define MAX_OBJECTS    10000
 
 
-class IndexBuffer{
-public:
-        IndexBuffer();
-       ~IndexBuffer();
-        IndexBuffer(GLushort *data,GLsizei count);
-public:
-        void Bind();
-        void Unbind();
-      inline GLushort Get_Count(){return COUNT;}
-  
-private:
-        GLsizei COUNT; // Number of Indices
-        GLuint  BUFFER_ID;
+struct Vertex
+{
+    Vec3 Position;
+    Vec3 Normals;
+    Vec2 Uv;
 };
 
 
-class Renderer{
+class Renderer
+{
 public: 
      
      void Submit();
      void Flush_Renderer();
 
    private:
-       vector<Matrix4> Transformation_Stack;
+
+       std::vector<Matrix4> Transformation_Stack;
 
        void Push(Matrix4 mat4);
        Matrix4 Pop();
 };
+
+
+
+// CONVERT THIS NAME TO SOMETHING LIKE IMAGE SINCE IT DOES NOT MAKE A TEXTURE BUT INSTEAD LOADS AN IMAGE
+// THE TEXTUREBUFFER SHOULD EITHER BECOME TEXTURE OR PROB EVEN BETTER CALLED UV_BUFFER OR SOMETHING AND HAVE 
+// A TEXTURE CLASS WHICH IS ITSELF A COMBINATION OF THE IMAGE AND THE TEXTURE COORDS SO THAT THEY CAN BE LOADED
+// AND UNLOADED AT THE SAME TIME OR SEPERATELY AS NEEDED.
+
+
+class Image
+{
+public:
+        Image();
+       ~Image();
+        Image(const char *filename);
+        Image(GLenum param, const char *filename);
+       
+        GLuint ID;
+       
+        GLubyte header[54];
+        GLuint  dataPos;
+       
+        GLuint  Width,
+                Height,
+                ImageSize;
+       
+        GLubyte *Data;
+       
+        GLuint ElementCount;
+       
+        GLubyte* LoadBMP      (const char *filename);
+       
+        void SetWH(float width, float height);
+        void GenColorTexture(float W, float H);
+        void GenDepthTexture(float W, float H);
+        void Bind();
+        void Unbind();
+};
+
+
+//#include"glm.hpp"
+//#include"Shader.h"
+
+
+class VertexBuffer
+{
+    public:
+        VertexBuffer(){}
+       ~VertexBuffer();
+        VertexBuffer(Vec3 *Vertexdata, GLsizei count);
+
+        GLuint ID;
+        GLint  ElementCount; 
+
+        Vec3  *Data;
+
+        void Bind();
+        void Unbind();
+
+        void Lock(GLenum access);
+        void Unlock();
+
+        GLfloat *Read();
+
+        void Write(GLuint pos, GLfloat data);
+        void Rebuild();
+};  
+
+class IndexBuffer
+{
+    public:
+        IndexBuffer();
+       ~IndexBuffer();
+        IndexBuffer(GLuint *data, GLsizei count);
+
+        GLuint ID;
+        GLuint ElementCount;
+        GLuint *Data;
+
+    public:
+
+        void Bind();
+        void Unbind();
+        void Rebuild();
+
+        inline GLushort Get_Count(){return ElementCount;}
+};
+
+class ColorBuffer
+{
+   public:
+        ColorBuffer(){}
+       ~ColorBuffer();
+        ColorBuffer(Vec3 *ColorData, GLsizei count);
+//        ColorBuffer(Vec4 *ColorData, GLsizei count);
+
+        GLuint ID;
+        GLint  ElementCount; 
+
+        Vec3 *Data;
+
+    public:
+        void Bind();
+        void Unbind();
+};
+
+
+
+
+class NormalBuffer
+{
+    public:
+        NormalBuffer(){}
+       ~NormalBuffer();
+        NormalBuffer(Vec3 *NormalData, GLsizei count);
+
+        GLuint ID;
+        GLint  ElementCount; 
+        Vec3  *Data;
+
+    public:
+        void Bind();
+        void Unbind();
+};
+
+class TextureBuffer
+{
+public:
+    TextureBuffer();
+   ~TextureBuffer();
+    TextureBuffer(Image &img, Vec2 *UVdata, GLsizei count);
+
+    GLuint ID;
+    GLuint ElementCount;
+
+    Vec2     *Data;
+    Image ImageData;
+public:
+
+    void Bind();
+    void Unbind();
+};
+
+//=============================================================================================================================================
+//_______________________________________________________________________________________________________________________________________________________________
+
+class VAOBuffer
+{
+public:
+        VAOBuffer();
+       ~VAOBuffer(){}
+
+       VertexBuffer    *Vertices;
+       IndexBuffer     *Indices;
+       NormalBuffer    *Normals;
+       TextureBuffer   *Textures;
+       ColorBuffer     *Colors;
+
+       void Attach(VertexBuffer  *vertices);
+       void Attach(IndexBuffer   *indices);
+       void Attach(NormalBuffer  *normals);
+       void Attach(TextureBuffer *textures);
+       void Attach(ColorBuffer   *colors);
+
+       void Bind();
+       void Unbind();
+};
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

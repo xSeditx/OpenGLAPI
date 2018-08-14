@@ -1,7 +1,12 @@
 #pragma once
 #include"Collision.h"
 #include"Vertex.h"
-
+//#include"glm.hpp"
+//typedef glm::vec2 Vec2;
+//typedef glm::vec3 Vec3;
+//typedef glm::vec4 Vec4;
+//typedef glm::mat4 Matrix4;
+//
 enum Direction
 {
     NE = 0,

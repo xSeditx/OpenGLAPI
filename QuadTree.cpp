@@ -10,7 +10,7 @@ Node::~Node()
 Node::Node(Vec2 pos, Vec2 size)
     : Position(pos),
       Size(size),
-      Capacity(10),
+      Capacity(5),
       IsLeaf(true),
       Facing(NE)
 {

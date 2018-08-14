@@ -7,6 +7,8 @@
 
 #define Collider       CollisionSphere::Collision_ObjectList 
 #define MaxObjects     1000
+
+
 class Mass{
     public:
         Mass(){}
@@ -58,46 +60,47 @@ class Node;
 class CollisionSphere{
 
 public:
-     CollisionSphere(){}
-     CollisionSphere(Vec3 pos, float radius, int parent);
-     CollisionSphere(const CollisionSphere &other);
-
-     int ID;
-     int ParentID;
-
-     Node *QuadTreeIndex;
-
-     float  Radius;
-
-     Mass Body;
-
-     float  DeltaTime, 
-            PresentTime;
-
-//------------ Getters && Setters ------------------------
-     void   SetPosition(Vec3 pos)   { Body.Position = pos;}
-     void   SetRadius(float radius) { Radius=radius; }
- 
-     Vec3   GetPosition(){return Body.Position;}
-     float  GetRadius(){return Radius;}
-
-//--------------------------------------------------------
-
-     float  Is_Collision(int other);
-     void   CollisionDetection();
-     void   Update();
-
-    struct convert{
-        inline float Pounds_to_Kg  (float lb) { return lb * .453; }
-        inline float Newtons_to_Kg (float N)  { return N / 9.8;   }
-        inline float Kg_to_Newtons (float Kg) { return Kg * 9.8;  }
-    }Convert;
+        CollisionSphere(){}
+        CollisionSphere(Vec3 pos, float radius, int parent);
+        CollisionSphere(const CollisionSphere &other);
+        
+        int ID;
+        int ParentID;
+        
+        Node *QuadTreeIndex;
+        
+        float  Radius;
+        
+        Mass Body;
+        
+        float  DeltaTime, 
+               PresentTime;
+        
+//----------- Getters && Setters ------------------------
+        void   SetPosition(Vec3 pos)   { Body.Position = pos;}
+        void   SetRadius(float radius) { Radius=radius; }
+        
+        Vec3   GetPosition(){return Body.Position;}
+        float  GetRadius(){return Radius;}
+        
+//-------------------------------------------------------
+        
+        float  Is_Collision(int other);
+        void   CollisionDetection();
+        void   Update();
+         
+        struct convert
+        {
+            inline float Pounds_to_Kg  (float lb) { return lb * .453; }
+            inline float Newtons_to_Kg (float N)  { return N / 9.8;   }
+            inline float Kg_to_Newtons (float Kg) { return Kg * 9.8;  }
+        }Convert;
 
 // Static object list
 public:
      static std::vector<CollisionSphere*> Collision_ObjectList;
      static unsigned int  Collision_ObjectCount;
-//     static OctTree Tree;
+
  };
 #include"Camera.h"
-extern int MousePicker(Camera cam, int x, int y);
+extern CollisionSphere* MousePicker(Camera cam, int *dist);

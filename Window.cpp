@@ -118,7 +118,6 @@ void Window::Window_close_callback (GLFWwindow* window)
         if (glfwWindowShouldClose(SCREEN->glCONTEXT))
             glfwSetWindowShouldClose(window, GL_TRUE);
 }
-
 void Window::KeyBoard_Callback     (GLFWwindow *window, int key, int scancode, int action, int mods) 
 { 
 f_TRACE(Print("Keyboard Callback"));
@@ -130,35 +129,34 @@ f_TRACE(Print("Keyboard Callback"));
         SCREEN->KEY_BOARD.Modifications = mods;
         SCREEN->KEY_BOARD.KEY_STATES[key] = glfwGetKey(SCREEN->glCONTEXT,key);	       
   
-  
-       switch (action)
-       {
-       case(GLFW_PRESS):
-               SCREEN->KEY_BOARD.Key = key; 
-               if(SCREEN->Callbacks.CallBackOnKeyDown != nullptr)
-               {
-                   SCREEN->Callbacks.CallBackOnKeyDown(key, scancode, mods , NULL); // Check this Null its suppose to be a Repeat checker
-               }
-           break;
-       
-       case(GLFW_REPEAT):
-               SCREEN->KEY_BOARD.Key = key; 
-               if(SCREEN->Callbacks.CallBackOnKeyHold != nullptr)
-               {
-                   SCREEN->Callbacks.CallBackOnKeyHold(key, scancode, mods); // Check this Null its suppose to be a Repeat checker
-               }
-           break;
-          
-       case(GLFW_RELEASE):  
-               SCREEN->KEY_BOARD.Key = 0; 
-               if(SCREEN->Callbacks.CallBackOnKeyUp != nullptr)
-               {
-                   SCREEN->Callbacks.CallBackOnKeyUp(key, scancode, mods);
-               }
-           break;
-       }
+  //
+  //  switch (action)
+  //  {
+  //  case(GLFW_PRESS):
+  //          SCREEN->KEY_BOARD.Key = key; 
+  //          if(SCREEN->Callbacks.CallBackOnKeyDown != nullptr)
+  //          {
+  //              SCREEN->Callbacks.CallBackOnKeyDown(key, scancode, mods , NULL); // Check this Null its suppose to be a Repeat checker
+  //          }
+  //      break;
+  //  
+  //  case(GLFW_REPEAT):
+  //          SCREEN->KEY_BOARD.Key = key; 
+  //          if(SCREEN->Callbacks.CallBackOnKeyHold != nullptr)
+  //          {
+  //              SCREEN->Callbacks.CallBackOnKeyHold(key, scancode, mods); // Check this Null its suppose to be a Repeat checker
+  //          }
+  //      break;
+  //     
+  //  case(GLFW_RELEASE):  
+  //          SCREEN->KEY_BOARD.Key = 0; 
+  //          if(SCREEN->Callbacks.CallBackOnKeyUp != nullptr)
+  //          {
+  //              SCREEN->Callbacks.CallBackOnKeyUp(key, scancode, mods);
+  //          }
+  //      break;
+  //  }
 }
-
 void Window::Mouse_Callback        (GLFWwindow *window, int button, int action, int mod)
 {
  // TODO: ADD THESE MIDDLE MOUSE AND WHEEL CALLBACKS
@@ -208,7 +206,6 @@ void Window::Mouse_Callback        (GLFWwindow *window, int button, int action, 
         }
     }
 }
-
 void Window::DropFile_callback     (GLFWwindow *window, int count, const char** paths)
 {
         for (int i = 0;  i < count;  i++){
@@ -224,6 +221,7 @@ void Window::MouseMove_Callback    (GLFWwindow *window, double xpos, double ypos
         SCREEN->MOUSE.X = xpos,
         SCREEN->MOUSE.Y = ypos;
 
+
 }
 void Window::Window_Size_Callback  (GLFWwindow *window, int x, int y)
 {
@@ -237,28 +235,30 @@ f_TRACE("WINDOW SIZE CALLBACK"); // I AM CURRENTLY NOT SURE HOW EXACTLY THIS DIF
 
 
  /*========================================================= Set Sync Rate(FPS) of Window =============================================================================*/
-void Window::SYNC(unsigned short rate){
-        SyncRATE = 1000 / rate;
+void Window::SetSyncRate(unsigned short rate)
+{
+    SyncRATE = 1000 / rate;
 }
 
 /*========================================================== Get Sync Rate(FPS) of Window =============================================================================*/
-unsigned short Window::SYNC_RATE(){
-        return SyncRATE;
+unsigned short Window::SYNC_RATE()
+{
+    return SyncRATE;
 }
 
 /*================================================== Free the memory Allocated for the Window ========================================================================*/
-void Window::DESTROY(){
-        glfwDestroyWindow(glCONTEXT);
+void Window::DESTROY()
+{
+    glfwDestroyWindow(glCONTEXT);
 }
 
 /*================================================== Return the current Window position as a Vec2 ====================================================================*/
-Vec2 Window::GET_WINDOW_POSITION(){ 
-        int X,Y;
-        glfwGetWindowPos(SCREEN->glCONTEXT, &X, &Y);
-        return Vec2((int)X,(int)Y);
+Vec2 Window::GET_WINDOW_POSITION()
+{ 
+    int X,Y;
+    glfwGetWindowPos(SCREEN->glCONTEXT, &X, &Y);
+    return Vec2((int)X,(int)Y);
 }
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -268,122 +268,177 @@ Vec2 Window::GET_WINDOW_POSITION(){
 
 //======================================================================================================================================================================
 //__________________________________________________________ Set Window To be API Target _______________________________________________________________________________
-    inline bool Set_Window_Focus(Window *win){
-            SCREEN = win;
-            return true;
-    }
+bool Set_Window_Focus(Window *win)
+{
+    SCREEN = win;
+    return true;
+}
 //======================================================================================================================================================================
 //__________________________________________________________ Swap front and back buffers _______________________________________________________________________________
-	inline void SYNC(){
-/*~~~~~~~~~~~~~~~~~~Get Frames Per Second~~~~~~~~~~~~~~~~~~~~*/
-   
-        if((glfwGetTime() - SCREEN->TIMER) >= 1)
-            {
-                        SCREEN->FPS = SCREEN->FRAME_COUNT;
-                        SCREEN->FRAME_COUNT = 0;
-            }
-            SCREEN->TIMER = glfwGetTime();
-            SCREEN->FRAME_COUNT++;
-/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/		
-            glfwPollEvents();
-            int W,H;
-            glfwGetFramebufferSize(SCREEN->glCONTEXT,&W,&H); //<---------- The pollevents here and in the GAME_LOOP function should be reviewed because even though its working I dont believe its being done correctly;
-            glfwSwapBuffers(SCREEN->glCONTEXT);
-
-    }
-
-//======================================================================================================================================================================
-//____________________________________________________________  Clear the back buffers  ________________________________________________________________________________
-    inline void CLS(){
-        _GL(glClearColor(0,0,GL_Color(255),1));
-        _GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-
-    }
- 
-    inline void CLS(unsigned long color){
-        int R =  color % 255,
-            G = (color / 256)   % 256,
-            B = (color / 65536) % 256;
-        _GL(glClearColor(R,G,B,1));
-        _GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-    }
-
-//======================================================================================================================================================================
-//______________________________________________________  EVENT HANDLER AND MESSAGE DISPATCHER  ________________________________________________________________________
-bool GAME_LOOP(){          /*----- May be overloaded -----*/
-
-    //  SCREEN->MOUSE.MouseMoveX -= SCREEN->MOUSE.X;
-    //  SCREEN->MOUSE.MouseMoveY -= SCREEN->MOUSE.Y;
-
-               SCREEN->MOUSE.OldX = SCREEN->MOUSE.X;
-               SCREEN->MOUSE.Oldy = SCREEN->MOUSE.Y;
-
-            SCREEN->MOUSE.MouseMoveX += SCREEN->MOUSE.X;
-            SCREEN->MOUSE.MouseMoveY += SCREEN->MOUSE.Y;
-
-            glfwPollEvents();
-            if (glfwWindowShouldClose(SCREEN->glCONTEXT))return false;
-
-       //  = key;
-       // 
-       // = scancode;  
-       // SCREEN->KEY_BOARD.Modifications = mods;
-       // SCREEN->KEY_BOARD.KEY_STATES[key] = glfwGetKey(SCREEN->glCONTEXT,key);	
-
-       switch (SCREEN->KEY_BOARD.Action)
-        {
+void SYNC()
+{
+    switch (SCREEN->KEY_BOARD.Action)
+    {
         case(GLFW_PRESS):
- 
-                if(SCREEN->Callbacks.CallBackOnKeyDown != nullptr)
-                {
-                    SCREEN->Callbacks.CallBackOnKeyDown(SCREEN->KEY_BOARD.Key,  
-                                                        SCREEN->KEY_BOARD.Scancode, 
-                                                        SCREEN->KEY_BOARD.Modifications , NULL); // Check this Null its suppose to be a Repeat checker
-                }
-            break;
+        
+            if(SCREEN->Callbacks.CallBackOnKeyDown != nullptr)
+            {
+                SCREEN->Callbacks.CallBackOnKeyDown(SCREEN->KEY_BOARD.Key,  
+                                                    SCREEN->KEY_BOARD.Scancode, 
+                                                    SCREEN->KEY_BOARD.Modifications , NULL); // Check this Null its suppose to be a Repeat checker
+            }
+        break;
         
         case(GLFW_REPEAT):
- 
-                if(SCREEN->Callbacks.CallBackOnKeyHold != nullptr)
-                {
-                    SCREEN->Callbacks.CallBackOnKeyHold(SCREEN->KEY_BOARD.Key,  
-                                                        SCREEN->KEY_BOARD.Scancode, 
-                                                        SCREEN->KEY_BOARD.Modifications); // Check this Null its suppose to be a Repeat checker
-                }
-            break;
+        
+            if(SCREEN->Callbacks.CallBackOnKeyHold != nullptr)
+            {
+                SCREEN->Callbacks.CallBackOnKeyHold(SCREEN->KEY_BOARD.Key,  
+                                                    SCREEN->KEY_BOARD.Scancode, 
+                                                    SCREEN->KEY_BOARD.Modifications); // Check this Null its suppose to be a Repeat checker
+            }
+        break;
            
         case(GLFW_RELEASE):  
-                SCREEN->KEY_BOARD.Key = 0; 
-                if(SCREEN->Callbacks.CallBackOnKeyUp != nullptr)
-                {
-                    SCREEN->Callbacks.CallBackOnKeyUp(SCREEN->KEY_BOARD.Key,  
-                                                      SCREEN->KEY_BOARD.Scancode, 
-                                                      SCREEN->KEY_BOARD.Modifications);
-                }
-            break;
+            SCREEN->KEY_BOARD.Key = 0; 
+            if(SCREEN->Callbacks.CallBackOnKeyUp != nullptr)
+            {
+                SCREEN->Callbacks.CallBackOnKeyUp(SCREEN->KEY_BOARD.Key,  
+                                                  SCREEN->KEY_BOARD.Scancode, 
+                                                  SCREEN->KEY_BOARD.Modifications);
+            }
+        break;
+    }
+
+    if(SCREEN->Callbacks.CallBackOnMouseMove != nullptr)
+    {
+        SCREEN->Callbacks.CallBackOnMouseMove(SCREEN->MOUSE.X, SCREEN->MOUSE.Y, 
+                                              0, 0,
+                                              SCREEN->MOUSE.Button[0], SCREEN->MOUSE.Button[1],SCREEN->MOUSE.Button[2]);
+    }
+/*~~~~~~~~~~~~~~~~~~Get Frames Per Second~~~~~~~~~~~~~~~~~~~~*/
+   
+    if((glfwGetTime() - SCREEN->TIMER) >= 1)
+    {
+        SCREEN->FPS = SCREEN->FRAME_COUNT;
+        SCREEN->FRAME_COUNT = 0;
+    }
+    SCREEN->TIMER = glfwGetTime();
+    SCREEN->FRAME_COUNT++;
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/		
+
+    glfwPollEvents();
+    int W,H;
+    glfwGetFramebufferSize(SCREEN->glCONTEXT,&W,&H); //<---------- The pollevents here and in the GAME_LOOP function should be reviewed because even though its working I dont believe its being done correctly;
+    glfwSwapBuffers(SCREEN->glCONTEXT);
+    
+ }
+ 
+// ====================================================================================================================================================================
+// __________________________________________________________  Clear the back buffers  ________________________________________________________________________________
+ void CLS()
+ {
+     _GL(glClearColor(0,0,GL_Color(255),1));
+     _GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+ 
+ }
+ void CLS(unsigned long color)
+ {
+     int R =  color % 255,
+         G = (color / 256)   % 256,
+         B = (color / 65536) % 256;
+     _GL(glClearColor(R,G,B,1));
+     _GL(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+ }
+ 
+//======================================================================================================================================================================
+//______________________________________________________  EVENT HANDLER AND MESSAGE DISPATCHER  ________________________________________________________________________
+bool GAME_LOOP()
+{          /*----- May be overloaded -----*/
+        
+        SCREEN->MOUSE.OldX = SCREEN->MOUSE.X;
+        SCREEN->MOUSE.Oldy = SCREEN->MOUSE.Y;
+        
+        SCREEN->MOUSE.MouseMoveX += SCREEN->MOUSE.X;
+        SCREEN->MOUSE.MouseMoveY += SCREEN->MOUSE.Y;
+        
+        glfwPollEvents();
+        if (glfwWindowShouldClose(SCREEN->glCONTEXT))
+        {
+            return false;
         }
-
-
-
-
     return true;
 }                               
             
 //======================================================================================================================================================================
 //__________________________________________________________ CLIPBOARD GETTERS AND SETTERS _____________________________________________________________________________
-    const char *GET_CLIPBOARD(){        /*clipboard Getter*/          
-            Print("TEST GET CLIPBOARD FUNCTION");
-            const char* text = glfwGetClipboardString(SCREEN->glCONTEXT);
-            if(text) return text; else 
-        return NULL;
-    } 
-    void  SET_CLIPBOARD  (char *text){  /*clipboard setter*/
-		Print("TEST SET CLIPBOARD FUNCTION");
-			glfwSetClipboardString(SCREEN->glCONTEXT,text);
-	}
+const char *GET_CLIPBOARD()
+{        /*clipboard Getter*/          
+    Print("TEST GET CLIPBOARD FUNCTION");
+    const char* text = glfwGetClipboardString(SCREEN->glCONTEXT);
+    if(text) return text; else 
+  return NULL;
+} 
+void  SET_CLIPBOARD  (char *text)
+{  /*clipboard setter*/
+	Print("TEST SET CLIPBOARD FUNCTION");
+    glfwSetClipboardString(SCREEN->glCONTEXT,text);
+}
 
-//======================================================================================================================================================================
-//__________________________________________________________ Get Buffer Offser Pointer _________________________________________________________________________________
+
+//=================================================================================================================================================================== */
+//____________________________________________________ Error Logger for Printing OpenGL Errors _________________________________________________________________________
+
+bool GLLogCall(const char *function, const char *file, int line)
+{
+    GLenum error = glGetError();
+    if(error != 0)
+    {
+        printf("[OpenGL ERROR]: %s\n",glewGetErrorString(error));
+        std::cout << "Error Number: " <<  error << std::endl;
+        std::cout << "FILE: " << file << std::endl;
+        std::cout << "LINE NUMBER: " << line << std::endl;
+        std::cout << "FUNCTION: " << function << std::endl;
+    
+        system("PAUSE");
+        return false;
+    }
+  return true;
+}
+void GLCheckError()
+{
+   GLenum err;
+   while((err = glGetError()) != GL_NO_ERROR)
+   {
+       std::cout<< "GLCHECKERROR" << err ;
+   }
+
+}
+void GLClearError()
+{
+//     while((glGetError()) != GL_NO_ERROR);
+}
+
+float WrapAngle(float angle)
+{
+    while(angle < 0)   angle += 360;
+    while(angle > 360) angle -= 360;
+    return angle;
+}
+
+void *GetAnyGLFuncAddress(const char *name)
+{
+    void *p = (void *)wglGetProcAddress(name);
+    if(p == 0 ||
+      (p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
+      (p == (void*)-1) )
+    {
+        HMODULE module = LoadLibraryA("opengl32.dll");
+        p = (void *)GetProcAddress(module, name);
+    }
+    
+    return p;
+}
 inline GLvoid* BufferObjectPtr( unsigned int idx )
 {
     return (GLvoid*)( ((char*)NULL) + idx );
@@ -391,59 +446,6 @@ inline GLvoid* BufferObjectPtr( unsigned int idx )
 
 // http://ptgmedia.pearsoncmg.com/images/chap2_0321336798/elementLinks/02fig03.gif // Date of link: 1/ 27/ 2018
 
-//=================================================================================================================================================================== */
-//____________________________________________________ Error Logger for Printing OpenGL Errors _________________________________________________________________________
-
-bool GLLogCall(const char *function, const char *file, int line){
-        GLenum error = glGetError();
-        if(error != 0){
-            printf("[OpenGL ERROR]: %s\n",glewGetErrorString(error));
-            std::cout << "Error Number: " <<  error << std::endl;
-            std::cout << "FILE: " << file << std::endl;
-            std::cout << "LINE NUMBER: " << line << std::endl;
-            std::cout << "FUNCTION: " << function << std::endl;
-
-            system("PAUSE");
-            return false;
-        }
-  return true;
-}
-void GLCheckError(){
-   GLenum err;
-   while((err = glGetError()) != GL_NO_ERROR)
-   {
-     std::cout<< "GLCHECKERROR" << err ;
-   }
-
-}
-void GLClearError(){
-//     while((glGetError()) != GL_NO_ERROR);
-}
 
 //=================================================================================================================================================================== */
 //_____________________________________________________________________________________________________________________________________________________________________
-
-
-
-float WrapAngle(float angle){
-    while(angle < 0)   angle += 360;
-    while(angle > 360) angle -= 360;
-    return angle;
-}
-
-//=================================================================================================================================================================== */
-//_____________________________________________________________________________________________________________________________________________________________________
-
-void *GetAnyGLFuncAddress(const char *name)
-{
-  void *p = (void *)wglGetProcAddress(name);
-  if(p == 0 ||
-    (p == (void*)0x1) || (p == (void*)0x2) || (p == (void*)0x3) ||
-    (p == (void*)-1) )
-  {
-    HMODULE module = LoadLibraryA("opengl32.dll");
-    p = (void *)GetProcAddress(module, name);
-  }
-
-  return p;
-}

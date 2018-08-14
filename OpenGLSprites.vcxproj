@@ -74,7 +74,7 @@
     <LibraryPath>C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glew-2.1.0\lib\Release\Win32;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\OpenGL\Libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\Curt\Documents\Visual Studio 2012\Libraries\freeglut\include;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\SDL2\include;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glfw-3.2.1.bin.WIN32\include;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\OpenGL\Includes;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glew-2.1.0\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glm-0.9.2.7\glm;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\freeglut\include;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\SDL2\include;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glfw-3.2.1.bin.WIN32\include;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\OpenGL\Includes;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glew-2.1.0\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\Curt\Documents\Visual Studio 2012\Libraries\freeglut\lib;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\SDL2\lib\x86;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glfw-3.2.1.bin.WIN32\lib-vc2012;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\OpenGL\Libs;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\OpenGL;C:\Users\Curt\Documents\Visual Studio 2012\Libraries\glew-2.1.0\bin\Release\Win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

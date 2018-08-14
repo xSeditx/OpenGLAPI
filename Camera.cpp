@@ -46,13 +46,14 @@ void Camera::MoveRight(const float &speed)
             Position.x += cos(RADIANS(Rotation.y - 180)) * Speed;
             Position.z += sin(RADIANS(Rotation.y - 180)) * Speed;
 }
-void Camera::Rotate(float x,float y){
+void Camera::Rotate(float x,float y)
+{
         Rotation.y += (x * .8);  
         Rotation.x += (y * .8);
 }
 void Camera::Update()
 {
-        glMatrixMode(GL_MODELVIEW);
+        _GL(glMatrixMode(GL_MODELVIEW));
         glLoadIdentity();
 //  ROTATE the Camera  
         glRotatef(Rotation.x ,  1.0f,  0.0f,  0.0f);
@@ -61,5 +62,5 @@ void Camera::Update()
 //  Move Camera into Position       
         glTranslatef(Position.x, 0., 0.);
         glTranslatef(  0., Position.y,   0.);
-        glTranslatef(  0.,   0., Position.z);
+     _GL( glTranslatef(  0.,   0., Position.z));
 }

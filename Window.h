@@ -7,11 +7,32 @@
 #pragma warning(disable: 4005)	
 #pragma warning(disable: 4305)	
 
+#pragma warning(disable: 4996)	
+#pragma warning(disable: 4099)	
+
+
+#pragma warning(disable: 4715)	
+#pragma warning(disable: 4800)	
+#pragma warning(disable: 4018)	
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <Windows.h>
 #include "vertex.h"
+
+
+class Camera;
+
+//#include"glm.hpp"
+//typedef glm::vec2 Vec2;
+//typedef glm::vec3 Vec3;
+//typedef glm::vec4 Vec4;
+//typedef glm::mat4 Matrix4;
+//
+//typedef glm::vec4 RGBf;
+//typedef glm::vec3 RGB;
+
 
 #define GetRandom( min, max )     ((rand() % (int)(((max) + 1) - (min))) + (min))  
 #define RANDOM(x)                 ((rand() * (1.0 / (1.0 + RAND_MAX))) * (x))
@@ -46,7 +67,6 @@
 #else
       #define f_TRACE(x)
 #endif
-
 
 #ifdef DEBUG
 #define _GL(x)           GLClearError();\
@@ -188,18 +208,8 @@ class CallBack{
        void SetOnUser                         (GLubyte type, int code, void* data1, void* data2);
 };
 
-
-
-
-
-
-
-
-
-
-
-
-class Window{
+class Window
+{
 public:
     Window(){}
     ~Window(){glfwTerminate();}
@@ -223,7 +233,8 @@ public:
        GLuint NAME;
     }FRAME_BUFFER;
 
-    struct MouseProperties{
+    struct MouseProperties
+    {
         bool Button[5];      
         int  Action,
              Modifications;
@@ -238,7 +249,8 @@ public:
     }MOUSE;
 
 
-    struct Key_Board{
+    struct Key_Board
+    {
          int Key, 
              Scancode,  
              Action, 
@@ -247,7 +259,13 @@ public:
       inline bool IsKeyPressed        (int keycode)                              { return KEY_STATES[keycode];}		
     }KEY_BOARD;
 
+
+    Camera   *Cam;
     CallBack Callbacks;
+
+
+
+
 private:
     unsigned short SyncRATE;
     int           FrameRate;
@@ -255,12 +273,15 @@ public:
                int GetFPS(){ return FrameRate;}
 
               void DESTROY             ();
-              void SYNC                (unsigned short);
+              void SetSyncRate         (unsigned short);
+
     unsigned short SYNC_RATE           ();
               Vec2 GET_WINDOW_POSITION ();
        inline void SET_WINDOW_POSITION (GLFWwindow *,int x, int y)                {   glfwSetWindowPos(SCREEN->glCONTEXT, x, y);   }
        inline void SHOW()                                                         {   glfwShowWindow(this->glCONTEXT);             }
        inline void HIDE()                                                         {   glfwHideWindow(this->glCONTEXT);             }
+
+
 
 
 private:	
@@ -282,20 +303,20 @@ static void Window_Size_Callback     (GLFWwindow *window,    int,    int);
 //                                                          HELPER FUNCTIONS                                                                                                                            
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern void SYNC();
-extern void CLS();
-extern void CLS(unsigned long color);
-extern bool GAME_LOOP();
-extern bool Set_Window_Focus  (Window *);
+void SYNC();
+void CLS();
+void CLS(unsigned long color);
+bool GAME_LOOP();
+bool Set_Window_Focus  (Window *);
 
-extern const  char *GET_CLIPBOARD();
-extern        void  SET_CLIPBOARD(char*);
+const  char *GET_CLIPBOARD();
+       void  SET_CLIPBOARD(char*);
 
-extern GLvoid* BufferObjectPtr( unsigned int idx);
+GLvoid* BufferObjectPtr( unsigned int idx);
 
-extern void GLClearError();
-extern void GLCheckError();
-extern bool GLLogCall(const char *function, const char *file, int line);
+void GLClearError();
+void GLCheckError();
+bool GLLogCall(const char *function, const char *file, int line);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //                                                                                                                                                                  
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -307,7 +328,34 @@ extern float WrapAngle(float angle);
 //    http://antongerdelan.net/opengl/raycasting.html
 
 
+#include <chrono>
+typedef std::chrono::high_resolution_clock Clock;
+class Benchmark
+{
+public:
+       Benchmark(){}
+      ~Benchmark(){}
 
+       std::chrono::system_clock::time_point StartTime; 
+       std::chrono::system_clock::time_point  EndTime;
+       
+       char *Name;
+       
+       void Start(char *name)
+       {
+                Name = name;
+                std::cout<< "Started " << name << " Benchmark:\n" << std::endl;
+                StartTime = Clock::now();
+       }        
+       void End(char *endtext)
+       {
+               EndTime = Clock::now();
+               std::cout << "Time: " 
+                         << std::chrono::duration_cast<std::chrono::nanoseconds>(EndTime - StartTime).count()
+                         << " nanoseconds\n" << std::endl;
+               std::cout<< "End " << Name << " Benchmark\n\n" << std::endl;
+       }
+};     
 
 
 

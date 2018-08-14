@@ -22,14 +22,14 @@
 #define   GridSizeZ    50
 #define WX (WorldSizeX * GridSizeX)
 #define WZ (WorldSizeZ * GridSizeZ)
-
-struct Vertex{
-    Vec3 Position;
-    Vec3 Normal;
-    Vec2 Texture;
-};
-
-
+//
+//struct Vertex{
+//    Vec3 Position;
+//    Vec3 Normal;
+//    Vec2 Texture;
+//};
+//
+//
 struct MetaData
 {
     Vec3 Normals;
@@ -61,13 +61,17 @@ public:// OpenGL Stuff
      Sphere(Vec3 pos, float radius, int sectors);
 
      Vec3  Vertices[648];
+     GLuint Indices[972];
      RGBf  Colors  [648];
+
      GLuint VertexCount;
      GLuint ColorCount;
 
-     Buffer Vbo;
+//     Buffer Vbo;
 
-    // Shader SHADER;
+     VAOBuffer VAO;
+
+// Shader SHADER;
 
      void Set_Position(float x, float y, float z)    {Position = Vec3(x,y,z);}
      void Set_Position(Vec3 pos)                     {Position = pos;}
@@ -80,7 +84,7 @@ public:// OpenGL Stuff
 
      Vec3 GetVert(int index){return Vertices[index];}
      void ChangeVert(int index, Vec3 newpos);
-     void Submit(Vec3 *data); // <---- Set this up to Update the Vertex or ColorBuffer
+     void Submit(); // <---- Set this up to Update the Vertex or ColorBuffer
 
      void Update();
      void Render();
@@ -94,6 +98,17 @@ public:
 
      static unsigned int SphereCount;
      static int MakeCollisionSphere(Vec3 pos, float rad, int p);
+
+     static void Batch();
+     static void BatchBuild();
+
+     static std::vector<Vec3>   B_Vertices;
+     static std::vector<GLuint> B_Indices;
+     static std::vector<RGBf>   B_Colors; 
+
+     static VAOBuffer BatchVAO;
+     static bool BatchMade;
+
 };
 
 
@@ -104,6 +119,8 @@ struct Poly{
     Vec3 *P3;
     Vec3 Normal;
 };
+
+
 //============================================================================================================================================
 //__________________________________________ TERRAIN CLASS ___________________________________________________________________________________
 //============================================================================================================================================
@@ -113,44 +130,42 @@ struct Poly{
 
 
 
- class Terrain{
+ class Terrain
+ {
  public:
      Terrain(){}
      Terrain(int w, int d, int gw, int gd);
      ~Terrain();
-      int width; // x-axis
-      int depth; // z-axis, y is up
-      int gridw; // distance between heights on x-axis
-      int gridd; // distance between heights on z-axis
-      float *Heights;
+        int width; // x-axis
+        int depth; // z-axis, y is up
+        int gridw; // distance between heights on x-axis
+        int gridd; // distance between heights on z-axis
+
+        float *Heights;
+        
+int     VertexCount,
+        ColorsCount;
+        
+        VAOBuffer VAO;
+        
+        Vec3 Position; 
+        
+//        MetaData *Data;
+        
+        int IndexCount;
+        int NormalCount;
+
+        int Get_Vertex(int x, int z){ return (x + width * z);}
+
+        float Lerp(float a, float b, float c);
+        float SampleTerrain(float x, float z, Sphere *Ball);
+        Vec3  CollisionDetection(CollisionSphere ball);
+        Vec3  TerrainNormal(float x, float y);
       
-int   VertexCount,
-      ColorsCount;
-      
-      Buffer Vbo;
-      IndexBuffer Ibo;
-
-      Vec3 Position; 
-      Vec3  *Vertices;
-      RGBf  *Colors;
-      Vec3  *Normals;
-
-      MetaData *Data;
-
-      GLushort *Indices;
-      int IndexCount;
-      int NormalCount;
-              
-      Poly Polygons;
-
-      int   Get_Vertex(int x, int z){return (x + width * z);}
-float Lerp(float a, float b, float c);
-float SampleTerrain(float x, float z, Sphere *Ball);
-Vec3  CollisionDetection(CollisionSphere ball);
-Vec3 TerrainNormal(float x, float y);
-
-void Render();
-
+        void Delete();
+        void Render();
+        
+        bool View;
 
 static Terrain *GROUND;
  };
@@ -161,44 +176,47 @@ static Terrain *GROUND;
 extern Vec3 GetNormal(Vec3 v1, Vec3 v2, Vec3 v3);
 
 
-class Mesh{
+class Mesh
+{
 public:
-    Mesh(){}
-    Vec3 Rotation;
-    Vec3 Position;
-    Vec3 Scale;
-
-    GLint List;
-    Vec3  *Vertices;
-    RGBf  *Colors  ;
-
-    GLuint VertexCount;
-    GLuint ColorCount;
-
-    Buffer Vbo;
-
-    void Set_Position(float x, float y, float z)    {Position = Vec3(x,y,z);}
-    void Set_Position(Vec3 pos)                     {Position = pos;}    void Rotate(float x, float y, float z);
-    void Set_Rotation(float x, float y, float z)    {Rotation = Vec3(x,y,z);}    void Render();
-    void SetRotation(Vec3 rot)                      {Rotation = rot;}    void RenderVBO();
-
-    Vec3 Get_Position(){return Position;}
-    Vec3 Get_Rotation(){return Rotation;}
-
-    Vec3 GetVert(int index){return Vertices[index];}
-    
+        Mesh(){}
+        Vec3 Rotation;
+        Vec3 Position;
+        Vec3 Scale;
+        
+        GLint List;
+        Vec3  *Vertices;
+        RGBf  *Colors  ;
+        
+        GLuint VertexCount;
+        GLuint ColorCount;
 
 
+        void Set_Position(float x, float y, float z)    { Position = Vec3(x,y,z);}
+        void Set_Position(Vec3 pos)                     { Position = pos;}       
+        void Set_Rotation(float x, float y, float z)    { Rotation = Vec3(x,y,z);}   
+        void SetRotation(Vec3 rot)                      { Rotation = rot;} 
 
-    enum objecttype{
-        Torus_t,
-        Sphere_t,
-        Cube_t
-    }ObjectType;
+        void Rotate(float x, float y, float z);
+        void Render();
+        void RenderVBO();
+        
+        Vec3 Get_Position(){return Position;}
+        Vec3 Get_Rotation(){return Rotation;}
+        
+        Vec3 GetVert(int index){return Vertices[index];}
+        
+        
+        enum objecttype
+        {
+            Torus_t,
+            Sphere_t,
+            Cube_t
+        }ObjectType;
 };
 
-
-class Torus: public Mesh{
+class Torus: public Mesh
+{
 public:
     Torus(int numc, int numt, float x, float y, float z, float scale);
     Torus(int numc, int numt, float x, float y, float z);
@@ -212,7 +230,8 @@ public:
     void Render();
     void RenderVBO();
 };
-class Cube : public Mesh{
+class Cube : public Mesh
+{
 public:
     Cube(Vec3 pos, float size);
 

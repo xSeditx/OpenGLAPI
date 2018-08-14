@@ -1,5 +1,5 @@
 #include"Shader.h"
-#include"Vertex.h"
+//#include"Vertex.h"
 #include"Window.h"
 #include "Fileutils.h"
 #include<vector>

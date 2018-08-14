@@ -131,21 +131,28 @@ for(CollisionSphere *List: results)
        CollisionDetection();  
  }
 
-int MousePicker(Camera cam, int x, int y)
+CollisionSphere* MousePicker(Camera cam, int *distance)
 {
-    Vec3 StartPosition = cam.Position;
-    Vec3 EndPosition = Vec3::RayCast(StartPosition, Vec3(0.,0.,0.), 100);
-  //  glLineWidth(5.);
-    glBegin(GL_LINES);
-       /// glVertex3f(0.,0.,0.);
-         glVertex3f(100+EndPosition.x,100+EndPosition.y,100+EndPosition.z);
-         glVertex3f(100-StartPosition.x,100-StartPosition.y,100-StartPosition.z);
-       
-       // glVertex3f(10,10,10);
-       // glVertex3f(-100,-100,-100);
-    glEnd();
-    glFlush();
-    return 1;
+  Vec3  EndPosition, 
+        StartPosition = cam.Position;
+
+        for_loop(dist, 200)
+        {
+            EndPosition =   Vec3::RayCast(StartPosition, cam.Rotation, dist);
+            for_loop(i, CollisionSphere::Collision_ObjectCount)
+            {
+                    if(Collider[i]->Body.Position.x < EndPosition.x +  Collider[i]->Radius && Collider[i]->Body.Position.x > EndPosition.x - Collider[i]->Radius &&
+                       Collider[i]->Body.Position.y < EndPosition.y +  Collider[i]->Radius && Collider[i]->Body.Position.y > EndPosition.y - Collider[i]->Radius &&
+                       Collider[i]->Body.Position.z < EndPosition.z +  Collider[i]->Radius && Collider[i]->Body.Position.z > EndPosition.z - Collider[i]->Radius)
+                    {
+                       *distance = dist;
+                       return Collider[i];
+                    }
+                    
+            }
+
+        }
+return false;
 }
 
 //  Acceleration = Force / Mass;

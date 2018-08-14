@@ -194,3 +194,27 @@ ________________________________________________________________________________
   Its been a while so I touched base again with this and added the Quad tree I have been off working on. I also implemented the Callback system I used
   On SDL2 programs to function here just as well to allow simpler user defined callback on keyboard and mouse input
   There is a delay issue with glfw callbacks and a minor delay when mine is first being called
+
+
+
+
+======================================================================================================================================================
+______________________________________________________________________________________________________________________________________________________
+5/23:		MOUSE PICKER ADDED. 
+______________________________________________________________________________________________________________________________________________________
+
+    Its still a work in progress but a simple mouse picker was added so that the user can select given Spheres and move them around. Holding on to the'
+Sphere has presented its own challenges but its just a matter of ensuring its selected and held until mouse release at this point.
+
+
+
+
+
+======================================================================================================================================================
+______________________________________________________________________________________________________________________________________________________
+8/11:		SWITCHED TO MY MORE RECENT RENDERING METHOD
+______________________________________________________________________________________________________________________________________________________
+ 
+    Decided to open this project up for a bit and convert the old rendering method into my new form which manages the buffers all seperately while at
+the same time providing a VAObuffer class which clusters all various buffers into a single unit so binds and unbinds are all performed at the same time 
+with a single call to bind.
